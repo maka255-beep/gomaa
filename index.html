@@ -13,19 +13,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
       :root {
-        /* Luxury Dark Mauve Palette */
-        --color-bg-primary: #2e0235; /* باذنجاني غامق */
-        --color-bg-secondary: #4c1d95; /* بنفسجي عميق */
+        /* Luxury Dark Purple Palette */
+        --color-bg-primary: #2e1065; /* بنفسجي غامق جداً - Dark Purple */
+        --color-bg-secondary: #581c87; /* بنفسجي - Purple */
         --color-accent-gold: #fbbf24; /* ذهبي */
-        --color-accent-fuchsia: #d946ef; /* فوشيا */
+        --color-accent-fuchsia: #db2777; /* وردي متوسط الغمق - Medium Dark Pink */
         
         /* Scrollbar Colors */
-        --scrollbar-track: #1a011f;
-        --scrollbar-thumb: #701a75;
-        --scrollbar-thumb-hover: #c026d3;
+        --scrollbar-track: #1e1b4b;
+        --scrollbar-thumb: #7c3aed;
+        --scrollbar-thumb-hover: #db2777;
         
         /* Glow Effect */
-        --glow-color: rgba(217, 70, 239, 0.6);
+        --glow-color: rgba(219, 39, 119, 0.6); /* Adjusted Glow */
       }
 
       html, body {
@@ -52,7 +52,7 @@
       input:-webkit-autofill:hover, 
       input:-webkit-autofill:focus, 
       input:-webkit-autofill:active {
-          -webkit-box-shadow: 0 0 0 30px #2e0235 inset !important;
+          -webkit-box-shadow: 0 0 0 30px #2e1065 inset !important;
           -webkit-text-fill-color: white !important;
           transition: background-color 5000s ease-in-out 0s;
       }
@@ -60,7 +60,7 @@
       /* Animations */
       .nawaya-intro-text {
         color: white;
-        text-shadow: 0 0 10px var(--glow-color), 0 0 20px rgba(91, 33, 182, 0.4);
+        text-shadow: 0 0 10px var(--glow-color), 0 0 20px rgba(124, 58, 237, 0.4);
         animation: intro-text-animation 1.8s ease-out forwards;
         opacity: 0;
       }
@@ -80,41 +80,52 @@
 
       /* Gradient Classes */
       .bg-theme-header-gradient {
-        background: linear-gradient(90deg, #2e0235 0%, #4c1d95 100%);
+        /* Dominant Dark Purple, fading only slightly to deep mauve at the end */
+        /* Changed from bright pink ending to deep purple/mauve mix */
+        background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 70%, #4c1d95 100%);
         backdrop-filter: blur(10px);
       }
       .bg-theme-gradient-btn {
-        background-image: linear-gradient(to right, #c026d3, #9333ea);
+        /* Smooth subtle gradient for buttons */
+        background-image: linear-gradient(to right, #7c3aed, #db2777);
       }
       .bg-theme-gradient-btn:hover {
-        background-image: linear-gradient(to right, #d946ef, #a855f7);
+        background-image: linear-gradient(to right, #8b5cf6, #ec4899);
       }
 
       /* Card Border Animation */
+      @property --border-angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+      }
+
       .card-animated-border { position: relative; overflow: hidden; }
       .card-animated-border::before {
-        content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        content: ''; position: absolute; inset: 0;
         border-radius: inherit; padding: 2px;
-        background: linear-gradient(45deg, transparent, #d946ef, transparent);
+        background: conic-gradient(from var(--border-angle), #d946ef, #a855f7, #d946ef);
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor; mask-composite: exclude;
         animation: rotate-border 4s linear infinite;
         pointer-events: none;
       }
-      @keyframes rotate-border { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+      @keyframes rotate-border { 
+        to { --border-angle: 360deg; }
+      }
 
       /* Chatbot */
       .chatbot-fab {
         position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 45;
         width: 4rem; height: 4rem; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        color: white; background: linear-gradient(135deg, #d946ef, #9333ea);
-        box-shadow: 0 4px 15px rgba(217, 70, 239, 0.4);
+        color: white; background: linear-gradient(135deg, #7c3aed, #db2777);
+        box-shadow: 0 4px 15px rgba(219, 39, 119, 0.4);
         transition: all 0.3s; border: 2px solid rgba(255,255,255,0.2);
       }
       .chatbot-fab:hover { transform: scale(1.1) rotate(5deg); }
       .glowing-chatbot-animation { animation: glowing-pulse 2.5s infinite; }
-      @keyframes glowing-pulse { 0% { box-shadow: 0 0 10px rgba(217, 70, 239, 0.4); } 50% { box-shadow: 0 0 25px rgba(217, 70, 239, 0.7); } 100% { box-shadow: 0 0 10px rgba(217, 70, 239, 0.4); } }
+      @keyframes glowing-pulse { 0% { box-shadow: 0 0 10px rgba(219, 39, 119, 0.4); } 50% { box-shadow: 0 0 25px rgba(219, 39, 119, 0.7); } 100% { box-shadow: 0 0 10px rgba(219, 39, 119, 0.4); } }
 
       .ltr-input { direction: ltr; text-align: left; }
       .ltr-input::placeholder { direction: rtl; text-align: right; }

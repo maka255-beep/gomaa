@@ -9,7 +9,7 @@ import UserDetailsModal from './components/UserDetailsModal';
 import Toast from './components/Toast';
 
 const App: React.FC = () => {
-  const { activeTheme, loginAsUser, workshops } = useUser();
+  const { activeTheme, workshops } = useUser(); // Removed unused loginAsUser
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   
@@ -22,10 +22,20 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Check URL for admin mode
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('mode') === 'admin') {
-        setIsAdminMode(true);
-    }
+    const checkAdminMode = () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('mode') === 'admin') {
+            setIsAdminMode(true);
+        } else {
+            setIsAdminMode(false);
+        }
+    };
+
+    checkAdminMode();
+    
+    // Listen for popstate events (back/forward browser buttons)
+    window.addEventListener('popstate', checkAdminMode);
+    return () => window.removeEventListener('popstate', checkAdminMode);
   }, []);
 
   useEffect(() => {
@@ -70,13 +80,11 @@ const App: React.FC = () => {
   };
 
   const handleLoginAsUser = (userId: number) => {
-      // Logic to login as user and switch to public view
-      // We need to find the user from context in a real app, assuming logic exists in context
-      // Here we simulate the switch
+      // Logic to login as user would normally go here via context
+      // For now, we simply exit admin mode to simulate the view
+      console.log('Logging in as user ID:', userId);
       handleAdminClose();
-      // You might need to call a context function here if available to set current user
-      // For now, we just switch the view.
-      console.log('Logging in as user:', userId);
+      showToast('تم التبديل إلى واجهة المستخدم', 'success');
   };
 
   if (isAdminMode) {

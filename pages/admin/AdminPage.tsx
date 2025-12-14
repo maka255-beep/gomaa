@@ -1,22 +1,20 @@
 
-import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
-import { CloseIcon, ShieldCheckIcon, ArrowCircleDownIcon, GlobeAltIcon, MenuIcon, UserIcon, LockClosedIcon } from '../../components/icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { CloseIcon, ShieldCheckIcon, MenuIcon, UserIcon, LockClosedIcon } from '../../components/icons';
 import { AdminSidebar } from '../../components/AdminSidebar';
-// FIX: Add Subscription to types import for onViewInvoice prop
 import { User, Subscription } from '../../types';
 import { LanguageProvider, useAdminTranslation } from './AdminTranslationContext';
 
-// --- Lazy Load Components ---
-
-const UserManagementPage = lazy(() => import('./UserManagementPage'));
-const WorkshopManagementPage = lazy(() => import('./WorkshopManagementPage'));
-const TransfersPage = lazy(() => import('./TransfersPage'));
-const CertificatesPage = lazy(() => import('./CertificatesPage'));
-const FinancialCenterPage = lazy(() => import('./FinancialCenterPage'));
-const BroadcastPage = lazy(() => import('./BroadcastPage'));
-const LinksManagementPage = lazy(() => import('./LinksManagementPage'));
-const BoutiqueManagementPage = lazy(() => import('./BoutiqueManagementPage'));
-const AdvancedAnalyticsPage = lazy(() => import('./AdvancedAnalyticsPage'));
+// Direct Imports (Removed Lazy Loading for Stability)
+import UserManagementPage from './UserManagementPage';
+import WorkshopManagementPage from './WorkshopManagementPage';
+import TransfersPage from './TransfersPage';
+import CertificatesPage from './CertificatesPage';
+import FinancialCenterPage from './FinancialCenterPage';
+import BroadcastPage from './BroadcastPage';
+import LinksManagementPage from './LinksManagementPage';
+import BoutiqueManagementPage from './BoutiqueManagementPage';
+import AdvancedAnalyticsPage from './AdvancedAnalyticsPage';
 
 type AdminView = 'users' | 'workshops' | 'transfers' | 'certificates' | 'financialCenter' | 'broadcast' | 'drhope' | 'links' | 'boutiqueManagement' | 'activity';
 
@@ -35,7 +33,7 @@ interface AdminPageProps {
 const AdminLayout: React.FC<AdminPageProps> = (props) => {
     const [currentView, setCurrentView] = useState<AdminView>('users');
     const [isClosing, setIsClosing] = useState(false);
-    const { language, setLanguage, t } = useAdminTranslation();
+    const { language, t } = useAdminTranslation();
     const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const collapseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const mainPanelRef = useRef<HTMLDivElement>(null);
@@ -75,14 +73,13 @@ const AdminLayout: React.FC<AdminPageProps> = (props) => {
 
     const handleSetCurrentView = (view: AdminView) => {
       setCurrentView(view);
-      setIsMobileSidebarOpen(false); // Close sidebar on mobile after navigation
+      setIsMobileSidebarOpen(false);
     };
 
     const renderView = () => {
         switch (currentView) {
             case 'users': return <UserManagementPage showToast={props.showToast} onViewUserProfile={props.onViewUserProfile} />;
             case 'workshops': return <WorkshopManagementPage showToast={props.showToast} onLoginAsUserId={props.onLoginAsUserId} />;
-            // FIX: Pass down onViewInvoice prop to TransfersPage to satisfy its prop requirements.
             case 'transfers': return <TransfersPage showToast={props.showToast} onViewUserProfile={props.onViewUserProfile} onViewInvoice={props.onViewInvoice} />;
             case 'certificates': return <CertificatesPage showToast={props.showToast} />;
             case 'financialCenter': return <FinancialCenterPage showToast={props.showToast} />;
@@ -96,14 +93,12 @@ const AdminLayout: React.FC<AdminPageProps> = (props) => {
     
     return (
         <div className={`fixed inset-0 bg-black/60 z-50 flex transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}>
-            
             <div 
                 className={`bg-gradient-to-br from-[#2e0235] via-[#1e0b2b] to-[#2e0235] text-white shadow-2xl h-full flex transition-transform duration-300 ease-in-out w-full`}
                 style={{
                   transform: isClosing ? `translateX(${language === 'ar' ? '100%' : '-100%'})` : 'translateX(0)',
                 }}
             >
-                {/* Sidebar (Mobile Fixed, Desktop Static) */}
                 <div className={`
                     fixed top-0 h-full z-40
                     md:static md:flex-shrink-0 
@@ -121,9 +116,7 @@ const AdminLayout: React.FC<AdminPageProps> = (props) => {
                     />
                 </div>
                 
-                {/* Content Area */}
                 <div ref={mainPanelRef} className="flex-grow flex flex-col p-4 md:p-8 overflow-y-auto bg-black/10 backdrop-blur-sm">
-                    {/* Mobile Header */}
                     <div className="grid grid-cols-3 md:hidden items-center mb-6 flex-shrink-0 border-b border-white/10 pb-4">
                         <div className="justify-start flex">
                             <button onClick={() => setIsMobileSidebarOpen(true)} className="p-2 -m-2 rounded-full hover:bg-white/10" title="Open Menu">
@@ -131,17 +124,12 @@ const AdminLayout: React.FC<AdminPageProps> = (props) => {
                             </button>
                         </div>
                          <h1 className="text-lg font-bold text-white text-center">{t('adminHeader.title')}</h1>
-                         {/* Empty third cell for spacing */}
                     </div>
-                    {/* View Content */}
                     <div className="flex-grow">
-                        <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-fuchsia-500"></div></div>}>
-                            {renderView()}
-                        </Suspense>
+                        {renderView()}
                     </div>
                 </div>
 
-                {/* Mobile Sidebar Overlay */}
                 <div
                     className={`fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity ${isMobileSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                     onClick={() => setIsMobileSidebarOpen(false)}
@@ -150,7 +138,6 @@ const AdminLayout: React.FC<AdminPageProps> = (props) => {
         </div>
     );
 };
-
 
 const AdminPage: React.FC<AdminPageProps> = (props) => {
     const [username, setUsername] = useState('');

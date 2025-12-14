@@ -65,7 +65,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
     const btnClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 text-sm sm:text-base flex items-center justify-center gap-2 group mx-auto border border-white/10";
 
     return (
-        <section className="hero-section relative text-center py-8 sm:py-20 overflow-hidden">
+        <section className="hero-section relative text-center py-8 sm:py-20 overflow-hidden bg-gradient-to-b from-[#2e1065]/80 via-[#2e1065]/40 to-transparent">
             <div className="container mx-auto px-4 relative z-10">
                 {nextWorkshop && timeLeft ? (
                     <>

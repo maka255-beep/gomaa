@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { InstagramIcon, TwitterIcon, FacebookIcon, SnapchatIcon, TikTokIcon, PhoneIcon, EnvelopeIcon, GlobeAltIcon } from './icons';
+import { InstagramIcon, TwitterIcon, FacebookIcon, SnapchatIcon, TikTokIcon, PhoneIcon, EnvelopeIcon, LockClosedIcon } from './icons';
 import { useUser } from '../context/UserContext';
 import { SocialMediaLinks } from '../types';
 
@@ -23,11 +23,21 @@ const Footer: React.FC<FooterProps> = ({ onShippingClick, onTermsClick, onAboutC
   const { drhopeData } = useUser();
   const { socialMediaLinks } = drhopeData;
 
+  const handleAdminEntry = (e: React.MouseEvent) => {
+      e.preventDefault();
+      // Add ?mode=admin to the URL and reload/update state
+      const url = new URL(window.location.href);
+      url.searchParams.set('mode', 'admin');
+      window.history.pushState({}, '', url);
+      // Trigger a popstate event so App.tsx detects the change
+      window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
   return (
-    <footer className="relative mt-10 pt-6 pb-3 bg-theme-header-gradient text-slate-300 overflow-hidden border-t border-fuchsia-500/30">
+    <footer className="relative mt-10 pt-6 pb-3 bg-theme-header-gradient text-slate-300 overflow-hidden border-t-0 md:border-t border-fuchsia-500/30">
       
-      {/* Top Glow Effect */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fuchsia-400 to-transparent shadow-[0_0_20px_rgba(232,121,249,0.8)]"></div>
+      {/* Top Glow Effect - Hidden on Mobile */}
+      <div className="hidden md:block absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fuchsia-400 to-transparent shadow-[0_0_20px_rgba(232,121,249,0.8)]"></div>
       
       {/* Ambient Background Glows */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 blur-[80px] rounded-full pointer-events-none mix-blend-screen"></div>
@@ -117,10 +127,22 @@ const Footer: React.FC<FooterProps> = ({ onShippingClick, onTermsClick, onAboutC
         </div>
 
         {/* Bottom Bar - Centered Content */}
-        <div className="border-t border-white/10 pt-3 pb-2 flex flex-col items-center justify-center relative">
-          <p dir="ltr" className="text-[9px] text-slate-400 font-medium opacity-60 text-center">
-            &copy; {new Date().getFullYear()} <span className="text-white">Nawaya</span>. All Rights Reserved.
-          </p>
+        {/* FIX: Explicitly removing border on mobile with border-none and adding it back on desktop */}
+        <div className="border-none md:border-t md:border-white/10 pt-3 pb-2 flex flex-col items-center justify-center relative">
+          <div className="flex items-center justify-center gap-2">
+            <p dir="ltr" className="text-[9px] text-slate-400 font-medium opacity-60 text-center">
+                &copy; {new Date().getFullYear()} <span className="text-white">Nawaya</span>. All Rights Reserved.
+            </p>
+            {/* Admin Entry Button - Visible */}
+            <button 
+                onClick={handleAdminEntry}
+                className="text-slate-500 hover:text-fuchsia-500 p-1 flex items-center gap-1 transition-colors"
+                title="دخول المسؤول"
+            >
+                <LockClosedIcon className="w-3 h-3" />
+                <span className="text-[10px] font-bold">Admin</span>
+            </button>
+          </div>
         </div>
       </div>
     </footer>

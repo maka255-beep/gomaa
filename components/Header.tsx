@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
-import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, MenuIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, LoginIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon, UserAddIcon } from './icons';
+import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, MenuIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, LoginIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon, UserAddIcon, InformationCircleIcon } from './icons';
 import { useUser } from '../context/UserContext';
 import NotificationsPanel from './NotificationsPanel';
 
@@ -50,26 +50,34 @@ const Header: React.FC<HeaderProps> = ({
   const [isNotificationsPanelOpen, setIsNotificationsPanelOpen] = useState(false);
   const [isMobileNotificationsOpen, setIsMobileNotificationsOpen] = useState(false);
   const [isMobileDrHopeOpen, setIsMobileDrHopeOpen] = useState(false); // State for mobile accordion
+  const [showGuestNotificationMessage, setShowGuestNotificationMessage] = useState(false); // State for guest message
   const desktopNotificationContainerRef = useRef<HTMLDivElement>(null);
+  const mobileNotificationContainerRef = useRef<HTMLDivElement>(null);
   
   const unreadCount = user ? notifications.filter(n => !n.read).length : 0;
 
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Close desktop panel
       if (window.innerWidth >= 768 && desktopNotificationContainerRef.current && !desktopNotificationContainerRef.current.contains(event.target as Node)) {
         setIsNotificationsPanelOpen(false);
+        setShowGuestNotificationMessage(false);
+      }
+      // Close mobile guest message
+      if (window.innerWidth < 768 && mobileNotificationContainerRef.current && !mobileNotificationContainerRef.current.contains(event.target as Node)) {
+         setShowGuestNotificationMessage(false);
       }
     };
 
-    if (isNotificationsPanelOpen) {
+    if (isNotificationsPanelOpen || showGuestNotificationMessage) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isNotificationsPanelOpen]);
+  }, [isNotificationsPanelOpen, showGuestNotificationMessage]);
 
   const handleCloseMobileMenu = () => setIsMobileMenuOpen(false);
 
@@ -79,17 +87,22 @@ const Header: React.FC<HeaderProps> = ({
   }
   
   const handleNotificationsToggle = () => {
+      if (!user) {
+          setShowGuestNotificationMessage(!showGuestNotificationMessage);
+          return;
+      }
       handleCloseMobileMenu();
       const willOpen = !isNotificationsPanelOpen;
       if (willOpen && unreadCount > 0) {
         markNotificationsAsRead();
       }
       setIsNotificationsPanelOpen(willOpen);
+      setShowGuestNotificationMessage(false);
   }
 
   const handleMobileNotificationsToggle = () => {
     if (!user) {
-        onLoginClick();
+        setShowGuestNotificationMessage(!showGuestNotificationMessage);
         return;
     }
     handleCloseMobileMenu();
@@ -98,12 +111,14 @@ const Header: React.FC<HeaderProps> = ({
       markNotificationsAsRead();
     }
     setIsMobileNotificationsOpen(willOpen);
+    setShowGuestNotificationMessage(false);
   }
 
   const handleHamburgerClick = () => {
     setIsNotificationsPanelOpen(false);
     setIsMobileNotificationsOpen(false);
     setIsMobileMenuOpen(true);
+    setShowGuestNotificationMessage(false);
   }
   
   const navLinkClasses = `py-2 px-4 rounded-md font-semibold transition-all duration-300 text-slate-200 hover:text-white hover:bg-white/10`;
@@ -117,6 +132,34 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const headerBgClass = 'bg-theme-header-gradient shadow-xl border-b border-white/10';
+
+  // Component for Guest Notification Message
+  const GuestNotificationMessage = () => (
+      <div className="absolute top-full left-0 mt-3 w-72 bg-slate-900/95 backdrop-blur-xl border border-fuchsia-500/30 rounded-xl shadow-2xl p-4 z-50 text-right animate-fade-in-up">
+          <div className="flex items-start gap-3">
+              <div className="p-2 bg-fuchsia-500/20 rounded-full text-fuchsia-400 flex-shrink-0">
+                  <InformationCircleIcon className="w-5 h-5" />
+              </div>
+              <div>
+                  <h4 className="text-white font-bold text-sm mb-1">خاص بالمشتركين</h4>
+                  <p className="text-slate-300 text-xs leading-relaxed mb-3">
+                      هذه الميزة متاحة فقط للأعضاء المسجلين لمتابعة تحديثات الورش.
+                  </p>
+                  <button 
+                      onClick={() => {
+                          setShowGuestNotificationMessage(false);
+                          onLoginClick();
+                      }}
+                      className="w-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white text-xs font-bold py-2 rounded-lg transition-colors"
+                  >
+                      تسجيل الدخول
+                  </button>
+              </div>
+          </div>
+          {/* Arrow */}
+          <div className="absolute -top-2 left-4 w-4 h-4 bg-slate-900 border-t border-l border-fuchsia-500/30 transform rotate-45"></div>
+      </div>
+  );
 
   return (
     <>
@@ -202,8 +245,8 @@ const Header: React.FC<HeaderProps> = ({
           {/* Right section */}
           <div className="flex justify-end items-center gap-4">
             
-            {/* Mobile Notifications Icon - Always Visible (Prompts login if guest) */}
-            <div className="md:hidden relative">
+            {/* Mobile Notifications Icon - Always Visible (Prompts guest message if guest) */}
+            <div className="md:hidden relative" ref={mobileNotificationContainerRef}>
                 <button onClick={handleMobileNotificationsToggle} className={`${iconButtonClasses} relative`}>
                     <BellIcon className="w-6 h-6" />
                     {user && unreadCount > 0 && (
@@ -212,23 +255,28 @@ const Header: React.FC<HeaderProps> = ({
                         </span>
                     )}
                 </button>
+                {/* Guest Hint for Mobile */}
+                {!user && showGuestNotificationMessage && <GuestNotificationMessage />}
+            </div>
+
+            {/* Desktop Notifications Icon - Always Visible (Prompts guest message if guest) */}
+            <div className="hidden md:block relative" ref={desktopNotificationContainerRef}>
+                <button onClick={handleNotificationsToggle} className={`${iconButtonClasses} relative`}>
+                    <BellIcon className="w-6 h-6" />
+                    {user && unreadCount > 0 && (
+                        <span className="absolute top-0 right-0 h-4 w-4 bg-fuchsia-600 rounded-full text-[10px] flex items-center justify-center text-white font-bold animate-pulse shadow-lg shadow-fuchsia-500/50">
+                            {unreadCount}
+                        </span>
+                    )}
+                </button>
+                {user && isNotificationsPanelOpen && <NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} />}
+                
+                {/* Guest Hint for Desktop */}
+                {!user && showGuestNotificationMessage && <GuestNotificationMessage />}
             </div>
 
             {user ? (
                 <>
-                    {/* Desktop Notifications - Only when logged in */}
-                    <div className="hidden md:block relative" ref={desktopNotificationContainerRef}>
-                        <button onClick={handleNotificationsToggle} className={`${iconButtonClasses} relative`}>
-                            <BellIcon className="w-6 h-6" />
-                            {unreadCount > 0 && (
-                                <span className="absolute top-0 right-0 h-4 w-4 bg-fuchsia-600 rounded-full text-[10px] flex items-center justify-center text-white font-bold animate-pulse shadow-lg shadow-fuchsia-500/50">
-                                    {unreadCount}
-                                </span>
-                            )}
-                        </button>
-                        {isNotificationsPanelOpen && <NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} />}
-                    </div>
-
                     <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
                         <GlobeAltIcon className="w-6 h-6"/>
                     </button>

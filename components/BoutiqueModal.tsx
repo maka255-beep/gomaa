@@ -73,7 +73,7 @@ const BoutiqueModal: React.FC<BoutiqueModalProps> = ({
             >
               <ShoppingCartIcon className="w-6 h-6"/>
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-600 to-purple-600 text-[10px] font-bold ring-2 ring-[#2e0235] shadow-lg animate-bounce">
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-purple-800 to-pink-600 text-[10px] font-bold ring-2 ring-[#2e0235] shadow-lg animate-bounce">
                   {cartItemCount}
                 </span>
               )}
@@ -133,7 +133,7 @@ const BoutiqueModal: React.FC<BoutiqueModalProps> = ({
                 <p className="text-lg">سلة مشترياتك فارغة.</p>
                 <button 
                     onClick={() => setView('products')} 
-                    className="mt-6 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-2 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-fuchsia-500/30 border border-fuchsia-500/20"
+                    className="mt-6 bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-2 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-500/30 border border-fuchsia-500/20"
                 >
                     تصفح المنتجات
                 </button>
@@ -154,7 +154,7 @@ const BoutiqueModal: React.FC<BoutiqueModalProps> = ({
                 </div>
                 <button 
                 onClick={onCheckout}
-                className="w-full bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-fuchsia-900/30 transform hover:scale-[1.01] border border-fuchsia-500/20"
+                className="w-full bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-purple-900/30 transform hover:scale-[1.01] border border-fuchsia-500/20"
                 >
                 الانتقال إلى الدفع الآمن
                 </button>

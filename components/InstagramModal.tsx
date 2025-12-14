@@ -48,7 +48,7 @@ const InstagramModal: React.FC<InstagramModalProps> = ({ isOpen, onClose }) => {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full flex items-center justify-center gap-x-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-fuchsia-800/40 text-sm border border-fuchsia-500/20"
+                      className="w-full flex items-center justify-center gap-x-2 bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-800/40 text-sm border border-fuchsia-500/20"
                   >
                       <InstagramIcon className="w-5 h-5" />
                       <span>{link.title}</span>

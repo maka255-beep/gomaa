@@ -20,7 +20,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           <p className="text-xl font-bold text-fuchsia-400">{product.price.toFixed(2)} <span className="text-sm">درهم</span></p>
           <button 
             onClick={onAddToCart}
-            className="flex items-center gap-x-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 text-sm border border-fuchsia-500/20"
+            className="flex items-center gap-x-2 bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/50 text-sm border border-fuchsia-500/20"
             aria-label={`إضافة ${product.name} إلى السلة`}
           >
             <ShoppingCartIcon className="w-5 h-5"/>

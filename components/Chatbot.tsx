@@ -151,7 +151,7 @@ const Chatbot: React.FC = () => {
           <div className="flex-grow p-4 overflow-y-auto space-y-4 custom-scrollbar">
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`message-bubble ${msg.role === 'user' ? 'message-bubble-user bg-gradient-to-r from-fuchsia-600 to-purple-600' : 'message-bubble-model bg-white/10 border-white/5'}`}>
+                <div className={`message-bubble ${msg.role === 'user' ? 'message-bubble-user bg-gradient-to-r from-purple-800 to-pink-600' : 'message-bubble-model bg-white/10 border-white/5'}`}>
                   {msg.text}
                 </div>
               </div>
@@ -177,7 +177,7 @@ const Chatbot: React.FC = () => {
               />
               <button
                 type="submit"
-                className="absolute left-1 top-1 bottom-1 w-10 flex items-center justify-center rounded-full bg-gradient-to-tr from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="absolute left-1 top-1 bottom-1 w-10 flex items-center justify-center rounded-full bg-gradient-to-tr from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isLoading}
                 aria-label="إرسال"
               >

@@ -201,7 +201,7 @@ const WorkshopDetailsModal: React.FC<WorkshopDetailsModalProps> = ({ workshop, o
                     </button>
                     <button 
                         onClick={handleEnrollClick}
-                        className="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-fuchsia-500/30 text-sm border border-fuchsia-500/20"
+                        className="bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-purple-900/30 hover:shadow-pink-500/50 text-sm border border-fuchsia-500/20"
                     >
                         إهداء الورشة لنفسي
                     </button>

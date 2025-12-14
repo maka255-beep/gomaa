@@ -61,13 +61,15 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
         return () => clearInterval(timer);
     }, [nextWorkshop]);
 
+    // Updated Button Gradient: from-purple-800 to-pink-600
+    const btnClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 text-sm sm:text-base flex items-center justify-center gap-2 group mx-auto border border-white/10";
+
     return (
         <section className="hero-section relative text-center py-8 sm:py-20 overflow-hidden">
             <div className="container mx-auto px-4 relative z-10">
                 {nextWorkshop && timeLeft ? (
                     <>
                         <h2 className="text-[10px] sm:text-xs font-bold text-fuchsia-600 tracking-widest uppercase mb-1 sm:mb-2">الورشة المباشرة القادمة</h2>
-                        {/* Font size reduced here from text-lg sm:text-xl to text-base sm:text-lg */}
                         <h1 className="text-base sm:text-lg font-bold text-slate-900 mb-2 sm:mb-4">{nextWorkshop.title}</h1>
                         <p className="text-xs text-slate-600 mb-4 sm:mb-6 font-semibold">{nextWorkshop.instructor}</p>
                         
@@ -83,7 +85,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
 
                         <button
                             onClick={() => onOpenWorkshopDetails(nextWorkshop.id)}
-                            className="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 text-xs sm:text-sm flex items-center justify-center gap-2 group mx-auto border border-fuchsia-500/20"
+                            className={btnClasses}
                         >
                             <span>عرض التفاصيل والاشتراك</span>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transform transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">
@@ -93,7 +95,6 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                     </>
                 ) : (
                     <>
-                        {/* Also reducing the default intro text size slightly for consistency */}
                         <h1 className="text-xl sm:text-3xl font-black mb-3 sm:mb-4 nawaya-intro-text text-glow-animation !text-slate-900" style={{ animationDelay: '0s', color: '#0f172a' }}>
                             الحمد لله الذي بنعمته تتم الصالحات
                         </h1>
@@ -103,7 +104,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                         <div className="nawaya-intro-text" style={{ animationDelay: '0.4s' }}>
                             <button
                                 onClick={onExploreClick}
-                                className="bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 text-sm sm:text-base flex items-center justify-center gap-2 group mx-auto border border-fuchsia-500/20"
+                                className={btnClasses}
                             >
                                 <span>استكشف الورش الآن</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transform transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">

@@ -23,7 +23,7 @@ interface HeaderProps {
 }
 
 const LogoButton: React.FC<{ logoUrl?: string; onClick: () => void }> = ({ logoUrl, onClick }) => {
-  const btnClasses = `group w-14 h-14 md:w-20 md:h-20 flex items-center justify-center rounded-full text-xl font-bold tracking-wider transition-all duration-300 transform hover:scale-110 focus:outline-none shadow-lg hover:shadow-xl bg-white/5 text-fuchsia-400 border border-white/10`;
+  const btnClasses = `group w-14 h-14 md:w-20 md:h-20 flex items-center justify-center rounded-full text-xl font-bold tracking-wider transition-all duration-300 transform hover:scale-110 focus:outline-none shadow-lg hover:shadow-xl bg-white/5 text-pink-400 border border-white/10`;
 
   return (
     <button
@@ -102,9 +102,10 @@ const Header: React.FC<HeaderProps> = ({
   }
   
   const navLinkClasses = `py-2 px-4 rounded-md font-semibold transition-all duration-300 text-slate-200 hover:text-white hover:bg-white/10`;
-  const iconButtonClasses = `p-2 rounded-full transition-all duration-300 transform hover:scale-110 text-slate-200 hover:bg-white/10 hover:text-fuchsia-400`;
-  const primaryButtonClasses = "bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 border border-fuchsia-500/20 text-sm";
-  const outlineButtonClasses = "border border-white/20 hover:bg-white/10 text-white font-bold py-2.5 px-5 rounded-xl transition-all duration-300 text-sm hover:border-fuchsia-400";
+  const iconButtonClasses = `p-2 rounded-full transition-all duration-300 transform hover:scale-110 text-slate-200 hover:bg-white/10 hover:text-pink-400`;
+  // UPDATED: Darker gradient for buttons (Purple-800 -> Pink-600)
+  const primaryButtonClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 border border-white/10 text-sm";
+  const outlineButtonClasses = "border border-white/20 hover:bg-white/10 text-white font-bold py-2.5 px-5 rounded-xl transition-all duration-300 text-sm hover:border-pink-400";
 
   const headerLinks = drhopeData.headerLinks || {
     drhope: 'دكتور هوب',
@@ -113,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   // Always solid background using theme variables
-  const headerBgClass = 'bg-theme-header-gradient shadow-xl border-b border-fuchsia-500/20';
+  const headerBgClass = 'bg-theme-header-gradient shadow-xl border-b border-white/10';
 
   return (
     <>
@@ -150,35 +151,35 @@ const Header: React.FC<HeaderProps> = ({
                   <ChevronDownIcon className="w-4 h-4 transition-transform group-hover:rotate-180" />
                 </button>
                 {/* Dropdown Menu */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform transition-all duration-300 ease-in-out group-hover:translate-y-2 translate-y-4 bg-theme-header-gradient backdrop-blur-2xl rounded-xl shadow-2xl mt-2 p-2 w-[480px] border border-fuchsia-500/30 z-10 ring-1 ring-black/20">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform transition-all duration-300 ease-in-out group-hover:translate-y-2 translate-y-4 bg-theme-header-gradient backdrop-blur-2xl rounded-xl shadow-2xl mt-2 p-2 w-[480px] border border-white/10 z-10 ring-1 ring-black/20">
                   <div className="grid grid-cols-2 gap-2 text-slate-200">
                     {/* Menu Items */}
                     <a onClick={onShowVideo} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <VideoIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <VideoIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">من هي دكتور هوب</span><span className="text-xs text-slate-400 block">تعرفي على مسيرتها</span></div>
                     </a>
                      <a onClick={onShowPhotoAlbum} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <CollectionIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <CollectionIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">ألبوم الصور</span><span className="text-xs text-slate-400 block">لحظات من ورشاتنا</span></div>
                     </a>
                     <a onClick={onShowInstagram} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <InstagramIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <InstagramIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">بثوث انستجرام</span><span className="text-xs text-slate-400 block">البثوث المباشرة والمسجلة</span></div>
                     </a>
                      <a onClick={onRequestConsultationClick} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <ChatBubbleIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <ChatBubbleIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">طلب استشارة</span><span className="text-xs text-slate-400 block">جلسة خاصة</span></div>
                     </a>
                     <a onClick={onBoutiqueClick} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <ShoppingCartIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <ShoppingCartIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">البوتيك</span><span className="text-xs text-slate-400 block">منتجات مختارة</span></div>
                     </a>
                      <a onClick={() => onNavigate(Page.REVIEWS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <ChatBubbleLeftRightIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <ChatBubbleLeftRightIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">{headerLinks.reviews}</span><span className="text-xs text-slate-400 block">ماذا قالت المشاركات</span></div>
                     </a>
                      <a onClick={() => onNavigate(Page.PARTNERS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <UsersIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <UsersIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">شركاء النجاح</span><span className="text-xs text-slate-400 block">من يدعمنا</span></div>
                     </a>
                   </div>
@@ -208,13 +209,13 @@ const Header: React.FC<HeaderProps> = ({
                 <button onClick={handleNotificationsToggle} className={`hidden md:inline-flex ${iconButtonClasses} relative group`}>
                     <BellIcon className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12"/>
                     {unreadCount > 0 && (
-                        <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-fuchsia-500 ring-2 ring-slate-900 animate-pulse"></span>
+                        <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-pink-500 ring-2 ring-slate-900 animate-pulse"></span>
                     )}
                 </button>
                  <button onClick={handleMobileNotificationsToggle} className={`md:hidden ${iconButtonClasses} relative group`}>
                     <BellIcon className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12"/>
                     {unreadCount > 0 && (
-                        <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-fuchsia-500 ring-2 ring-slate-900 animate-pulse"></span>
+                        <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-pink-500 ring-2 ring-slate-900 animate-pulse"></span>
                     )}
                 </button>
                 {isNotificationsPanelOpen && <div className="hidden md:block"><NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} /></div>}
@@ -241,12 +242,12 @@ const Header: React.FC<HeaderProps> = ({
           </div>
 
         </nav>
-        {/* Animated Line at bottom of header - always visible now */}
+        {/* Animated Line at bottom of header - updated color */}
         <div
             className="absolute bottom-0 left-0 right-0 h-[1px] opacity-100"
             style={{
-              background: 'linear-gradient(90deg, transparent, rgba(217, 70, 239, 0.5), transparent)',
-              boxShadow: '0 0 10px rgba(217, 70, 239, 0.3)'
+              background: 'linear-gradient(90deg, transparent, rgba(219, 39, 119, 0.5), transparent)',
+              boxShadow: '0 0 10px rgba(219, 39, 119, 0.3)'
             }}
         />
       </header>
@@ -260,12 +261,12 @@ const Header: React.FC<HeaderProps> = ({
         ></div>
       )}
       <div 
-        className={`fixed top-0 right-0 h-full w-4/5 max-w-sm bg-theme-header-gradient backdrop-blur-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden border-l border-fuchsia-500/20 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-0 right-0 h-full w-4/5 max-w-sm bg-theme-header-gradient backdrop-blur-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden border-l border-white/10 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
         role="dialog"
         aria-modal="true"
       >
         <div className="flex justify-between items-center p-4 border-b border-white/10 bg-black/10">
-          <h2 className="text-lg font-bold text-fuchsia-400">القائمة الرئيسية</h2>
+          <h2 className="text-lg font-bold text-pink-400">القائمة الرئيسية</h2>
           <button 
             onClick={handleCloseMobileMenu} 
             className="group p-2 rounded-full text-slate-300 hover:bg-white/20"
@@ -281,7 +282,7 @@ const Header: React.FC<HeaderProps> = ({
                     className="group w-full flex justify-between items-center px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
                 >
                     <span className="flex items-center gap-x-4">
-                        <UsersIcon className="w-6 h-6 text-fuchsia-400 transition-transform duration-300 group-hover:scale-110" />
+                        <UsersIcon className="w-6 h-6 text-pink-400 transition-transform duration-300 group-hover:scale-110" />
                         <span>دكتور هوب</span>
                     </span>
                     <ChevronDownIcon className={`h-5 w-5 transition-transform duration-300 group-hover:scale-125 ${isExploreMenuOpen ? 'rotate-180' : ''}`} />
@@ -289,26 +290,26 @@ const Header: React.FC<HeaderProps> = ({
                 <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExploreMenuOpen ? 'max-h-[500px]' : 'max-h-0'}`}>
                     <div className="pr-4 pt-2 space-y-1 bg-black/10 rounded-lg my-1">
                         <a onClick={() => handleMobileLinkClick(onShowVideo)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <VideoIcon className="w-5 h-5 text-fuchsia-400/80"/> <span>من هي دكتور هوب</span>
+                            <VideoIcon className="w-5 h-5 text-pink-400/80"/> <span>من هي دكتور هوب</span>
                         </a>
                         <a onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <CollectionIcon className="w-5 h-5 text-fuchsia-400/80"/><span>عرض ألبوم الصور</span>
+                            <CollectionIcon className="w-5 h-5 text-pink-400/80"/><span>عرض ألبوم الصور</span>
                         </a>
                         <a onClick={() => handleMobileLinkClick(onShowInstagram)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                        <InstagramIcon className="w-5 h-5 text-fuchsia-400/80"/> <span>بثوث انستجرام</span>
+                        <InstagramIcon className="w-5 h-5 text-pink-400/80"/> <span>بثوث انستجرام</span>
                         </a>
                         <div className="h-px bg-white/10 my-1 mx-4"></div>
                         <a onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <ChatBubbleIcon className="w-5 h-5 text-fuchsia-400/80" /> <span>طلب استشارة</span>
+                            <ChatBubbleIcon className="w-5 h-5 text-pink-400/80" /> <span>طلب استشارة</span>
                         </a>
                         <a onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <ShoppingCartIcon className="w-5 h-5 text-fuchsia-400/80" /> <span>البوتيك</span>
+                            <ShoppingCartIcon className="w-5 h-5 text-pink-400/80" /> <span>البوتيك</span>
                         </a>
                         <a onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <ChatBubbleLeftRightIcon className="w-5 h-5 text-fuchsia-400/80" /> <span>{headerLinks.reviews}</span>
+                            <ChatBubbleLeftRightIcon className="w-5 h-5 text-pink-400/80" /> <span>{headerLinks.reviews}</span>
                         </a>
                         <a onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <UsersIcon className="w-5 h-5 text-fuchsia-400/80" /> <span>شركاء النجاح</span>
+                            <UsersIcon className="w-5 h-5 text-pink-400/80" /> <span>شركاء النجاح</span>
                         </a>
                     </div>
                 </div>
@@ -316,7 +317,7 @@ const Header: React.FC<HeaderProps> = ({
 
             {user && (
               <a onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-white/10 cursor-pointer transition-colors">
-                  <UserIcon className="w-6 h-6 text-fuchsia-400 transition-transform duration-300 group-hover:scale-110" />
+                  <UserIcon className="w-6 h-6 text-pink-400 transition-transform duration-300 group-hover:scale-110" />
                   <span>{headerLinks.profile}</span>
               </a>
             )}
@@ -333,7 +334,7 @@ const Header: React.FC<HeaderProps> = ({
                             <LoginIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
                             <span>تسجيل الدخول</span>
                         </a>
-                        <a onClick={() => handleMobileLinkClick(onRegisterClick)} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-bold text-fuchsia-300 hover:text-white hover:bg-fuchsia-500/20 cursor-pointer transition-colors">
+                        <a onClick={() => handleMobileLinkClick(onRegisterClick)} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-bold text-pink-300 hover:text-white hover:bg-pink-500/20 cursor-pointer transition-colors">
                             <UserAddIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
                             <span>إنشاء حساب جديد</span>
                         </a>
@@ -352,7 +353,7 @@ const Header: React.FC<HeaderProps> = ({
         ></div>
       )}
       <div 
-        className={`fixed top-0 right-0 h-full w-4/5 max-w-sm bg-theme-header-gradient backdrop-blur-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden border-l border-fuchsia-500/20 ${isMobileNotificationsOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed top-0 right-0 h-full w-4/5 max-w-sm bg-theme-header-gradient backdrop-blur-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden border-l border-white/10 ${isMobileNotificationsOpen ? 'translate-x-0' : 'translate-x-full'}`}
         role="dialog"
         aria-modal="true"
       >

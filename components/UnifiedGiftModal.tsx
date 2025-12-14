@@ -115,14 +115,14 @@ const UnifiedGiftModal: React.FC<UnifiedGiftModalProps> = ({ workshop, selectedP
                 <div className="p-4 flex gap-3 bg-black/20">
                     <button 
                         onClick={() => setActiveTab('friend')}
-                        className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 border ${activeTab === 'friend' ? 'bg-fuchsia-600 border-fuchsia-400 text-white shadow-[0_0_15px_rgba(217,70,239,0.4)]' : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5'}`}
+                        className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 border ${activeTab === 'friend' ? 'bg-purple-800 border-purple-600 text-white shadow-[0_0_15px_rgba(107,33,168,0.4)]' : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5'}`}
                     >
                         <UserIcon className="w-5 h-5"/>
                         <span>لصديقة (أو أكثر)</span>
                     </button>
                     <button 
                         onClick={() => setActiveTab('fund')}
-                        className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 border ${activeTab === 'fund' ? 'bg-fuchsia-600 border-fuchsia-400 text-white shadow-[0_0_15px_rgba(217,70,239,0.4)]' : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5'}`}
+                        className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 border ${activeTab === 'fund' ? 'bg-purple-800 border-purple-600 text-white shadow-[0_0_15px_rgba(107,33,168,0.4)]' : 'bg-transparent border-transparent text-slate-400 hover:bg-white/5'}`}
                     >
                         <HeartIcon className="w-5 h-5"/>
                         <span>صندوق الدعم</span>
@@ -226,7 +226,7 @@ const UnifiedGiftModal: React.FC<UnifiedGiftModalProps> = ({ workshop, selectedP
                                     <p className="text-5xl font-bold text-white">{fundSeats}</p>
                                     <p className="text-sm text-slate-400 mt-1">مقاعد</p>
                                 </div>
-                                <button onClick={() => setFundSeats(fundSeats + 1)} className="w-12 h-12 rounded-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-bold text-2xl transition-colors shadow-lg shadow-fuchsia-900/30">+</button>
+                                <button onClick={() => setFundSeats(fundSeats + 1)} className="w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-2xl transition-colors shadow-lg shadow-purple-900/30">+</button>
                             </div>
                             
                             {error && <p className="text-red-400 text-sm text-center bg-red-900/20 p-2 rounded border border-red-500/20">{error}</p>}
@@ -242,7 +242,7 @@ const UnifiedGiftModal: React.FC<UnifiedGiftModalProps> = ({ workshop, selectedP
                     </div>
                     <button 
                         onClick={handleProceed}
-                        className="w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-transform hover:scale-[1.01] flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 border border-fuchsia-500/20"
+                        className="w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-transform hover:scale-[1.01] flex items-center justify-center gap-2 bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 border border-fuchsia-500/20"
                     >
                         {activeTab === 'friend' ? <GiftIcon className="w-6 h-6"/> : <HeartIcon className="w-6 h-6"/>}
                         <span>متابعة الدفع ({activeTab === 'friend' ? 'إهداء' : 'دعم'})</span>

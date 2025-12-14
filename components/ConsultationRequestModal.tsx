@@ -70,7 +70,7 @@ const ConsultationRequestModal: React.FC<ConsultationRequestModalProps> = ({ isO
 
             <footer className="pt-2 flex justify-end gap-3">
               <button type="button" onClick={onClose} className="py-2.5 px-6 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-sm transition-colors">إلغاء</button>
-              <button type="submit" className="py-2.5 px-8 rounded-xl bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold text-sm shadow-lg shadow-fuchsia-900/40 transition-all transform hover:scale-105">
+              <button type="submit" className="py-2.5 px-8 rounded-xl bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold text-sm shadow-lg shadow-purple-900/40 transition-all transform hover:scale-105">
                 إرسال الطلب
               </button>
             </footer>

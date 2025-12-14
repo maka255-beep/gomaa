@@ -62,7 +62,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({ isOpen, onClose, use
                 <header className="p-3 bg-slate-800 flex justify-between items-center flex-shrink-0 rounded-t-lg">
                     <h2 className="text-lg font-bold text-white">معاينة الفاتورة الضريبية</h2>
                     <div className="flex items-center gap-x-3">
-                         <button onClick={handlePrint} className="flex items-center gap-x-2 py-2 px-3 rounded-md bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold text-sm shadow-lg shadow-fuchsia-500/30 transition-all transform hover:scale-105 border border-fuchsia-500/20">
+                         <button onClick={handlePrint} className="flex items-center gap-x-2 py-2 px-3 rounded-md bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold text-sm shadow-lg shadow-purple-500/30 transition-all transform hover:scale-105 border border-fuchsia-500/20">
                             <PrintIcon className="w-5 h-5" />
                             <span>طباعة / حفظ</span>
                         </button>

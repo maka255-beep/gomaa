@@ -67,7 +67,7 @@ const PayItForwardModal: React.FC<PayItForwardModalProps> = ({ workshop, onClose
                         <span className="text-xl font-bold text-white w-8 text-center">{seatCount}</span>
                         <button 
                             onClick={handleIncrement}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white transition-colors font-bold text-lg"
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-purple-600 hover:bg-purple-500 text-white transition-colors font-bold text-lg"
                         >
                             +
                         </button>
@@ -84,7 +84,7 @@ const PayItForwardModal: React.FC<PayItForwardModalProps> = ({ workshop, onClose
         <footer className="p-6 pt-2 pb-8">
             <button 
                 onClick={handleProceed}
-                className="w-full bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-fuchsia-500/30 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-x-2 border border-fuchsia-500/20"
+                className="w-full bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-purple-900/30 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-x-2 border border-fuchsia-500/20"
             >
                 <span>متابعة للدفع</span>
                 <UsersIcon className="w-5 h-5" />

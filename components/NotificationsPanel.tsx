@@ -59,14 +59,14 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ onClose, isMobi
 
   if (isMobile) {
     return (
-      <div className="h-full flex flex-col bg-gradient-to-b from-[#2e0235] to-[#1e0b2b]">
+      <div className="h-full flex flex-col bg-theme-header-gradient">
         {content}
       </div>
     )
   }
 
   return (
-    <div className="absolute top-full right-0 mt-4 w-80 sm:w-96 bg-gradient-to-br from-[#2e0235] via-[#2c0838] to-[#1e0b2b] rounded-2xl shadow-2xl border border-fuchsia-500/30 z-50 overflow-hidden ring-1 ring-black/50">
+    <div className="absolute top-full right-0 mt-4 w-80 sm:w-96 bg-theme-header-gradient rounded-2xl shadow-2xl border border-fuchsia-500/30 z-50 overflow-hidden ring-1 ring-black/50">
       {content}
     </div>
   );

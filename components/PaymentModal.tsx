@@ -121,10 +121,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onCardPaym
         }
     };
     
+    // Updated Method Button to darker gradient
     const methodButtonClass = (method: PaymentMethod) =>
         `flex-1 py-4 px-2 text-sm font-bold rounded-xl transition-all border flex items-center justify-center gap-x-2 relative overflow-hidden group ${
             selectedMethod === method
-            ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 border-fuchsia-400 text-white shadow-lg shadow-fuchsia-500/20'
+            ? 'bg-gradient-to-r from-purple-800 to-pink-600 border-pink-400 text-white shadow-lg shadow-purple-500/20'
             : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:border-white/20'
         }`;
 
@@ -141,7 +142,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onCardPaym
                 
                 <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6 space-y-6 custom-scrollbar">
                     <div className="bg-white/5 p-6 rounded-2xl border border-white/10">
-                        <h3 className="text-xs font-bold text-fuchsia-300 uppercase tracking-wider mb-2">
+                        <h3 className="text-xs font-bold text-pink-300 uppercase tracking-wider mb-2">
                             {paymentType === 'payItForward' ? 'تفاصيل المساهمة' : 'ملخص الطلب'}
                         </h3>
                         <p className="font-bold text-lg text-white">{itemTitle}</p>
@@ -195,29 +196,29 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onCardPaym
                                <div>
                                    <label className="text-xs font-bold text-slate-400 mb-1.5 block">رقم البطاقة</label>
                                    <div className="relative">
-                                        <input type="tel" value={cardNumber} onChange={handleCardNumberChange} placeholder="0000 0000 0000 0000" className="w-full p-3 bg-white/5 border border-white/10 rounded-lg ltr-input focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500 transition-all text-white placeholder-slate-600" maxLength={19} required/>
+                                        <input type="tel" value={cardNumber} onChange={handleCardNumberChange} placeholder="0000 0000 0000 0000" className="w-full p-3 bg-white/5 border border-white/10 rounded-lg ltr-input focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all text-white placeholder-slate-600" maxLength={19} required/>
                                         <LockClosedIcon className="w-4 h-4 text-slate-500 absolute right-3 top-3.5"/>
                                    </div>
                                </div>
                                <div>
                                    <label className="text-xs font-bold text-slate-400 mb-1.5 block">الاسم على البطاقة</label>
-                                   <input type="text" value={cardName} onChange={e => setCardName(e.target.value)} placeholder="Full Name" className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500 transition-all text-white placeholder-slate-600" required/>
+                                   <input type="text" value={cardName} onChange={e => setCardName(e.target.value)} placeholder="Full Name" className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all text-white placeholder-slate-600" required/>
                                </div>
                                <div className="grid grid-cols-2 gap-4">
                                    <div>
                                        <label className="text-xs font-bold text-slate-400 mb-1.5 block">تاريخ الانتهاء</label>
-                                       <input type="text" value={cardExpiry} onChange={handleExpiryChange} placeholder="MM / YY" className="w-full p-3 bg-white/5 border border-white/10 rounded-lg ltr-input focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500 transition-all text-white placeholder-slate-600" required/>
+                                       <input type="text" value={cardExpiry} onChange={handleExpiryChange} placeholder="MM / YY" className="w-full p-3 bg-white/5 border border-white/10 rounded-lg ltr-input focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all text-white placeholder-slate-600" required/>
                                    </div>
                                    <div>
                                        <label className="text-xs font-bold text-slate-400 mb-1.5 block">CVV</label>
-                                       <input type="tel" value={cardCvv} onChange={e => setCardCvv(e.target.value.replace(/\D/g, ''))} placeholder="123" className="w-full p-3 bg-white/5 border border-white/10 rounded-lg ltr-input focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500 transition-all text-white placeholder-slate-600" maxLength={4} required/>
+                                       <input type="tel" value={cardCvv} onChange={e => setCardCvv(e.target.value.replace(/\D/g, ''))} placeholder="123" className="w-full p-3 bg-white/5 border border-white/10 rounded-lg ltr-input focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all text-white placeholder-slate-600" maxLength={4} required/>
                                    </div>
                                </div>
                                {cardError && <p className="text-sm text-red-400 text-center bg-red-900/20 p-2 rounded border border-red-500/20">{cardError}</p>}
                            </div>
                         ) : amount > 0 && selectedMethod === 'BANK_TRANSFER' ? (
                             <div className="space-y-4 text-center">
-                                <h3 className="font-bold text-fuchsia-300 text-sm">تفاصيل الحساب البنكي للتحويل</h3>
+                                <h3 className="font-bold text-pink-300 text-sm">تفاصيل الحساب البنكي للتحويل</h3>
                                 <div className="bg-white/5 p-5 rounded-2xl border border-white/10 space-y-3 text-right text-sm">
                                     <div className="flex justify-between border-b border-white/5 pb-2">
                                         <span className="text-slate-400">اسم صاحب الحساب</span>
@@ -229,7 +230,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onCardPaym
                                     </div>
                                     <div className="flex justify-between border-b border-white/5 pb-2">
                                         <span className="text-slate-400">رقم IBAN</span>
-                                        <span dir="ltr" className="font-mono text-fuchsia-300 select-all">{drhopeData.ibanNumber || 'غير متوفر'}</span>
+                                        <span dir="ltr" className="font-mono text-pink-300 select-all">{drhopeData.ibanNumber || 'غير متوفر'}</span>
                                     </div>
                                     <div className="flex justify-between border-b border-white/5 pb-2">
                                         <span className="text-slate-400">رقم الحساب</span>
@@ -252,7 +253,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onCardPaym
                         type="submit"
                         onClick={handleSubmit}
                         disabled={isProcessing || (amount > 0 && !selectedMethod)}
-                        className="w-full flex items-center justify-center gap-x-3 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-fuchsia-900/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-fuchsia-500/20"
+                        className="w-full flex items-center justify-center gap-x-3 bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg shadow-purple-900/40 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border border-white/10"
                     >
                         {isProcessing ? (
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>

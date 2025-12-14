@@ -67,7 +67,8 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                 {nextWorkshop && timeLeft ? (
                     <>
                         <h2 className="text-[10px] sm:text-xs font-bold text-fuchsia-600 tracking-widest uppercase mb-1 sm:mb-2">الورشة المباشرة القادمة</h2>
-                        <h1 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 sm:mb-4">{nextWorkshop.title}</h1>
+                        {/* Font size reduced here from text-lg sm:text-xl to text-base sm:text-lg */}
+                        <h1 className="text-base sm:text-lg font-bold text-slate-900 mb-2 sm:mb-4">{nextWorkshop.title}</h1>
                         <p className="text-xs text-slate-600 mb-4 sm:mb-6 font-semibold">{nextWorkshop.instructor}</p>
                         
                         <div className="flex justify-center items-center gap-3 sm:gap-6 my-4 sm:my-6">
@@ -92,7 +93,8 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                     </>
                 ) : (
                     <>
-                        <h1 className="text-2xl sm:text-4xl font-black mb-3 sm:mb-4 nawaya-intro-text text-glow-animation !text-slate-900" style={{ animationDelay: '0s', color: '#0f172a' }}>
+                        {/* Also reducing the default intro text size slightly for consistency */}
+                        <h1 className="text-xl sm:text-3xl font-black mb-3 sm:mb-4 nawaya-intro-text text-glow-animation !text-slate-900" style={{ animationDelay: '0s', color: '#0f172a' }}>
                             الحمد لله الذي بنعمته تتم الصالحات
                         </h1>
                         <p className="text-xs sm:text-sm text-slate-600 max-w-3xl mx-auto mb-6 sm:mb-10 nawaya-intro-text font-medium" style={{ animationDelay: '0.2s', color: '#475569' }}>

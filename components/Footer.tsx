@@ -78,7 +78,8 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick, onShippingClick, onTermsC
               روابط تهمك
               <span className="absolute -bottom-1 right-0 w-4 h-0.5 bg-fuchsia-500 rounded-full"></span>
             </h3>
-            <ul className="space-y-1 text-[10px]">
+            {/* Grid layout for links */}
+            <ul className="grid grid-cols-2 gap-y-1 gap-x-2 text-[10px]">
               <li><button onClick={onAboutClick} className="hover:text-fuchsia-300 transition-all duration-200 hover:translate-x-[-2px] transform inline-flex items-center gap-1 font-medium"><span>من نحن</span></button></li>
               <li><button onClick={onShippingClick} className="hover:text-fuchsia-300 transition-all duration-200 hover:translate-x-[-2px] transform inline-flex items-center gap-1 font-medium"><span>سياسة الشحن</span></button></li>
               <li><button onClick={onTermsClick} className="hover:text-fuchsia-300 transition-all duration-200 hover:translate-x-[-2px] transform inline-flex items-center gap-1 font-medium"><span>الشروط والأحكام</span></button></li>
@@ -116,14 +117,15 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick, onShippingClick, onTermsC
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-white/10 pt-2 flex flex-col-reverse md:flex-row justify-between items-center gap-2">
-          <p dir="ltr" className="text-[9px] text-slate-400 font-medium opacity-60">
+        {/* Bottom Bar - Centered Content */}
+        <div className="border-t border-white/10 pt-3 pb-2 flex flex-col items-center justify-center relative">
+          <p dir="ltr" className="text-[9px] text-slate-400 font-medium opacity-60 text-center">
             &copy; {new Date().getFullYear()} <span className="text-white">Nawaya</span>. All Rights Reserved.
           </p>
           
-          <div className="flex items-center gap-2">
-             <button onClick={onAdminClick} className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1 px-2 py-0.5 rounded-full hover:bg-white/5">
+          {/* Admin Button - Absolute Left on Desktop, Stacked on Mobile */}
+          <div className="mt-2 md:mt-0 md:absolute md:left-0 flex items-center gap-2">
+             <button onClick={onAdminClick} className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1 px-2 py-0.5 rounded-full hover:bg-white/5 opacity-70 hover:opacity-100">
                 <span className="w-1 h-1 rounded-full bg-fuchsia-500"></span> 
                 Admin
              </button>

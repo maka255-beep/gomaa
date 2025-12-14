@@ -54,14 +54,14 @@ const LiveStreamCard: React.FC<LiveStreamCardProps> = ({ workshopId, workshopTit
 
                 {/* Title with "LIVE" badge */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-3">
-                    <span className="text-base sm:text-lg font-bold text-fuchsia-100 tracking-wide">البث المباشر عبر ZOOM</span>
-                    <span className="flex items-center gap-1.5 bg-red-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-900/50 border border-red-400/50 tracking-wider">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                    <span className="text-sm sm:text-base font-bold text-fuchsia-100 tracking-wide">البث المباشر عبر ZOOM</span>
+                    <span className="flex items-center gap-1.5 bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full animate-pulse shadow-lg shadow-red-900/50 border border-red-400/50 tracking-wider">
+                        <span className="w-1 h-1 rounded-full bg-white"></span>
                         LIVE
                     </span>
                 </div>
                 
-                <h4 className="text-lg sm:text-2xl font-black text-white mb-2 leading-tight drop-shadow-lg">
+                <h4 className="text-base sm:text-xl font-black text-white mb-2 leading-tight drop-shadow-lg">
                     {workshopTitle}
                 </h4>
 

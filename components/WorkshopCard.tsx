@@ -74,18 +74,18 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
       
       {/* Card Body - White Background */}
       <div className="p-4 sm:p-5 flex-grow bg-white">
-        <div className="space-y-2.5 sm:space-y-3 text-xs sm:text-sm">
+        <div className="space-y-3 text-xs sm:text-sm">
           <div className="flex items-center gap-x-3 text-slate-600">
             <GlobeAltIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />
-            <span>{locationDisplay}</span>
+            <span className="font-medium">{locationDisplay}</span>
           </div>
           {!workshop.isRecorded && (
             <>
-              <div className="flex items-center gap-x-3 text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-100 hover:border-slate-200 transition-colors">
+              <div className="flex items-center gap-x-3 text-slate-600">
                 <CalendarIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />
                 <span className="font-medium">{dateDisplay}</span>
               </div>
-              <div className="flex items-center gap-x-3 text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-100 hover:border-slate-200 transition-colors mt-2">
+              <div className="flex items-center gap-x-3 text-slate-600">
                 <ClockIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />
                 <span className="font-medium">{formatArabicTime(workshop.startTime)}{workshop.endTime ? ` - ${formatArabicTime(workshop.endTime)}` : ''}</span>
               </div>
@@ -94,7 +94,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
           {workshop.isRecorded && (
              <div className="flex items-center gap-x-3 text-slate-600">
                 <VideoIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />
-                <span>متاحة للمشاهدة فور الاشتراك</span>
+                <span className="font-medium">متاحة للمشاهدة فور الاشتراك</span>
             </div>
           )}
         </div>

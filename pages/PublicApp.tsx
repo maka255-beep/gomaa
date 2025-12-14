@@ -211,8 +211,7 @@ const PublicApp: React.FC<PublicAppProps> = ({ onSwitchToAdmin }) => {
   const isHomePage = currentPage === Page.WORKSHOPS;
 
   return (
-    // Use fixed background styles consistent with index.html variables
-    <div className="min-h-screen font-sans selection:bg-fuchsia-500/30 bg-theme-gradient text-slate-200">
+    <div className={`min-h-screen font-sans selection:bg-fuchsia-500/30 ${isHomePage ? 'bg-white text-slate-900' : 'bg-theme-gradient text-slate-200'}`}>
       {showIntro && <IntroAnimation />}
       
       <Header 

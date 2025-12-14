@@ -13,19 +13,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
       :root {
-        /* Unified Dark Mauve Identity */
-        --color-bg-primary: #2e0235; /* Deep Mauve Base */
-        --color-bg-secondary: #4c1d95; /* Deep Purple */
-        --color-accent-pink: #db2777; /* Pink 600 */
-        --color-accent-purple: #6b21a8; /* Purple 800 */
+        /* Luxury Dark Purple Palette */
+        --color-bg-primary: #2e1065; /* بنفسجي غامق جداً - Dark Purple */
+        --color-bg-secondary: #581c87; /* بنفسجي - Purple */
+        --color-accent-gold: #fbbf24; /* ذهبي */
+        --color-accent-fuchsia: #db2777; /* وردي متوسط الغمق - Medium Dark Pink */
         
         /* Scrollbar Colors */
-        --scrollbar-track: #1e0b2b;
-        --scrollbar-thumb: #831843;
+        --scrollbar-track: #1e1b4b;
+        --scrollbar-thumb: #7c3aed;
         --scrollbar-thumb-hover: #db2777;
         
         /* Glow Effect */
-        --glow-color: rgba(219, 39, 119, 0.5);
+        --glow-color: rgba(219, 39, 119, 0.6); /* Adjusted Glow */
       }
 
       html, body {
@@ -33,25 +33,26 @@
         margin: 0;
         padding: 0;
         background-color: var(--color-bg-primary);
-        color: #f1f5f9; /* Slate 100 for better readability on dark */
+        color: #e2e8f0; /* نص فاتح للقراءة */
         font-family: 'Noto Sans Arabic', sans-serif;
       }
 
       /* Custom Scrollbar */
-      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
       ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
       ::-webkit-scrollbar-thumb { 
-        background: linear-gradient(to bottom, var(--color-accent-purple), var(--color-accent-pink)); 
-        border-radius: 4px; 
+        background: linear-gradient(to bottom, var(--scrollbar-thumb), var(--scrollbar-thumb-hover)); 
+        border-radius: 5px; 
+        border: 2px solid var(--scrollbar-track);
       }
-      ::-webkit-scrollbar-thumb:hover { background: var(--color-accent-pink); }
+      ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
       /* Input Autofill Fix for Dark Mode */
       input:-webkit-autofill,
       input:-webkit-autofill:hover, 
       input:-webkit-autofill:focus, 
       input:-webkit-autofill:active {
-          -webkit-box-shadow: 0 0 0 30px #2e0235 inset !important;
+          -webkit-box-shadow: 0 0 0 30px #2e1065 inset !important;
           -webkit-text-fill-color: white !important;
           transition: background-color 5000s ease-in-out 0s;
       }
@@ -72,37 +73,24 @@
       .text-glow-animation { animation: text-glow 3s infinite ease-in-out; }
       @keyframes text-glow {
         0%, 100% { text-shadow: 0 0 5px var(--glow-color); }
-        50% { text-shadow: 0 0 15px var(--glow-color), 0 0 25px var(--color-accent-pink); }
+        50% { text-shadow: 0 0 15px var(--glow-color), 0 0 25px var(--color-accent-fuchsia); }
       }
       
       main, header, footer { position: relative; z-index: 1; }
 
-      /* Unified Gradient Classes */
+      /* Gradient Classes */
       .bg-theme-header-gradient {
-        /* Rich Dark Gradient */
-        background: linear-gradient(180deg, #1e0b2b 0%, #2e0235 100%);
-        backdrop-filter: blur(12px);
-      }
-      
-      .bg-theme-gradient {
-        /* Main Page Background */
-        background: linear-gradient(135deg, #1e0b2b 0%, #2e0235 40%, #4c1d95 100%);
-        background-attachment: fixed;
-      }
-
-      /* Unified Button Gradient - Available globally */
-      .bg-theme-btn-gradient {
-        background-image: linear-gradient(to right, #6b21a8, #db2777); /* Purple-800 to Pink-600 */
-      }
-      .bg-theme-btn-gradient:hover {
-        background-image: linear-gradient(to right, #581c87, #be185d);
-      }
-
-      /* Card Styling */
-      .glass-panel {
-        background: rgba(0, 0, 0, 0.25);
+        /* Dominant Dark Purple, fading only slightly to deep mauve at the end */
+        /* Changed from bright pink ending to deep purple/mauve mix */
+        background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 70%, #4c1d95 100%);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .bg-theme-gradient-btn {
+        /* Smooth subtle gradient for buttons - Updated to match unified theme */
+        background-image: linear-gradient(to right, #6b21a8, #db2777);
+      }
+      .bg-theme-gradient-btn:hover {
+        background-image: linear-gradient(to right, #7e22ce, #ec4899);
       }
 
       /* Card Border Animation */
@@ -116,7 +104,7 @@
       .card-animated-border::before {
         content: ''; position: absolute; inset: 0;
         border-radius: inherit; padding: 2px;
-        background: conic-gradient(from var(--border-angle), #db2777, #7c3aed, #db2777);
+        background: conic-gradient(from var(--border-angle), #d946ef, #a855f7, #d946ef);
         -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor; mask-composite: exclude;
         animation: rotate-border 4s linear infinite;
@@ -131,8 +119,7 @@
         position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 45;
         width: 4rem; height: 4rem; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        color: white; 
-        background: linear-gradient(135deg, #6b21a8, #db2777);
+        color: white; background: linear-gradient(135deg, #6b21a8, #db2777);
         box-shadow: 0 4px 15px rgba(219, 39, 119, 0.4);
         transition: all 0.3s; border: 2px solid rgba(255,255,255,0.2);
       }
@@ -142,6 +129,11 @@
 
       .ltr-input { direction: ltr; text-align: left; }
       .ltr-input::placeholder { direction: rtl; text-align: right; }
+      
+      .bg-theme-gradient {
+        background-image: linear-gradient(to bottom right, var(--color-bg-from) var(--color-bg-balance, 50%), var(--color-bg-to));
+        background-attachment: fixed;
+      }
 
     </style>
     <script type="importmap">

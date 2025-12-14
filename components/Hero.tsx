@@ -10,10 +10,10 @@ interface HeroProps {
 
 const CountdownUnit: React.FC<{ value: number; label: string }> = ({ value, label }) => (
     <div className="flex flex-col items-center">
-        <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-wider">
+        <span className="text-2xl font-black text-slate-200 tracking-wider">
             {value.toString().padStart(2, '0')}
         </span>
-        <span className="text-[10px] sm:text-xs text-fuchsia-600 uppercase tracking-widest font-bold">{label}</span>
+        <span className="text-xs text-fuchsia-400 uppercase tracking-widest font-bold">{label}</span>
     </div>
 );
 
@@ -62,24 +62,24 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
     }, [nextWorkshop]);
 
     // Updated Button Gradient: from-purple-800 to-pink-600
-    const btnClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 text-sm sm:text-base flex items-center justify-center gap-2 group mx-auto border border-white/10";
+    const btnClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 md:py-4 px-10 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 text-base flex items-center justify-center gap-2 group mx-auto border border-white/10";
 
     return (
-        <section className="hero-section relative text-center py-8 sm:py-20 overflow-hidden">
+        <section className="hero-section relative text-center py-20 overflow-hidden">
             <div className="container mx-auto px-4 relative z-10">
                 {nextWorkshop && timeLeft ? (
                     <>
-                        <h2 className="text-[10px] sm:text-xs font-bold text-fuchsia-600 tracking-widest uppercase mb-1 sm:mb-2">الورشة المباشرة القادمة</h2>
-                        <h1 className="text-base sm:text-lg font-bold text-slate-900 mb-2 sm:mb-4">{nextWorkshop.title}</h1>
-                        <p className="text-xs text-slate-600 mb-4 sm:mb-6 font-semibold">{nextWorkshop.instructor}</p>
+                        <h2 className="text-xs font-bold text-fuchsia-400 tracking-widest uppercase mb-2">الورشة المباشرة القادمة</h2>
+                        <h1 className="text-lg font-bold text-white mb-4">{nextWorkshop.title}</h1>
+                        <p className="text-sm text-slate-300 mb-6 font-semibold">{nextWorkshop.instructor}</p>
                         
-                        <div className="flex justify-center items-center gap-3 sm:gap-6 my-4 sm:my-6">
+                        <div className="flex justify-center items-center gap-6 my-6">
                             <CountdownUnit value={timeLeft.days || 0} label="أيام" />
-                            <span className="text-xl sm:text-2xl font-black text-slate-400 -mt-4">:</span>
+                            <span className="text-2xl font-black text-slate-500 -mt-4">:</span>
                             <CountdownUnit value={timeLeft.hours || 0} label="ساعات" />
-                            <span className="text-xl sm:text-2xl font-black text-slate-400 -mt-4">:</span>
+                            <span className="text-2xl font-black text-slate-500 -mt-4">:</span>
                             <CountdownUnit value={timeLeft.minutes || 0} label="دقائق" />
-                            <span className="text-xl sm:text-2xl font-black text-slate-400 -mt-4">:</span>
+                            <span className="text-2xl font-black text-slate-500 -mt-4">:</span>
                             <CountdownUnit value={timeLeft.seconds || 0} label="ثواني" />
                         </div>
 
@@ -95,10 +95,10 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                     </>
                 ) : (
                     <>
-                        <h1 className="text-xl sm:text-3xl font-black mb-3 sm:mb-4 nawaya-intro-text text-glow-animation !text-slate-900" style={{ animationDelay: '0s', color: '#0f172a' }}>
+                        <h1 className="text-3xl font-black mb-4 nawaya-intro-text text-glow-animation text-white" style={{ animationDelay: '0s' }}>
                             الحمد لله الذي بنعمته تتم الصالحات
                         </h1>
-                        <p className="text-xs sm:text-sm text-slate-600 max-w-3xl mx-auto mb-6 sm:mb-10 nawaya-intro-text font-medium" style={{ animationDelay: '0.2s', color: '#475569' }}>
+                        <p className="text-sm text-slate-200 max-w-3xl mx-auto mb-10 nawaya-intro-text font-medium" style={{ animationDelay: '0.2s' }}>
                             اكتشف ورش عمل مباشرة ومسجلة تمنحك المهارات والمعرفة لتحقيق أهدافك.
                         </p>
                         <div className="nawaya-intro-text" style={{ animationDelay: '0.4s' }}>

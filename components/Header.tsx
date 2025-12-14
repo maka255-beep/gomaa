@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
-import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, MenuIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, LoginIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon, UserAddIcon } from './icons';
+import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, MenuIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon } from './icons';
 import { useUser } from '../context/UserContext';
 import NotificationsPanel from './NotificationsPanel';
 
 interface HeaderProps {
   onLoginClick: () => void;
-  onRegisterClick: () => void; // Kept for interface compatibility
+  onRegisterClick: () => void;
   onNavigate: (target: Page | string) => void;
   onScrollToSection: (sectionId: string) => void;
   onShowVideo: () => void;
@@ -46,7 +46,6 @@ const Header: React.FC<HeaderProps> = ({
     isVisible = true
 }) => {
   const { currentUser: user, logout: onLogout, notifications, drhopeData, markNotificationsAsRead } = useUser();
-  const [isExploreMenuOpen, setIsExploreMenuOpen] = useState(false);
   const [isNotificationsPanelOpen, setIsNotificationsPanelOpen] = useState(false);
   const [isMobileNotificationsOpen, setIsMobileNotificationsOpen] = useState(false);
   const desktopNotificationContainerRef = useRef<HTMLDivElement>(null);
@@ -78,7 +77,6 @@ const Header: React.FC<HeaderProps> = ({
   }
   
   const handleNotificationsToggle = () => {
-      handleCloseMobileMenu();
       const willOpen = !isNotificationsPanelOpen;
       if (willOpen && unreadCount > 0) {
         markNotificationsAsRead();
@@ -195,9 +193,10 @@ const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Right section */}
-          <div className="flex justify-end items-center gap-4">
+          <div className="flex justify-end items-center gap-2 sm:gap-4">
             {user ? (
                 <>
+                    {/* Desktop Notification Bell */}
                     <div className="hidden md:block relative" ref={desktopNotificationContainerRef}>
                         <button onClick={handleNotificationsToggle} className={`${iconButtonClasses} relative`}>
                             <BellIcon className="w-6 h-6" />
@@ -209,6 +208,16 @@ const Header: React.FC<HeaderProps> = ({
                         </button>
                         {isNotificationsPanelOpen && <NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} />}
                     </div>
+
+                    {/* Mobile Notification Bell */}
+                    <button onClick={handleMobileNotificationsToggle} className={`md:hidden ${iconButtonClasses} relative`}>
+                        <BellIcon className="w-6 h-6" />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-0 right-0 h-3 w-3 bg-fuchsia-600 rounded-full animate-pulse shadow-lg shadow-fuchsia-500/50">
+                            </span>
+                        )}
+                    </button>
+
                     <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
                         <GlobeAltIcon className="w-6 h-6"/>
                     </button>
@@ -237,6 +246,17 @@ const Header: React.FC<HeaderProps> = ({
         </nav>
       </header>
 
+      {/* Mobile Notifications Overlay */}
+      {isMobileNotificationsOpen && (
+        <div className="fixed inset-0 z-[60] bg-theme-header-gradient flex flex-col animate-fade-in-up md:hidden">
+             <div className="p-4 flex justify-between items-center border-b border-white/10 bg-black/20">
+                <h3 className="font-bold text-white text-lg">الإشعارات</h3>
+                <button onClick={() => setIsMobileNotificationsOpen(false)} className="p-2 rounded-full bg-white/5 text-white hover:bg-white/20"><CloseIcon className="w-6 h-6"/></button>
+             </div>
+             <NotificationsPanel onClose={() => setIsMobileNotificationsOpen(false)} isMobile={true} />
+        </div>
+      )}
+
       {/* Mobile Menu Overlay */}
       <div className={`fixed inset-0 bg-black/90 z-[60] transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
         <div className={`fixed inset-y-0 right-0 w-[80%] max-w-sm bg-theme-header-gradient shadow-2xl transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} overflow-y-auto flex flex-col`}>
@@ -248,9 +268,9 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
             </div>
 
-            <div className="p-5 flex flex-col gap-4 flex-grow">
+            <div className="p-5 flex flex-col gap-2 flex-grow custom-scrollbar">
                 {user && (
-                    <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/5 mb-2">
+                    <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/5 mb-4" onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))}>
                         <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-lg text-xl font-bold text-white">
                             {user.fullName.charAt(0)}
                         </div>
@@ -261,24 +281,51 @@ const Header: React.FC<HeaderProps> = ({
                     </div>
                 )}
 
-                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.WORKSHOPS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">الرئيسية</button>
-                <button onClick={() => handleMobileLinkClick(onShowVideo)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">من هي دكتور هوب</button>
-                <button onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">ألبوم الصور</button>
-                <button onClick={() => handleMobileLinkClick(onShowInstagram)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">بثوث انستجرام</button>
-                <button onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">طلب استشارة</button>
-                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">آراء المشتركات</button>
-                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">شركاء النجاح</button>
-                <button onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">البوتيك</button>
+                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.WORKSHOPS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-3 hover:bg-white/5 rounded-lg">الرئيسية</button>
+                
+                {/* Dr Hope Grouped Section */}
+                <div className="border-t border-white/10 pt-4 mt-2">
+                    <p className="text-xs text-fuchsia-400 font-bold mb-3 px-2 tracking-wider">عالم دكتور هوب</p>
+                    <div className="space-y-1 pr-2 border-r-2 border-white/10 mr-1">
+                        <button onClick={() => handleMobileLinkClick(onShowVideo)} className="w-full text-right text-slate-300 font-medium text-base hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg flex items-center gap-3">
+                            <VideoIcon className="w-5 h-5 text-fuchsia-500/70" />
+                            من هي دكتور هوب
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="w-full text-right text-slate-300 font-medium text-base hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg flex items-center gap-3">
+                            <ChatBubbleLeftRightIcon className="w-5 h-5 text-fuchsia-500/70" />
+                            آراء المشتركات
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="w-full text-right text-slate-300 font-medium text-base hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg flex items-center gap-3">
+                            <CollectionIcon className="w-5 h-5 text-fuchsia-500/70" />
+                            ألبوم الصور
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="w-full text-right text-slate-300 font-medium text-base hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg flex items-center gap-3">
+                            <UsersIcon className="w-5 h-5 text-fuchsia-500/70" />
+                            شركاء النجاح
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onShowInstagram)} className="w-full text-right text-slate-300 font-medium text-base hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg flex items-center gap-3">
+                            <InstagramIcon className="w-5 h-5 text-fuchsia-500/70" />
+                            بثوث انستجرام
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="w-full text-right text-slate-300 font-medium text-base hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg flex items-center gap-3">
+                            <ShoppingCartIcon className="w-5 h-5 text-fuchsia-500/70" />
+                            البوتيك
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="w-full text-right text-slate-300 font-medium text-base hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg flex items-center gap-3">
+                            <ChatBubbleIcon className="w-5 h-5 text-fuchsia-500/70" />
+                            طلب استشارة
+                        </button>
+                    </div>
+                </div>
 
                 {user && (
-                    <>
-                        <div className="h-px bg-white/10 my-2"></div>
-                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">ملفي الشخصي</button>
-                        <button onClick={() => handleMobileLinkClick(onLogout)} className="text-right text-red-400 font-bold text-lg hover:text-red-300 transition-colors p-2 flex items-center gap-2">
+                    <div className="border-t border-white/10 pt-4 mt-2">
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))} className="w-full text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-3 hover:bg-white/5 rounded-lg">ملفي الشخصي</button>
+                        <button onClick={() => handleMobileLinkClick(onLogout)} className="w-full text-right text-red-400 font-bold text-lg hover:text-red-300 transition-colors p-3 hover:bg-red-500/10 rounded-lg flex items-center gap-2">
                             <ArrowLeftOnRectangleIcon className="w-5 h-5"/>
                             تسجيل خروج
                         </button>
-                    </>
+                    </div>
                 )}
             </div>
 

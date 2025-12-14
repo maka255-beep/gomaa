@@ -48,12 +48,12 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
 
   const priceToDisplay = workshop.price ?? (workshop.packages?.[0]?.price);
 
-  // Common Icon Color - Deep Fuchsia to match the site theme strongly against white
-  const iconColorClass = "text-fuchsia-700";
+  // Common Icon Color - Pink-600 matches the site's accent #db2777
+  const iconColorClass = "text-pink-600";
 
   return (
     <div 
-      className="bg-white rounded-2xl border border-slate-200 flex flex-col h-full transition-all duration-500 transform hover:-translate-y-2 hover:shadow-[0_0_20px_rgba(219,39,119,0.4)] hover:border-fuchsia-400 group overflow-hidden shadow-[0_0_10px_rgba(0,0,0,0.05)]"
+      className="bg-white rounded-2xl border border-slate-200 flex flex-col h-full transition-all duration-500 transform hover:-translate-y-2 hover:shadow-[0_0_20px_rgba(219,39,119,0.4)] hover:border-pink-400 group overflow-hidden shadow-[0_0_10px_rgba(0,0,0,0.05)]"
     >
       {/* Card Header - Light Background */}
       <div className="p-4 sm:p-5 border-b border-slate-100 bg-gradient-to-b from-slate-50 to-white">
@@ -64,7 +64,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
         </div>
         <div className="text-center min-h-[4.5rem] sm:min-h-[5.5rem] flex flex-col justify-center items-center">
             {/* Title Text: Dark Slate for readability on white */}
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug group-hover:text-fuchsia-800 transition-colors">{workshop.title}</h3>
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug group-hover:text-pink-700 transition-colors">{workshop.title}</h3>
             <div className="flex items-center justify-center gap-x-2 text-slate-500 text-xs mt-3 sm:mt-4 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
                 <AcademicCapIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${iconColorClass}`} />
                 <span className="font-semibold">{workshop.instructor}</span>
@@ -75,26 +75,26 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
       {/* Card Body - White Background */}
       <div className="p-4 sm:p-5 flex-grow bg-white">
         <div className="space-y-3 text-xs sm:text-sm">
-          <div className="flex items-center gap-x-3 text-slate-600">
-            <GlobeAltIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />
-            <span className="font-medium">{locationDisplay}</span>
+          <div className="flex items-start gap-x-3 text-slate-600">
+            <GlobeAltIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0 mt-0.5`} />
+            <span className="font-medium leading-tight">{locationDisplay}</span>
           </div>
           {!workshop.isRecorded && (
             <>
-              <div className="flex items-center gap-x-3 text-slate-600">
-                <CalendarIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />
-                <span className="font-medium">{dateDisplay}</span>
+              <div className="flex items-start gap-x-3 text-slate-600">
+                <CalendarIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0 mt-0.5`} />
+                <span className="font-medium leading-tight">{dateDisplay}</span>
               </div>
-              <div className="flex items-center gap-x-3 text-slate-600">
-                <ClockIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />
-                <span className="font-medium">{formatArabicTime(workshop.startTime)}{workshop.endTime ? ` - ${formatArabicTime(workshop.endTime)}` : ''}</span>
+              <div className="flex items-start gap-x-3 text-slate-600">
+                <ClockIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0 mt-0.5`} />
+                <span className="font-medium leading-tight">{formatArabicTime(workshop.startTime)}{workshop.endTime ? ` - ${formatArabicTime(workshop.endTime)}` : ''}</span>
               </div>
             </>
           )}
           {workshop.isRecorded && (
-             <div className="flex items-center gap-x-3 text-slate-600">
-                <VideoIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />
-                <span className="font-medium">متاحة للمشاهدة فور الاشتراك</span>
+             <div className="flex items-start gap-x-3 text-slate-600">
+                <VideoIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0 mt-0.5`} />
+                <span className="font-medium leading-tight">متاحة للمشاهدة فور الاشتراك</span>
             </div>
           )}
         </div>
@@ -110,7 +110,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
             </div>
             <button 
               onClick={handleOpenDetails} 
-              className="bg-white border-2 border-fuchsia-600 text-fuchsia-700 font-bold py-1.5 px-4 sm:py-2 sm:px-5 rounded-xl transition-all duration-300 hover:bg-fuchsia-600 hover:text-white text-xs sm:text-sm shadow-sm"
+              className="bg-white border-2 border-pink-600 text-pink-600 font-bold py-1.5 px-4 sm:py-2 sm:px-5 rounded-xl transition-all duration-300 hover:bg-pink-600 hover:text-white text-xs sm:text-sm shadow-sm"
             >
               عرض التفاصيل
             </button>
@@ -118,7 +118,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
         ) : (
           <div className="flex justify-between items-center">
             {workshop.location === 'حضوري' || workshop.location === 'أونلاين وحضوري' ? (
-              <div className="text-xs sm:text-sm text-fuchsia-800 font-bold bg-fuchsia-100 px-3 py-1.5 rounded-lg border border-fuchsia-200">باقات متعددة</div>
+              <div className="text-xs sm:text-sm text-pink-800 font-bold bg-pink-50 px-3 py-1.5 rounded-lg border border-pink-200">باقات متعددة</div>
             ) : priceToDisplay !== undefined ? (
               <div className="flex items-center gap-x-1">
                 <TagIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0`} />

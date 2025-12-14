@@ -98,7 +98,7 @@ const AdminLayout: React.FC<AdminPageProps> = (props) => {
         <div className={`fixed inset-0 bg-black/60 z-50 flex transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}>
             
             <div 
-                className={`bg-gradient-to-br from-[#2e0235] via-[#1e0b2b] to-[#2e0235] text-white shadow-2xl h-full flex transition-transform duration-300 ease-in-out w-full`}
+                className={`bg-theme-gradient text-white shadow-2xl h-full flex transition-transform duration-300 ease-in-out w-full`}
                 style={{
                   transform: isClosing ? `translateX(${language === 'ar' ? '100%' : '-100%'})` : 'translateX(0)',
                 }}
@@ -205,7 +205,7 @@ const AdminPage: React.FC<AdminPageProps> = (props) => {
                             />
                         </div>
                         {error && <p className="text-red-400 text-sm font-bold bg-red-900/20 p-2 rounded-lg border border-red-500/20">{error}</p>}
-                        <button type="submit" className="w-full mt-4 py-4 px-6 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 rounded-xl font-bold text-white transition-all shadow-lg shadow-fuchsia-900/40 hover:scale-[1.02]">
+                        <button type="submit" className="w-full mt-4 py-4 px-6 bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 rounded-xl font-bold text-white transition-all shadow-lg shadow-fuchsia-900/40 hover:scale-[1.02]">
                             دخول آمن
                         </button>
                     </form>

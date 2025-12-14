@@ -7,7 +7,7 @@ import NotificationsPanel from './NotificationsPanel';
 
 interface HeaderProps {
   onLoginClick: () => void;
-  onRegisterClick: () => void; // New prop
+  onRegisterClick: () => void; // Kept for interface compatibility
   onNavigate: (target: Page | string) => void;
   onScrollToSection: (sectionId: string) => void;
   onShowVideo: () => void;
@@ -103,9 +103,7 @@ const Header: React.FC<HeaderProps> = ({
   
   const navLinkClasses = `py-2 px-4 rounded-md font-semibold transition-all duration-300 text-slate-200 hover:text-white hover:bg-white/10`;
   const iconButtonClasses = `p-2 rounded-full transition-all duration-300 transform hover:scale-110 text-slate-200 hover:bg-white/10 hover:text-pink-400`;
-  // UPDATED: Darker gradient for buttons (Purple-800 -> Pink-600)
   const primaryButtonClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 border border-white/10 text-sm";
-  const outlineButtonClasses = "border border-white/20 hover:bg-white/10 text-white font-bold py-2.5 px-5 rounded-xl transition-all duration-300 text-sm hover:border-pink-400";
 
   const headerLinks = drhopeData.headerLinks || {
     drhope: 'دكتور هوب',
@@ -113,7 +111,6 @@ const Header: React.FC<HeaderProps> = ({
     profile: 'ملفي الشخصي',
   };
 
-  // Always solid background using theme variables
   const headerBgClass = 'bg-theme-header-gradient shadow-xl border-b border-white/10';
 
   return (
@@ -151,213 +148,150 @@ const Header: React.FC<HeaderProps> = ({
                   <ChevronDownIcon className="w-4 h-4 transition-transform group-hover:rotate-180" />
                 </button>
                 {/* Dropdown Menu */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform transition-all duration-300 ease-in-out group-hover:translate-y-2 translate-y-4 bg-theme-header-gradient backdrop-blur-2xl rounded-xl shadow-2xl mt-2 p-2 w-[480px] border border-white/10 z-10 ring-1 ring-black/20">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform transition-all duration-300 ease-in-out group-hover:translate-y-2 translate-y-4 bg-theme-header-gradient backdrop-blur-2xl rounded-xl shadow-2xl mt-2 p-2 w-[550px] border border-white/10 z-10 ring-1 ring-black/20">
                   <div className="grid grid-cols-2 gap-2 text-slate-200">
-                    {/* Menu Items */}
+                    
+                    {/* Column 1 */}
                     <a onClick={onShowVideo} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <VideoIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">من هي دكتور هوب</span><span className="text-xs text-slate-400 block">تعرفي على مسيرتها</span></div>
                     </a>
-                     <a onClick={onShowPhotoAlbum} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
+                    
+                    <a onClick={() => onNavigate(Page.REVIEWS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
+                      <ChatBubbleLeftRightIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <div><span className="font-bold text-white text-sm">{headerLinks.reviews}</span><span className="text-xs text-slate-400 block">تجارب حقيقية</span></div>
+                    </a>
+
+                    <a onClick={onShowPhotoAlbum} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <CollectionIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">ألبوم الصور</span><span className="text-xs text-slate-400 block">لحظات من ورشاتنا</span></div>
                     </a>
+
+                    <a onClick={() => onNavigate(Page.PARTNERS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
+                      <UsersIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <div><span className="font-bold text-white text-sm">شركاء النجاح</span><span className="text-xs text-slate-400 block">شركاؤنا في الرحلة</span></div>
+                    </a>
+
+                    {/* Column 2 */}
                     <a onClick={onShowInstagram} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <InstagramIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                      <div><span className="font-bold text-white text-sm">بثوث انستجرام</span><span className="text-xs text-slate-400 block">البثوث المباشرة والمسجلة</span></div>
+                      <div><span className="font-bold text-white text-sm">بثوث انستجرام</span><span className="text-xs text-slate-400 block">البثوث المباشرة</span></div>
                     </a>
-                     <a onClick={onRequestConsultationClick} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <ChatBubbleIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                      <div><span className="font-bold text-white text-sm">طلب استشارة</span><span className="text-xs text-slate-400 block">جلسة خاصة</span></div>
-                    </a>
+
                     <a onClick={onBoutiqueClick} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <ShoppingCartIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                      <div><span className="font-bold text-white text-sm">البوتيك</span><span className="text-xs text-slate-400 block">منتجات مختارة</span></div>
+                      <div><span className="font-bold text-white text-sm">البوتيك</span><span className="text-xs text-slate-400 block">منتجات مختارة لك</span></div>
                     </a>
-                     <a onClick={() => onNavigate(Page.REVIEWS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <ChatBubbleLeftRightIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                      <div><span className="font-bold text-white text-sm">{headerLinks.reviews}</span><span className="text-xs text-slate-400 block">ماذا قالت المشاركات</span></div>
+
+                     <a onClick={onRequestConsultationClick} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200 col-span-2 border-t border-white/5 mt-1">
+                      <ChatBubbleIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+                      <div><span className="font-bold text-white text-sm">طلب استشارة خاصة</span><span className="text-xs text-slate-400 block">تحدثي مباشرة مع المختصين</span></div>
                     </a>
-                     <a onClick={() => onNavigate(Page.PARTNERS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
-                      <UsersIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                      <div><span className="font-bold text-white text-sm">شركاء النجاح</span><span className="text-xs text-slate-400 block">من يدعمنا</span></div>
-                    </a>
+
                   </div>
                 </div>
               </div>
-              
-              {user && (
-                <button onClick={() => onNavigate(Page.PROFILE)} className={navLinkClasses}>
-                  {headerLinks.profile}
-                </button>
-              )}
             </div>
           </div>
-          
+
           {/* Right section */}
-          <div className="flex justify-end">
-            <div className="flex items-center gap-x-2 md:gap-x-5">
-              
-              {/* Navigation Hub Trigger (Desktop) */}
-              {user && (
-                  <button onClick={onOpenNavigationHub} className={`hidden md:inline-flex ${iconButtonClasses}`} title="إلى أين تود الذهاب؟">
-                      <GlobeAltIcon className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12"/>
-                  </button>
-              )}
-
-              <div className="relative" ref={desktopNotificationContainerRef}>
-                <button onClick={handleNotificationsToggle} className={`hidden md:inline-flex ${iconButtonClasses} relative group`}>
-                    <BellIcon className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12"/>
-                    {unreadCount > 0 && (
-                        <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-pink-500 ring-2 ring-slate-900 animate-pulse"></span>
-                    )}
-                </button>
-                 <button onClick={handleMobileNotificationsToggle} className={`md:hidden ${iconButtonClasses} relative group`}>
-                    <BellIcon className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12"/>
-                    {unreadCount > 0 && (
-                        <span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-pink-500 ring-2 ring-slate-900 animate-pulse"></span>
-                    )}
-                </button>
-                {isNotificationsPanelOpen && <div className="hidden md:block"><NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} /></div>}
-              </div>
-               <div className="hidden md:flex gap-x-3 items-center">
-                {user ? (
-                      <button onClick={onLogout} className={`${primaryButtonClasses} group flex items-center gap-x-2`}>
-                          <ArrowLeftOnRectangleIcon className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" />
-                          <span>خروج</span>
-                      </button>
-                  ) : (
-                    <>
-                      <button onClick={onLoginClick} className={outlineButtonClasses}>
-                        تسجيل الدخول
-                      </button>
-                      <button onClick={onRegisterClick} className={`${primaryButtonClasses} group flex items-center gap-x-2`}>
-                        <UserAddIcon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                        <span>إنشاء حساب</span>
-                      </button>
-                    </>
-                  )}
-               </div>
-            </div>
-          </div>
-
-        </nav>
-        {/* Animated Line at bottom of header - updated color */}
-        <div
-            className="absolute bottom-0 left-0 right-0 h-[1px] opacity-100"
-            style={{
-              background: 'linear-gradient(90deg, transparent, rgba(219, 39, 119, 0.5), transparent)',
-              boxShadow: '0 0 10px rgba(219, 39, 119, 0.3)'
-            }}
-        />
-      </header>
-      
-      {/* Main Mobile Menu - Dark Theme */}
-      {isMobileMenuOpen && (
-        <div 
-            className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm" 
-            onClick={handleCloseMobileMenu}
-            aria-hidden="true"
-        ></div>
-      )}
-      <div 
-        className={`fixed top-0 right-0 h-full w-4/5 max-w-sm bg-theme-header-gradient backdrop-blur-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden border-l border-white/10 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className="flex justify-between items-center p-4 border-b border-white/10 bg-black/10">
-          <h2 className="text-lg font-bold text-pink-400">القائمة الرئيسية</h2>
-          <button 
-            onClick={handleCloseMobileMenu} 
-            className="group p-2 rounded-full text-slate-300 hover:bg-white/20"
-            aria-label="إغلاق القائمة"
-          >
-            <CloseIcon className="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" />
-          </button>
-        </div>
-        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100%-60px)]">
-            <div>
-                <button 
-                    onClick={() => setIsExploreMenuOpen(!isExploreMenuOpen)}
-                    className="group w-full flex justify-between items-center px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
-                >
-                    <span className="flex items-center gap-x-4">
-                        <UsersIcon className="w-6 h-6 text-pink-400 transition-transform duration-300 group-hover:scale-110" />
-                        <span>دكتور هوب</span>
-                    </span>
-                    <ChevronDownIcon className={`h-5 w-5 transition-transform duration-300 group-hover:scale-125 ${isExploreMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
-                <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isExploreMenuOpen ? 'max-h-[500px]' : 'max-h-0'}`}>
-                    <div className="pr-4 pt-2 space-y-1 bg-black/10 rounded-lg my-1">
-                        <a onClick={() => handleMobileLinkClick(onShowVideo)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <VideoIcon className="w-5 h-5 text-pink-400/80"/> <span>من هي دكتور هوب</span>
-                        </a>
-                        <a onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <CollectionIcon className="w-5 h-5 text-pink-400/80"/><span>عرض ألبوم الصور</span>
-                        </a>
-                        <a onClick={() => handleMobileLinkClick(onShowInstagram)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                        <InstagramIcon className="w-5 h-5 text-pink-400/80"/> <span>بثوث انستجرام</span>
-                        </a>
-                        <div className="h-px bg-white/10 my-1 mx-4"></div>
-                        <a onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <ChatBubbleIcon className="w-5 h-5 text-pink-400/80" /> <span>طلب استشارة</span>
-                        </a>
-                        <a onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <ShoppingCartIcon className="w-5 h-5 text-pink-400/80" /> <span>البوتيك</span>
-                        </a>
-                        <a onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <ChatBubbleLeftRightIcon className="w-5 h-5 text-pink-400/80" /> <span>{headerLinks.reviews}</span>
-                        </a>
-                        <a onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="group flex items-center gap-x-3 px-4 py-3 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <UsersIcon className="w-5 h-5 text-pink-400/80" /> <span>شركاء النجاح</span>
-                        </a>
+          <div className="flex justify-end items-center gap-4">
+            {user ? (
+                <>
+                    <div className="hidden md:block relative" ref={desktopNotificationContainerRef}>
+                        <button onClick={handleNotificationsToggle} className={`${iconButtonClasses} relative`}>
+                            <BellIcon className="w-6 h-6" />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-0 right-0 h-4 w-4 bg-fuchsia-600 rounded-full text-[10px] flex items-center justify-center text-white font-bold animate-pulse shadow-lg shadow-fuchsia-500/50">
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </button>
+                        {isNotificationsPanelOpen && <NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} />}
                     </div>
-                </div>
-            </div>
-
-            {user && (
-              <a onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-white/10 cursor-pointer transition-colors">
-                  <UserIcon className="w-6 h-6 text-pink-400 transition-transform duration-300 group-hover:scale-110" />
-                  <span>{headerLinks.profile}</span>
-              </a>
+                    <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
+                        <GlobeAltIcon className="w-6 h-6"/>
+                    </button>
+                    <button 
+                        onClick={() => onNavigate(Page.PROFILE)} 
+                        className={`hidden md:flex items-center gap-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full transition-all duration-300 border border-white/10`}
+                    >
+                        <span className="text-sm font-bold truncate max-w-[100px]">{user.fullName.split(' ')[0]}</span>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-lg">
+                            <span className="font-bold text-xs">{user.fullName.charAt(0)}</span>
+                        </div>
+                    </button>
+                </>
+            ) : (
+              <div className="hidden md:flex gap-3">
+                <button onClick={onLoginClick} className="text-white hover:text-pink-300 font-bold text-sm px-4 py-2 transition-colors">
+                  دخول
+                </button>
+                <button onClick={onRegisterClick} className={primaryButtonClasses}>
+                  حساب جديد
+                </button>
+              </div>
             )}
             
-            <div className="border-t border-white/10 pt-4 mt-4 space-y-2">
-                {user ? (
-                    <a onClick={() => handleMobileLinkClick(onLogout)} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-medium text-red-300 hover:text-red-200 hover:bg-red-500/10 cursor-pointer transition-colors">
-                        <ArrowLeftOnRectangleIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
-                        <span>خروج</span>
-                    </a>
-                ) : (
+            <button onClick={onBoutiqueClick} className={`md:hidden ${iconButtonClasses}`}>
+                <ShoppingCartIcon className="w-6 h-6"/>
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      <div className={`fixed inset-0 bg-black/90 z-[60] transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+        <div className={`fixed inset-y-0 right-0 w-[80%] max-w-sm bg-theme-header-gradient shadow-2xl transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} overflow-y-auto flex flex-col`}>
+            
+            <div className="p-5 flex justify-between items-center border-b border-white/10">
+                <span className="text-xl font-bold text-white">القائمة</span>
+                <button onClick={handleCloseMobileMenu} className="p-2 rounded-full hover:bg-white/10 text-white">
+                    <CloseIcon className="w-6 h-6" />
+                </button>
+            </div>
+
+            <div className="p-5 flex flex-col gap-4 flex-grow">
+                {user && (
+                    <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/5 mb-2">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-lg text-xl font-bold text-white">
+                            {user.fullName.charAt(0)}
+                        </div>
+                        <div>
+                            <p className="font-bold text-white text-lg">{user.fullName}</p>
+                            <p className="text-xs text-slate-400">{user.email}</p>
+                        </div>
+                    </div>
+                )}
+
+                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.WORKSHOPS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">الرئيسية</button>
+                <button onClick={() => handleMobileLinkClick(onShowVideo)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">من هي دكتور هوب</button>
+                <button onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">ألبوم الصور</button>
+                <button onClick={() => handleMobileLinkClick(onShowInstagram)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">بثوث انستجرام</button>
+                <button onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">طلب استشارة</button>
+                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">آراء المشتركات</button>
+                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">شركاء النجاح</button>
+                <button onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">البوتيك</button>
+
+                {user && (
                     <>
-                        <a onClick={() => handleMobileLinkClick(onLoginClick)} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
-                            <LoginIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
-                            <span>تسجيل الدخول</span>
-                        </a>
-                        <a onClick={() => handleMobileLinkClick(onRegisterClick)} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-bold text-pink-300 hover:text-white hover:bg-pink-500/20 cursor-pointer transition-colors">
-                            <UserAddIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
-                            <span>إنشاء حساب جديد</span>
-                        </a>
+                        <div className="h-px bg-white/10 my-2"></div>
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">ملفي الشخصي</button>
+                        <button onClick={() => handleMobileLinkClick(onLogout)} className="text-right text-red-400 font-bold text-lg hover:text-red-300 transition-colors p-2 flex items-center gap-2">
+                            <ArrowLeftOnRectangleIcon className="w-5 h-5"/>
+                            تسجيل خروج
+                        </button>
                     </>
                 )}
             </div>
-        </nav>
-      </div>
-      
-      {/* Mobile Notifications Panel */}
-      {isMobileNotificationsOpen && (
-        <div 
-            className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm" 
-            onClick={() => setIsMobileNotificationsOpen(false)}
-            aria-hidden="true"
-        ></div>
-      )}
-      <div 
-        className={`fixed top-0 right-0 h-full w-4/5 max-w-sm bg-theme-header-gradient backdrop-blur-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden border-l border-white/10 ${isMobileNotificationsOpen ? 'translate-x-0' : 'translate-x-full'}`}
-        role="dialog"
-        aria-modal="true"
-      >
-        <NotificationsPanel onClose={() => setIsMobileNotificationsOpen(false)} isMobile={true} />
+
+            {!user && (
+                <div className="p-5 border-t border-white/10 bg-black/20">
+                    <button onClick={() => handleMobileLinkClick(onLoginClick)} className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl mb-3 transition-colors">دخول</button>
+                    <button onClick={() => handleMobileLinkClick(onRegisterClick)} className="w-full bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg">حساب جديد</button>
+                </div>
+            )}
+        </div>
       </div>
     </>
   );

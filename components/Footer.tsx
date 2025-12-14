@@ -24,7 +24,7 @@ const Footer: React.FC<FooterProps> = ({ onShippingClick, onTermsClick, onAboutC
   const { socialMediaLinks } = drhopeData;
 
   return (
-    <footer className="relative mt-16 pt-12 pb-6 bg-[#2e1065] text-slate-300 overflow-hidden border-t border-fuchsia-500/20">
+    <footer className="relative mt-16 pt-12 pb-6 bg-gradient-to-b from-[#2e1065] to-[#1a0b2e] text-slate-300 overflow-hidden border-t border-fuchsia-500/20">
       
       {/* Ambient Background Glows */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-fuchsia-900/10 blur-[100px] rounded-full pointer-events-none"></div>

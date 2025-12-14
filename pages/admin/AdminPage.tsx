@@ -5,7 +5,7 @@ import { AdminSidebar } from '../../components/AdminSidebar';
 import { User, Subscription } from '../../types';
 import { LanguageProvider, useAdminTranslation } from './AdminTranslationContext';
 
-// Corrected Static Imports (Siblings in the same folder)
+// --- Static Imports (Corrected Paths: Sibling files) ---
 import UserManagementPage from './UserManagementPage';
 import WorkshopManagementPage from './WorkshopManagementPage';
 import TransfersPage from './TransfersPage';

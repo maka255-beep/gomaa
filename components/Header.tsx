@@ -224,11 +224,8 @@ const Header: React.FC<HeaderProps> = ({
                 </>
             ) : (
               <div className="hidden md:flex gap-3">
-                <button onClick={onLoginClick} className="text-white hover:text-pink-300 font-bold text-sm px-4 py-2 transition-colors">
-                  دخول
-                </button>
-                <button onClick={onRegisterClick} className={primaryButtonClasses}>
-                  حساب جديد
+                <button onClick={onLoginClick} className={primaryButtonClasses}>
+                  تسجيل دخول / انشاء حساب
                 </button>
               </div>
             )}
@@ -287,8 +284,7 @@ const Header: React.FC<HeaderProps> = ({
 
             {!user && (
                 <div className="p-5 border-t border-white/10 bg-black/20">
-                    <button onClick={() => handleMobileLinkClick(onLoginClick)} className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl mb-3 transition-colors">دخول</button>
-                    <button onClick={() => handleMobileLinkClick(onRegisterClick)} className="w-full bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg">حساب جديد</button>
+                    <button onClick={() => handleMobileLinkClick(onLoginClick)} className="w-full bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg">تسجيل دخول / انشاء حساب</button>
                 </div>
             )}
         </div>

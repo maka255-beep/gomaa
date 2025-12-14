@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { InstagramIcon, TwitterIcon, FacebookIcon, SnapchatIcon, TikTokIcon, PhoneIcon, EnvelopeIcon, LockClosedIcon } from './icons';
+import { InstagramIcon, TwitterIcon, FacebookIcon, SnapchatIcon, TikTokIcon, PhoneIcon, EnvelopeIcon, LockClosedIcon, GlobeAltIcon } from './icons';
 import { useUser } from '../context/UserContext';
 import { SocialMediaLinks } from '../types';
 
@@ -25,122 +25,155 @@ const Footer: React.FC<FooterProps> = ({ onShippingClick, onTermsClick, onAboutC
 
   const handleAdminEntry = (e: React.MouseEvent) => {
       e.preventDefault();
-      // Add ?mode=admin to the URL and reload/update state
       const url = new URL(window.location.href);
       url.searchParams.set('mode', 'admin');
       window.history.pushState({}, '', url);
-      // Trigger a popstate event so App.tsx detects the change
       window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
   return (
-    <footer className="relative mt-10 pt-6 pb-3 bg-theme-header-gradient text-slate-300 overflow-hidden border-t-0 md:border-t border-fuchsia-500/30">
-      
-      {/* Top Glow Effect - Hidden on Mobile */}
-      <div className="hidden md:block absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fuchsia-400 to-transparent shadow-[0_0_20px_rgba(232,121,249,0.8)]"></div>
+    <footer className="relative mt-16 pt-12 pb-6 bg-[#180a24] text-slate-300 overflow-hidden border-t border-fuchsia-500/20">
       
       {/* Ambient Background Glows */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 blur-[80px] rounded-full pointer-events-none mix-blend-screen"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 blur-[80px] rounded-full pointer-events-none mix-blend-screen"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-fuchsia-900/10 blur-[100px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-900/10 blur-[80px] rounded-full pointer-events-none"></div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-12 gap-x-4 gap-y-6 mb-4">
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 mb-10">
           
-          {/* Column 1: Brand Info (Full width on mobile, 5 cols on desktop) */}
-          <div className="col-span-2 md:col-span-5 space-y-2 flex flex-col items-center md:items-start text-center md:text-right">
-            <div className="flex flex-col items-center md:items-start">
+          {/* Column 1: Brand Info & Socials (5 Cols) */}
+          <div className="md:col-span-5 space-y-6">
+            <div className="flex flex-col items-start">
                {drhopeData.logoUrl ? (
-                  <img src={drhopeData.logoUrl} alt="Nawaya Logo" className="h-10 w-auto mb-1.5 opacity-100 drop-shadow-xl filter brightness-110" />
+                  <img src={drhopeData.logoUrl} alt="Nawaya Logo" className="h-14 w-auto mb-4 opacity-100 drop-shadow-lg filter brightness-110" />
                ) : (
-                  <h2 className="text-lg font-black text-white tracking-widest mb-1 bg-clip-text text-transparent bg-gradient-to-r from-white to-fuchsia-300">NAWAYA</h2>
+                  <h2 className="text-2xl font-black text-white tracking-widest mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-fuchsia-300">NAWAYA</h2>
                )}
-               <p className="text-[10px] leading-relaxed text-slate-300 font-medium max-w-sm opacity-90">
-                 منصة رائدة لإدارة الندوات والفعاليات وورش العمل التطويرية.
+               <p className="text-sm leading-relaxed text-slate-400 font-medium max-w-sm text-justify">
+                 منصة رائدة لإدارة الندوات والفعاليات وورش العمل التطويرية، نسعى لتقديم محتوى يلهمك لتكون أفضل نسخة من نفسك.
                </p>
             </div>
-            <div className="flex gap-2 pt-1 justify-center md:justify-start">
-                {socialPlatforms.map(platform => {
-                    const link = socialMediaLinks?.[platform.key];
-                    if (link) {
-                    const Icon = platform.icon;
-                    return (
-                        <a 
-                        key={platform.key}
-                        href={link} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        aria-label={platform.ariaLabel}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center bg-white/5 text-white backdrop-blur-sm transition-all duration-300 border border-white/10 hover:-translate-y-1 ${platform.hoverClasses}`}
-                        >
-                        <Icon className="w-3 h-3" />
-                        </a>
-                    );
-                    }
-                    return null;
-                })}
+            
+            <div>
+                <h4 className="text-xs font-bold text-fuchsia-400 uppercase tracking-wider mb-3">تابعنا على</h4>
+                <div className="flex gap-3">
+                    {socialPlatforms.map(platform => {
+                        const link = socialMediaLinks?.[platform.key];
+                        if (link) {
+                        const Icon = platform.icon;
+                        return (
+                            <a 
+                            key={platform.key}
+                            href={link} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            aria-label={platform.ariaLabel}
+                            className={`w-9 h-9 rounded-full flex items-center justify-center bg-white/5 text-slate-300 transition-all duration-300 border border-white/10 hover:-translate-y-1 ${platform.hoverClasses}`}
+                            >
+                            <Icon className="w-4 h-4" />
+                            </a>
+                        );
+                        }
+                        return null;
+                    })}
+                </div>
             </div>
           </div>
 
-          {/* Column 2: Quick Links (1 col on mobile, 3 cols on desktop) */}
-          <div className="col-span-1 md:col-span-3 pt-1">
-            <h3 className="text-white font-bold mb-2 text-xs relative inline-block">
-              روابط تهمك
-              <span className="absolute -bottom-1 right-0 w-4 h-0.5 bg-fuchsia-500 rounded-full"></span>
+          {/* Column 2: Quick Links (3 Cols) */}
+          <div className="md:col-span-3 pt-2">
+            <h3 className="text-white font-bold text-lg mb-6 relative inline-block">
+              روابط هامة
+              <span className="absolute -bottom-2 right-0 w-8 h-1 bg-fuchsia-500 rounded-full"></span>
             </h3>
-            {/* Grid layout for links */}
-            <ul className="grid grid-cols-2 gap-y-1 gap-x-2 text-[10px]">
-              <li><button onClick={onAboutClick} className="hover:text-fuchsia-300 transition-all duration-200 hover:translate-x-[-2px] transform inline-flex items-center gap-1 font-medium"><span>من نحن</span></button></li>
-              <li><button onClick={onShippingClick} className="hover:text-fuchsia-300 transition-all duration-200 hover:translate-x-[-2px] transform inline-flex items-center gap-1 font-medium"><span>سياسة الشحن</span></button></li>
-              <li><button onClick={onTermsClick} className="hover:text-fuchsia-300 transition-all duration-200 hover:translate-x-[-2px] transform inline-flex items-center gap-1 font-medium"><span>الشروط والأحكام</span></button></li>
-              <li><button onClick={onPrivacyClick} className="hover:text-fuchsia-300 transition-all duration-200 hover:translate-x-[-2px] transform inline-flex items-center gap-1 font-medium"><span>الخصوصية</span></button></li>
+            <ul className="space-y-3 text-sm">
+              <li>
+                  <button onClick={onAboutClick} className="flex items-center gap-2 hover:text-fuchsia-300 transition-colors duration-200 group">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-fuchsia-500 transition-colors"></span>
+                      <span>من نحن</span>
+                  </button>
+              </li>
+              <li>
+                  <button onClick={onShippingClick} className="flex items-center gap-2 hover:text-fuchsia-300 transition-colors duration-200 group">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-fuchsia-500 transition-colors"></span>
+                      <span>سياسة الشحن والتوصيل</span>
+                  </button>
+              </li>
+              <li>
+                  <button onClick={onTermsClick} className="flex items-center gap-2 hover:text-fuchsia-300 transition-colors duration-200 group">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-fuchsia-500 transition-colors"></span>
+                      <span>الشروط والأحكام</span>
+                  </button>
+              </li>
+              <li>
+                  <button onClick={onPrivacyClick} className="flex items-center gap-2 hover:text-fuchsia-300 transition-colors duration-200 group">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-fuchsia-500 transition-colors"></span>
+                      <span>سياسة الخصوصية</span>
+                  </button>
+              </li>
             </ul>
           </div>
 
-          {/* Column 3: Contact Info (1 col on mobile, 4 cols on desktop) */}
-          <div className="col-span-1 md:col-span-4 pt-1">
-            <h3 className="text-white font-bold mb-2 text-xs relative inline-block">
+          {/* Column 3: Contact Info (4 Cols) */}
+          <div className="md:col-span-4 pt-2">
+            <h3 className="text-white font-bold text-lg mb-6 relative inline-block">
               تواصل معنا
-              <span className="absolute -bottom-1 right-0 w-4 h-0.5 bg-fuchsia-500 rounded-full"></span>
+              <span className="absolute -bottom-2 right-0 w-8 h-1 bg-fuchsia-500 rounded-full"></span>
             </h3>
-            <div className="space-y-1.5">
-                <a href={`https://wa.me/${(drhopeData.whatsappNumber || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 group p-1 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                        <PhoneIcon className="w-3 h-3"/>
+            <div className="space-y-4">
+                <a href={`https://wa.me/${(drhopeData.whatsappNumber || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 group p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all">
+                    <div className="w-8 h-8 rounded-full bg-fuchsia-500/20 flex items-center justify-center text-fuchsia-400 mt-0.5">
+                        <PhoneIcon className="w-4 h-4"/>
                     </div>
-                    <div className="overflow-hidden">
-                        <p className="text-[9px] text-fuchsia-300 font-bold">واتساب</p>
-                        <p dir="ltr" className="text-white font-mono font-bold tracking-wide text-[9px] truncate">{drhopeData.whatsappNumber || drhopeData.companyPhone}</p>
+                    <div>
+                        <p className="text-xs text-fuchsia-300 font-bold mb-0.5">خدمة العملاء (واتساب)</p>
+                        <p dir="ltr" className="text-white font-mono text-sm tracking-wide group-hover:text-fuchsia-200 transition-colors">
+                            {drhopeData.whatsappNumber || drhopeData.companyPhone}
+                        </p>
                     </div>
                 </a>
                 
-                <a href="mailto:info@nawayaevent.com" className="flex items-center gap-2 group p-1 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-fuchsia-600 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform flex-shrink-0">
-                        <EnvelopeIcon className="w-3 h-3"/>
+                <a href="mailto:info@nawayaevent.com" className="flex items-start gap-3 group p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-fuchsia-500/30 transition-all">
+                    <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 mt-0.5">
+                        <EnvelopeIcon className="w-4 h-4"/>
                     </div>
-                    <div className="overflow-hidden">
-                        <p className="text-[9px] text-fuchsia-300 font-bold">البريد</p>
-                        <p className="text-white font-sans font-bold tracking-wide text-[9px] truncate">info@nawayaevent.com</p>
+                    <div>
+                        <p className="text-xs text-purple-300 font-bold mb-0.5">البريد الإلكتروني</p>
+                        <p className="text-white font-sans text-sm tracking-wide group-hover:text-purple-200 transition-colors">
+                            info@nawayaevent.com
+                        </p>
                     </div>
                 </a>
+
+                {drhopeData.companyAddress && (
+                    <div className="flex items-start gap-3 px-3">
+                        <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center">
+                            <GlobeAltIcon className="w-5 h-5 text-slate-500"/>
+                        </div>
+                        <p className="text-xs text-slate-400 leading-relaxed pt-1.5">
+                            {drhopeData.companyAddress}
+                        </p>
+                    </div>
+                )}
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar - Centered Content */}
-        {/* FIX: Explicitly removing border on mobile with border-none and adding it back on desktop */}
-        <div className="border-none md:border-t md:border-white/10 pt-3 pb-2 flex flex-col items-center justify-center relative">
-          <div className="flex items-center justify-center gap-2">
-            <p dir="ltr" className="text-[9px] text-slate-400 font-medium opacity-60 text-center">
-                &copy; {new Date().getFullYear()} <span className="text-white">Nawaya</span>. All Rights Reserved.
-            </p>
-            {/* Admin Entry Button - Visible */}
+        {/* Bottom Bar */}
+        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p dir="ltr" className="text-xs text-slate-500 font-medium">
+              &copy; {new Date().getFullYear()} <span className="text-white">Nawaya Events</span>. All Rights Reserved.
+          </p>
+          
+          <div className="flex items-center gap-4">
+             {/* Admin Entry Button - Subtle */}
             <button 
                 onClick={handleAdminEntry}
-                className="text-slate-500 hover:text-fuchsia-500 p-1 flex items-center gap-1 transition-colors"
+                className="text-slate-600 hover:text-fuchsia-500 flex items-center gap-1.5 transition-colors group"
                 title="دخول المسؤول"
             >
-                <LockClosedIcon className="w-3 h-3" />
-                <span className="text-[10px] font-bold">Admin</span>
+                <LockClosedIcon className="w-3 h-3 group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Admin Portal</span>
             </button>
           </div>
         </div>

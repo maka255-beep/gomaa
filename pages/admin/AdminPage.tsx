@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { CloseIcon, ShieldCheckIcon, MenuIcon, UserIcon, LockClosedIcon } from '../../components/icons';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { User, Subscription } from '../../types';

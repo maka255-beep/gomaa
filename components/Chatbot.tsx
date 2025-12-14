@@ -13,6 +13,7 @@ const Chatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(true); // Track if API is available
   const { workshops } = useUser();
   const chatRef = useRef<Chat | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -26,8 +27,16 @@ const Chatbot: React.FC = () => {
 
   useEffect(() => {
     const initChat = () => {
+      // SECURITY CHECK: Ensure API key exists before trying to initialize
+      if (!process.env.API_KEY) {
+          console.warn("Gemini API Key is missing. Chatbot disabled.");
+          setIsAvailable(false);
+          setMessages([{ role: 'model', text: 'عذراً، خدمة المساعد الذكي غير مفعلة حالياً.' }]);
+          return;
+      }
+
       try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         
         const workshopDataForAI = workshops
           .filter(w => w.isVisible && !w.isDeleted)
@@ -69,8 +78,9 @@ const Chatbot: React.FC = () => {
         ]);
       } catch (error) {
         console.error("Error initializing Gemini Chat:", error);
+        setIsAvailable(false);
         setMessages([
-          { role: 'model', text: 'عذراً، المساعد الذكي غير متوفر حالياً.' }
+          { role: 'model', text: 'عذراً، المساعد الذكي يواجه مشكلة تقنية حالياً.' }
         ]);
       }
     };
@@ -84,7 +94,7 @@ const Chatbot: React.FC = () => {
   const handleSend = async (e: FormEvent) => {
     e.preventDefault();
     const inputText = inputRef.current?.value;
-    if (!inputText?.trim() || isLoading || !chatRef.current) return;
+    if (!inputText?.trim() || isLoading || !chatRef.current || !isAvailable) return;
 
     const newUserMessage: Message = { role: 'user', text: inputText };
     setMessages(prev => [...prev, newUserMessage]);
@@ -109,10 +119,10 @@ const Chatbot: React.FC = () => {
       console.error("Gemini API error:", error);
       setMessages(prev => {
         const newMessages = [...prev];
-        if (newMessages[newMessages.length - 1].role === 'model' && newMessages[newMessages.length - 1].text === '') {
-            newMessages[newMessages.length - 1].text = 'عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+        if (newMessages.length > 0 && newMessages[newMessages.length - 1].role === 'model' && newMessages[newMessages.length - 1].text === '') {
+            newMessages[newMessages.length - 1].text = 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.';
         } else {
-            newMessages.push({ role: 'model', text: 'عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى.' });
+            newMessages.push({ role: 'model', text: 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.' });
         }
         return newMessages;
       });
@@ -120,6 +130,8 @@ const Chatbot: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  if (!isAvailable && !isOpen) return null; // Hide button if broken
 
   return (
     <>
@@ -140,7 +152,9 @@ const Chatbot: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-base font-bold text-white leading-tight">المساعد الذكي</h2>
-                <p className="text-[10px] text-fuchsia-300 font-medium">متصل الآن</p>
+                <p className="text-[10px] text-fuchsia-300 font-medium">
+                    {isAvailable ? 'متصل الآن' : 'غير متوفر'}
+                </p>
               </div>
             </div>
             <button onClick={() => setIsOpen(false)} className="p-2 rounded-full hover:bg-white/10 text-slate-300 hover:text-white transition-colors">
@@ -173,12 +187,12 @@ const Chatbot: React.FC = () => {
                 type="text"
                 placeholder="اكتب استفسارك هنا..."
                 className="flex-grow py-3 px-4 bg-white/5 border border-white/10 rounded-full text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-fuchsia-500/50 focus:border-fuchsia-500/50 transition-all pl-12"
-                disabled={isLoading}
+                disabled={isLoading || !isAvailable}
               />
               <button
                 type="submit"
                 className="absolute left-1 top-1 bottom-1 w-10 flex items-center justify-center rounded-full bg-gradient-to-tr from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLoading}
+                disabled={isLoading || !isAvailable}
                 aria-label="إرسال"
               >
                 {isLoading ? (

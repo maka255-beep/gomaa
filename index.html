@@ -4,7 +4,8 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- FIX: viewport-fit=cover prevents white bars on phones with notches -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Nawaya Events</title>
     <link rel="manifest" href="/manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,13 +29,28 @@
         --glow-color: rgba(219, 39, 119, 0.6); /* Adjusted Glow */
       }
 
-      html, body {
+      /* FIX: Ensure html/body take full height and cover background to prevent white bleeds */
+      html {
         height: 100%;
+        background-color: var(--color-bg-primary);
+      }
+
+      body {
+        min-height: 100%;
         margin: 0;
         padding: 0;
         background-color: var(--color-bg-primary);
         color: #e2e8f0; /* نص فاتح للقراءة */
         font-family: 'Noto Sans Arabic', sans-serif;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* FIX: Reset images to prevent layout shifts */
+      img, video {
+        max-width: 100%;
+        height: auto;
+        display: block;
       }
 
       /* Custom Scrollbar */
@@ -80,13 +96,10 @@
 
       /* Gradient Classes */
       .bg-theme-header-gradient {
-        /* Dominant Dark Purple, fading only slightly to deep mauve at the end */
-        /* Changed from bright pink ending to deep purple/mauve mix */
         background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 70%, #4c1d95 100%);
         backdrop-filter: blur(10px);
       }
       .bg-theme-gradient-btn {
-        /* Smooth subtle gradient for buttons - Updated to match unified theme */
         background-image: linear-gradient(to right, #6b21a8, #db2777);
       }
       .bg-theme-gradient-btn:hover {
@@ -154,7 +167,6 @@
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
     <script>
-      // UNREGISTER Service Worker to clear cache and ensure updates
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
           for(let registration of registrations) {

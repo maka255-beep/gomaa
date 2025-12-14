@@ -156,13 +156,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
     const [isCreditHistoryVisible, setIsCreditHistoryVisible] = useState(false);
     const [comingSoonModalWorkshop, setComingSoonModalWorkshop] = useState<Workshop | null>(null);
 
-    // FIX: Filter out PayItForward donation records from the displayed subscriptions
     const subscriptions = useMemo(() => {
         return user?.subscriptions
             .filter(sub => 
                 sub.isApproved !== false && 
                 sub.status !== SubscriptionStatus.PENDING &&
-                !sub.isPayItForwardDonation // <--- Added this check
+                !sub.isPayItForwardDonation
             )
             .sort((a, b) => new Date(b.activationDate).getTime() - new Date(a.activationDate).getTime()) || [];
     }, [user]);
@@ -173,9 +172,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
             .sort((a,b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
     }, [consultationRequests, user]);
 
-    // ... (rest of the file remains unchanged)
-
-    // Only render changes if there are differences from here
     useEffect(() => {
         // Reset view when modal is opened for a new user
         setActiveView('my_workshops');
@@ -184,10 +180,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
     }, [user]);
 
     const handleGenerateRecs = async () => {
+        if (!process.env.API_KEY) {
+            showToast('خدمة الاقتراحات الذكية غير مفعلة حالياً.', 'warning');
+            return;
+        }
+
         setIsLoadingRecs(true);
         setRecommendations([]);
         try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             
             const subscribedWorkshopTitles = subscriptions.map(sub => workshops.find(w => w.id === sub.workshopId)?.title).filter(Boolean);
             const availableWorkshops = workshops.filter(w => w.isVisible && !w.isDeleted && !subscriptions.some(sub => sub.workshopId === w.id)).map(w => ({ id: w.id, title: w.title, topics: w.topics }));

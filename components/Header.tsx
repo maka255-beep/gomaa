@@ -198,6 +198,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="flex justify-end items-center gap-4">
             {user ? (
                 <>
+                    {/* Desktop Notifications */}
                     <div className="hidden md:block relative" ref={desktopNotificationContainerRef}>
                         <button onClick={handleNotificationsToggle} className={`${iconButtonClasses} relative`}>
                             <BellIcon className="w-6 h-6" />
@@ -209,6 +210,19 @@ const Header: React.FC<HeaderProps> = ({
                         </button>
                         {isNotificationsPanelOpen && <NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} />}
                     </div>
+
+                    {/* Mobile Notifications Icon */}
+                    <div className="md:hidden relative">
+                        <button onClick={handleMobileNotificationsToggle} className={`${iconButtonClasses} relative`}>
+                            <BellIcon className="w-6 h-6" />
+                            {unreadCount > 0 && (
+                                <span className="absolute top-0 right-0 h-4 w-4 bg-fuchsia-600 rounded-full text-[10px] flex items-center justify-center text-white font-bold animate-pulse shadow-lg shadow-fuchsia-500/50">
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+
                     <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
                         <GlobeAltIcon className="w-6 h-6"/>
                     </button>
@@ -237,9 +251,16 @@ const Header: React.FC<HeaderProps> = ({
         </nav>
       </header>
 
+      {/* Mobile Notifications Fullscreen Overlay */}
+      {isMobileNotificationsOpen && (
+        <div className="fixed inset-0 z-[60] bg-theme-header-gradient md:hidden flex flex-col">
+            <NotificationsPanel onClose={() => setIsMobileNotificationsOpen(false)} isMobile={true} />
+        </div>
+      )}
+
       {/* Mobile Menu Overlay */}
       <div className={`fixed inset-0 bg-black/90 z-[60] transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-        <div className={`fixed inset-y-0 right-0 w-[80%] max-w-sm bg-theme-header-gradient shadow-2xl transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} overflow-y-auto flex flex-col`}>
+        <div className={`fixed inset-y-0 right-0 w-[85%] max-w-sm bg-theme-header-gradient shadow-2xl transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} overflow-y-auto flex flex-col`}>
             
             <div className="p-5 flex justify-between items-center border-b border-white/10">
                 <span className="text-xl font-bold text-white">القائمة</span>
@@ -261,19 +282,44 @@ const Header: React.FC<HeaderProps> = ({
                     </div>
                 )}
 
-                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.WORKSHOPS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">الرئيسية</button>
-                <button onClick={() => handleMobileLinkClick(onShowVideo)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">من هي دكتور هوب</button>
-                <button onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">ألبوم الصور</button>
-                <button onClick={() => handleMobileLinkClick(onShowInstagram)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">بثوث انستجرام</button>
-                <button onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">طلب استشارة</button>
-                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">آراء المشتركات</button>
-                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">شركاء النجاح</button>
-                <button onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">البوتيك</button>
+                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.WORKSHOPS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2 bg-white/5 rounded-lg border border-white/5">
+                    الرئيسية
+                </button>
+
+                {/* Grouped Dr Hope Section */}
+                <div className="bg-black/20 rounded-xl p-4 border border-fuchsia-500/20 mt-2">
+                    <h3 className="text-fuchsia-400 font-bold text-sm mb-3 border-b border-white/5 pb-2">عالم دكتور هوب</h3>
+                    <div className="flex flex-col gap-1">
+                        <button onClick={() => handleMobileLinkClick(onShowVideo)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
+                            <VideoIcon className="w-4 h-4 text-fuchsia-500"/> من هي دكتور هوب
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
+                            <CollectionIcon className="w-4 h-4 text-fuchsia-500"/> ألبوم الصور
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onShowInstagram)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
+                            <InstagramIcon className="w-4 h-4 text-fuchsia-500"/> بثوث انستجرام
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
+                            <ChatBubbleIcon className="w-4 h-4 text-fuchsia-500"/> طلب استشارة
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
+                            <ChatBubbleLeftRightIcon className="w-4 h-4 text-fuchsia-500"/> آراء المشتركات
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
+                            <UsersIcon className="w-4 h-4 text-fuchsia-500"/> شركاء النجاح
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
+                            <ShoppingCartIcon className="w-4 h-4 text-fuchsia-500"/> البوتيك
+                        </button>
+                    </div>
+                </div>
 
                 {user && (
                     <>
-                        <div className="h-px bg-white/10 my-2"></div>
-                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2">ملفي الشخصي</button>
+                        <div className="h-px bg-white/10 my-1"></div>
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2 flex items-center gap-2">
+                            <UserIcon className="w-5 h-5"/> ملفي الشخصي
+                        </button>
                         <button onClick={() => handleMobileLinkClick(onLogout)} className="text-right text-red-400 font-bold text-lg hover:text-red-300 transition-colors p-2 flex items-center gap-2">
                             <ArrowLeftOnRectangleIcon className="w-5 h-5"/>
                             تسجيل خروج

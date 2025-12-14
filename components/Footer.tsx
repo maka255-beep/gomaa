@@ -23,16 +23,8 @@ const Footer: React.FC<FooterProps> = ({ onShippingClick, onTermsClick, onAboutC
   const { drhopeData } = useUser();
   const { socialMediaLinks } = drhopeData;
 
-  const handleAdminEntry = (e: React.MouseEvent) => {
-      e.preventDefault();
-      const url = new URL(window.location.href);
-      url.searchParams.set('mode', 'admin');
-      window.history.pushState({}, '', url);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-
   return (
-    <footer className="relative mt-16 pt-12 pb-6 bg-[#180a24] text-slate-300 overflow-hidden border-t border-fuchsia-500/20">
+    <footer className="relative mt-16 pt-12 pb-6 bg-[#2e1065] text-slate-300 overflow-hidden border-t border-fuchsia-500/20">
       
       {/* Ambient Background Glows */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-fuchsia-900/10 blur-[100px] rounded-full pointer-events-none"></div>
@@ -166,15 +158,15 @@ const Footer: React.FC<FooterProps> = ({ onShippingClick, onTermsClick, onAboutC
           </p>
           
           <div className="flex items-center gap-4">
-             {/* Admin Entry Button - Subtle */}
-            <button 
-                onClick={handleAdminEntry}
-                className="text-slate-600 hover:text-fuchsia-500 flex items-center gap-1.5 transition-colors group"
+             {/* Admin Entry Link - Direct href for reliability */}
+            <a 
+                href="?mode=admin"
+                className="text-slate-600 hover:text-fuchsia-500 flex items-center gap-1.5 transition-colors group cursor-pointer"
                 title="دخول المسؤول"
             >
                 <LockClosedIcon className="w-3 h-3 group-hover:scale-110 transition-transform" />
                 <span className="text-[10px] font-bold uppercase tracking-wider">Admin Portal</span>
-            </button>
+            </a>
           </div>
         </div>
       </div>

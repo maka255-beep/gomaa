@@ -87,7 +87,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({ isOpen, onClose, use
                             <div className="space-y-1">
                                 <p className="font-bold text-gray-500">من:</p>
                                 <p className="font-extrabold text-base text-violet-800">مؤسسة نوايا للفعاليات</p>
-                                <p className="text-gray-600">{drhopeData.companyAddress || '123 Business Bay, Dubai, UAE'}</p>
+                                <p className="text-gray-600">{drhopeData.companyAddress || 'ابوظبي - الامارات العربية المتحدة'}</p>
                                 <p className="text-gray-600">الهاتف: {drhopeData.companyPhone || '+971 4 123 4567'}</p>
                             </div>
                             <div className="space-y-1">

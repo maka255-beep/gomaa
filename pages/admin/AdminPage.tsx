@@ -1,11 +1,11 @@
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CloseIcon, ShieldCheckIcon, MenuIcon, UserIcon, LockClosedIcon } from '../../components/icons';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { User, Subscription } from '../../types';
 import { LanguageProvider, useAdminTranslation } from './AdminTranslationContext';
 
-// Direct Imports (Removed Lazy Loading for Stability)
+// Corrected Static Imports (Siblings in the same folder)
 import UserManagementPage from './UserManagementPage';
 import WorkshopManagementPage from './WorkshopManagementPage';
 import TransfersPage from './TransfersPage';

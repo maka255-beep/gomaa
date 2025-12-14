@@ -1,16 +1,17 @@
-import React, { useState, lazy, Suspense } from 'react';
+
+import React, { useState } from 'react';
 import { useAdminTranslation } from './AdminTranslationContext';
 import { CreditCardIcon, UsersIcon, ChatBubbleLeftRightIcon, LinkIcon, CogIcon, PhotographIcon, LightBulbIcon, ChatBubbleIcon, BanknotesIcon } from '../../components/icons';
 
-// Lazy load the components this page will manage
-const DrHopePage = lazy(() => import('./DrHopePage'));
-const BankDetailsPage = lazy(() => import('./BankDetailsPage'));
-const ConsultationManagementTab = lazy(() => import('./ConsultationManagementTab'));
-const ReviewManagementPage = lazy(() => import('./ReviewManagementPage'));
-const GeneralSettingsTab = lazy(() => import('./GeneralSettingsTab'));
-const SiteColorsTab = lazy(() => import('./SiteColorsTab'));
-const PartnersManagementTab = lazy(() => import('./PartnersManagementTab'));
-const PaymentSettingsTab = lazy(() => import('./PaymentSettingsTab'));
+// Direct Imports
+import DrHopePage from './DrHopePage';
+import BankDetailsPage from './BankDetailsPage';
+import ConsultationManagementTab from './ConsultationManagementTab';
+import ReviewManagementPage from './ReviewManagementPage';
+import GeneralSettingsTab from './GeneralSettingsTab';
+import SiteColorsTab from './SiteColorsTab';
+import PartnersManagementTab from './PartnersManagementTab';
+import PaymentSettingsTab from './PaymentSettingsTab';
 
 
 interface LinksManagementPageProps {
@@ -25,7 +26,7 @@ const LinksManagementPage: React.FC<LinksManagementPageProps> = ({ showToast }) 
 
     const renderTabContent = () => {
         return (
-            <Suspense fallback={<div className="text-center p-8">Loading...</div>}>
+            <>
                 {activeTab === 'general' && <GeneralSettingsTab showToast={showToast} />}
                 {activeTab === 'siteColors' && <SiteColorsTab showToast={showToast} />}
                 {activeTab === 'consultations' && <ConsultationManagementTab />}
@@ -34,7 +35,7 @@ const LinksManagementPage: React.FC<LinksManagementPageProps> = ({ showToast }) 
                 {activeTab === 'drhope' && <DrHopePage showToast={showToast} />}
                 {activeTab === 'bank' && <BankDetailsPage showToast={showToast} />}
                 {activeTab === 'paymentSettings' && <PaymentSettingsTab showToast={showToast} />}
-            </Suspense>
+            </>
         )
     };
     

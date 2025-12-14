@@ -502,7 +502,7 @@ const initialDrhopeData: Omit<DrhopeData, 'theme'> & { themes: Theme[], activeTh
     ibanNumber: 'SA00 0000 0000 0000 0000 0000 0000',
     accountNumber: '1234567890123',
     swiftCode: '',
-    companyAddress: '123 Business Bay, Dubai, UAE',
+    companyAddress: 'ابوظبي - الامارات العربية المتحدة',
     companyPhone: '+971 4 123 4567',
     taxRegistrationNumber: '100000000000003',
     liveWorkshopRefundPolicy: 'يحق للمشتركة الإنسحاب وإسترجاع المبلغ كامل قبل بدايه الورشة بأسبوع ( ٧ ايام )\nقبل بدء الورشة بسبعة ايام نعتذر لا يمكننا إسترجاع المبلغ\nيتم إسترجاع المبلغ في خلال سبعة ايام عمل',

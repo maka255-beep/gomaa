@@ -48,7 +48,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
   // The live stream card should always point to the next upcoming workshop, regardless of filters.
   const liveStreamWorkshop = visibleWorkshops.filter(w => !w.isRecorded && !isWorkshopExpired(w)).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0] || null;
 
-  const filters: Array<'all' | 'أونلاين' | 'حضوري' | 'مسجلة' | 'أونلاين وحضوري'> = ['all', 'أونلاين', 'حضوري', 'مسجلة'];
+  const filters: Array<'all' | 'أونلاين' | 'حضوري' | 'مسجلة' | 'أونلاين وحضوري'> = ['all', 'أونلاين', 'حضوري', 'أونلاين وحضوري', 'مسجلة'];
   const filterLabels = {
     'all': 'الكل',
     'أونلاين': 'أونلاين',

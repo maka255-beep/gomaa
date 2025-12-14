@@ -100,7 +100,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
                         <button
                             key={filter}
                             onClick={() => setActiveFilter(filter)}
-                            className={`px-4 py-2 text-sm font-bold rounded-md transition-all duration-300 ${activeFilter === filter ? 'bg-fuchsia-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-200 hover:text-slate-800'}`}
+                            className={`px-4 py-2 text-sm font-bold rounded-md transition-all duration-300 ${activeFilter === filter ? 'bg-gradient-to-r from-purple-800 to-pink-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-200 hover:text-slate-800'}`}
                         >
                             {filterLabels[filter]}
                         </button>
@@ -157,3 +157,4 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
 };
 
 export default WorkshopsPage;
+    

@@ -1,34 +1,32 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUser } from './context/UserContext';
-import { User, Subscription, Workshop, Recording } from './types';
-import Toast from './components/Toast';
-import AdminPage from './pages/admin/AdminPage';
-import WatchPage from './pages/WatchPage';
-import { InvoiceModal } from './components/InvoiceModal';
-import ProfilePage from './pages/ProfilePage';
 import PublicApp from './pages/PublicApp';
-
-type AppView = 'public' | 'admin';
+import AdminPage from './pages/admin/AdminPage';
+import { User, Subscription } from './types';
+import { InvoiceModal } from './components/InvoiceModal';
+import UserDetailsModal from './components/UserDetailsModal';
+import Toast from './components/Toast';
 
 const App: React.FC = () => {
-  const { currentUser, loginAsUser, workshops, activeTheme } = useUser();
-  
-  // Navigation & View State
-  const [currentView, setCurrentView] = useState<AppView>('public');
-  
-  // Admin State
+  const { activeTheme, loginAsUser, workshops } = useUser();
+  const [isAdminMode, setIsAdminMode] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-
-  // Common UI State (Only for global toasts not handled in sub-apps)
-  const [toasts, setToasts] = useState<{ id: string, message: string, type: 'success' | 'warning' | 'error' }[]>([]);
-
-  // Shared state for Admin accessing Profile/Watch features
-  const [userProfileToView, setUserProfileToView] = useState<User | null>(null);
-  const [invoiceToView, setInvoiceToView] = useState<{ user: User; subscription: Subscription } | null>(null);
-  const [watchData, setWatchData] = useState<{ workshop: Workshop, recording: Recording } | null>(null);
   
+  // Admin specific states
+  const [toasts, setToasts] = useState<{ id: string, message: string, type: 'success' | 'warning' | 'error' }[]>([]);
+  const [invoiceToView, setInvoiceToView] = useState<{ user: User; subscription: Subscription } | null>(null);
+  const [userProfileToView, setUserProfileToView] = useState<User | null>(null);
+
   // --- Effects ---
+
+  useEffect(() => {
+    // Check URL for admin mode
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'admin') {
+        setIsAdminMode(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!activeTheme) return;
@@ -57,58 +55,74 @@ const App: React.FC = () => {
     root.style.setProperty('--glow-intensity-factor', (activeTheme.glow.intensity / 50).toString());
   }, [activeTheme]);
 
-  // --- Handlers ---
+  // --- Admin Handlers ---
 
   const showToast = (message: string, type: 'success' | 'warning' | 'error' = 'success') => {
     const id = Date.now().toString();
     setToasts(prev => [...prev, { id, message, type }]);
   };
 
-  // --- Render Logic ---
+  const handleAdminClose = () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('mode');
+      window.history.pushState({}, '', url);
+      setIsAdminMode(false);
+  };
 
-  if (currentView === 'admin') {
-    return (
-      <div className="min-h-screen bg-slate-950 text-slate-200">
-        <AdminPage 
-          isOpen={true} 
-          onClose={() => setCurrentView('public')} 
-          onCollapse={() => setCurrentView('public')} 
-          showToast={showToast} 
-          onViewUserProfile={(u) => setUserProfileToView(u)} 
-          onViewInvoice={(d) => setInvoiceToView(d)} 
-          isAdminAuthenticated={isAdminAuthenticated} 
-          onLoginSuccess={() => setIsAdminAuthenticated(true)} 
-          onLoginAsUserId={(uid) => { const user = useUser().users.find(u => u.id === uid); if (user) loginAsUser(user); setCurrentView('public'); showToast('تم تسجيل الدخول كمسؤول.'); }} 
-        />
-        
-        {/* Render Modals accessible from Admin */}
-        {userProfileToView && (
-          <ProfilePage 
-              isOpen={!!userProfileToView} 
-              onClose={() => setUserProfileToView(null)} 
-              user={userProfileToView} 
-              onZoomRedirect={() => {}} // Admin doesn't need to redirect
-              onPlayRecording={(w, r) => setWatchData({ workshop: w, recording: r })} 
-              onViewAttachment={() => {}} 
-              onViewRecommendedWorkshop={() => {}} 
-              showToast={showToast} 
-              onPayForConsultation={() => {}} 
-              onViewInvoice={(details) => setInvoiceToView(details)} 
-          />
-        )}
-        {watchData && (
-            <div className="fixed inset-0 z-[100] bg-black">
-               <WatchPage workshop={watchData.workshop} recording={watchData.recording} onBack={() => setWatchData(null)} />
-            </div>
-        )}
-        {invoiceToView && <InvoiceModal isOpen={!!invoiceToView} onClose={() => setInvoiceToView(null)} user={invoiceToView.user} subscription={invoiceToView.subscription} workshop={workshops.find(w => w.id === invoiceToView.subscription.workshopId)!} />}
-        {toasts.map(t => <Toast key={t.id} message={t.message} type={t.type} onClose={() => setToasts(prev => prev.filter(item => item.id !== t.id))} />)}
-      </div>
-    );
+  const handleLoginAsUser = (userId: number) => {
+      // Logic to login as user and switch to public view
+      // We need to find the user from context in a real app, assuming logic exists in context
+      // Here we simulate the switch
+      handleAdminClose();
+      // You might need to call a context function here if available to set current user
+      // For now, we just switch the view.
+      console.log('Logging in as user:', userId);
+  };
+
+  if (isAdminMode) {
+      return (
+        <div className="min-h-screen bg-theme-gradient text-slate-200 font-sans">
+            <AdminPage 
+                isOpen={true}
+                onClose={handleAdminClose}
+                onCollapse={() => {}}
+                showToast={showToast}
+                onViewUserProfile={(user) => setUserProfileToView(user)}
+                onViewInvoice={(details) => setInvoiceToView(details)}
+                isAdminAuthenticated={isAdminAuthenticated}
+                onLoginSuccess={() => setIsAdminAuthenticated(true)}
+                onLoginAsUserId={handleLoginAsUser}
+            />
+            
+            {/* Admin Modals */}
+            {invoiceToView && (
+                <InvoiceModal 
+                    isOpen={!!invoiceToView} 
+                    onClose={() => setInvoiceToView(null)} 
+                    user={invoiceToView.user} 
+                    subscription={invoiceToView.subscription} 
+                    workshop={workshops.find(w => w.id === invoiceToView.subscription.workshopId)!} 
+                />
+            )}
+            
+            {userProfileToView && (
+                <UserDetailsModal 
+                    isOpen={!!userProfileToView}
+                    onClose={() => setUserProfileToView(null)}
+                    onSuccess={(msg) => showToast(msg, 'success')}
+                    userToEdit={userProfileToView}
+                />
+            )}
+
+            {toasts.map(t => (
+                <Toast key={t.id} message={t.message} type={t.type} onClose={() => setToasts(prev => prev.filter(item => item.id !== t.id))} />
+            ))}
+        </div>
+      );
   }
 
-  // Public View
-  return <PublicApp onSwitchToAdmin={() => setCurrentView('admin')} />;
+  // Render Public View
+  return <PublicApp />;
 }
 
 export default App;

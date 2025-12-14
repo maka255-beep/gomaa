@@ -49,9 +49,10 @@ const Header: React.FC<HeaderProps> = ({
   const [isExploreMenuOpen, setIsExploreMenuOpen] = useState(false);
   const [isNotificationsPanelOpen, setIsNotificationsPanelOpen] = useState(false);
   const [isMobileNotificationsOpen, setIsMobileNotificationsOpen] = useState(false);
+  const [isMobileDrHopeOpen, setIsMobileDrHopeOpen] = useState(false); // State for mobile accordion
   const desktopNotificationContainerRef = useRef<HTMLDivElement>(null);
   
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = user ? notifications.filter(n => !n.read).length : 0;
 
   
   useEffect(() => {
@@ -87,6 +88,10 @@ const Header: React.FC<HeaderProps> = ({
   }
 
   const handleMobileNotificationsToggle = () => {
+    if (!user) {
+        onLoginClick();
+        return;
+    }
     handleCloseMobileMenu();
     const willOpen = !isMobileNotificationsOpen;
     if(willOpen && unreadCount > 0) {
@@ -196,9 +201,22 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Right section */}
           <div className="flex justify-end items-center gap-4">
+            
+            {/* Mobile Notifications Icon - Always Visible (Prompts login if guest) */}
+            <div className="md:hidden relative">
+                <button onClick={handleMobileNotificationsToggle} className={`${iconButtonClasses} relative`}>
+                    <BellIcon className="w-6 h-6" />
+                    {user && unreadCount > 0 && (
+                        <span className="absolute top-0 right-0 h-4 w-4 bg-fuchsia-600 rounded-full text-[10px] flex items-center justify-center text-white font-bold animate-pulse shadow-lg shadow-fuchsia-500/50">
+                            {unreadCount}
+                        </span>
+                    )}
+                </button>
+            </div>
+
             {user ? (
                 <>
-                    {/* Desktop Notifications */}
+                    {/* Desktop Notifications - Only when logged in */}
                     <div className="hidden md:block relative" ref={desktopNotificationContainerRef}>
                         <button onClick={handleNotificationsToggle} className={`${iconButtonClasses} relative`}>
                             <BellIcon className="w-6 h-6" />
@@ -209,18 +227,6 @@ const Header: React.FC<HeaderProps> = ({
                             )}
                         </button>
                         {isNotificationsPanelOpen && <NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} />}
-                    </div>
-
-                    {/* Mobile Notifications Icon */}
-                    <div className="md:hidden relative">
-                        <button onClick={handleMobileNotificationsToggle} className={`${iconButtonClasses} relative`}>
-                            <BellIcon className="w-6 h-6" />
-                            {unreadCount > 0 && (
-                                <span className="absolute top-0 right-0 h-4 w-4 bg-fuchsia-600 rounded-full text-[10px] flex items-center justify-center text-white font-bold animate-pulse shadow-lg shadow-fuchsia-500/50">
-                                    {unreadCount}
-                                </span>
-                            )}
-                        </button>
                     </div>
 
                     <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
@@ -243,10 +249,6 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
               </div>
             )}
-            
-            <button onClick={onBoutiqueClick} className={`md:hidden ${iconButtonClasses}`}>
-                <ShoppingCartIcon className="w-6 h-6"/>
-            </button>
           </div>
         </nav>
       </header>
@@ -286,10 +288,17 @@ const Header: React.FC<HeaderProps> = ({
                     الرئيسية
                 </button>
 
-                {/* Grouped Dr Hope Section */}
-                <div className="bg-black/20 rounded-xl p-4 border border-fuchsia-500/20 mt-2">
-                    <h3 className="text-fuchsia-400 font-bold text-sm mb-3 border-b border-white/5 pb-2">عالم دكتور هوب</h3>
-                    <div className="flex flex-col gap-1">
+                {/* Collapsible Dr Hope Section */}
+                <div className="bg-black/20 rounded-xl border border-fuchsia-500/20 mt-2 overflow-hidden transition-all duration-300">
+                    <button 
+                        onClick={() => setIsMobileDrHopeOpen(!isMobileDrHopeOpen)}
+                        className="w-full p-4 flex justify-between items-center text-fuchsia-400 font-bold text-sm hover:bg-white/5 transition-colors"
+                    >
+                        <span>عالم دكتور هوب</span>
+                        <ChevronDownIcon className={`w-4 h-4 transition-transform duration-300 ${isMobileDrHopeOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    <div className={`flex flex-col gap-1 px-4 pb-4 ${isMobileDrHopeOpen ? 'block' : 'hidden'}`}>
                         <button onClick={() => handleMobileLinkClick(onShowVideo)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
                             <VideoIcon className="w-4 h-4 text-fuchsia-500"/> من هي دكتور هوب
                         </button>

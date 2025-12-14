@@ -1,25 +1,30 @@
-// sw.js
 
-// On install, force the new service worker to activate immediately.
-self.addEventListener('install', event => {
-  console.log('Service Worker installing and skipping wait.');
+// sw.js - FORCE CLEANUP VERSION
+
+const CACHE_NAME = 'nawaya-cache-v-cleanup';
+
+self.addEventListener('install', (event) => {
+  // Skip waiting to activate immediately
   self.skipWaiting();
 });
 
-// On activate, take control of all clients and clear any old caches.
-self.addEventListener('activate', event => {
-  console.log('Service Worker activating.');
+self.addEventListener('activate', (event) => {
+  // Delete all caches immediately
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((keyList) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          console.log('Service Worker: Deleting old cache:', cacheName);
-          return caches.delete(cacheName);
+        keyList.map((key) => {
+          console.log('Deleting cache:', key);
+          return caches.delete(key);
         })
       );
     }).then(() => {
-      console.log('Service Worker: Claiming clients.');
-      return self.clients.claim();
+        return self.clients.claim();
     })
   );
+});
+
+// Pass through all fetch requests (no caching)
+self.addEventListener('fetch', (event) => {
+  return;
 });

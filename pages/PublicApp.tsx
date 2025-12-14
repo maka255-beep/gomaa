@@ -32,11 +32,7 @@ import ProductCheckoutModal from '../components/ProductCheckoutModal';
 import LegalModal from '../components/LegalModal';
 import { PrivacyPolicyContent, TermsContent, ShippingPolicyContent, AboutContent } from '../components/LegalContent';
 
-interface PublicAppProps {
-    onSwitchToAdmin: () => void;
-}
-
-const PublicApp: React.FC<PublicAppProps> = ({ onSwitchToAdmin }) => {
+const PublicApp: React.FC = () => {
   const { currentUser, workshops, products, placeOrder, addSubscription, addPendingGift, donateToPayItForward } = useUser();
   
   // Navigation State
@@ -249,7 +245,6 @@ const PublicApp: React.FC<PublicAppProps> = ({ onSwitchToAdmin }) => {
       </main>
 
       <Footer 
-        onAdminClick={onSwitchToAdmin}
         onShippingClick={() => setLegalModalContent({ title: 'سياسة الشحن والتوصيل', content: <ShippingPolicyContent /> })}
         onTermsClick={() => setLegalModalContent({ title: 'الشروط والأحكام', content: <TermsContent /> })}
         onAboutClick={() => setLegalModalContent({ title: 'من نحن', content: <AboutContent /> })}

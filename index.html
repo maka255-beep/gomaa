@@ -154,9 +154,14 @@
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
     <script>
+      // UNREGISTER Service Worker to clear cache and ensure updates
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(registration => console.log('SW registered')).catch(err => console.log('SW failed', err));
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister().then(function(boolean) {
+                console.log('Service Worker unregistered: ', boolean);
+            });
+          }
         });
       }
     </script>

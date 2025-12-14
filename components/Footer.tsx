@@ -5,7 +5,6 @@ import { useUser } from '../context/UserContext';
 import { SocialMediaLinks } from '../types';
 
 interface FooterProps {
-  onAdminClick: () => void;
   onShippingClick: () => void;
   onTermsClick: () => void;
   onAboutClick: () => void;
@@ -20,7 +19,7 @@ const socialPlatforms: { key: keyof SocialMediaLinks; icon: React.FC<{ className
     { key: 'tiktok', icon: TikTokIcon, hoverClasses: 'hover:bg-[#00f2ea] hover:text-black hover:shadow-[0_0_15px_rgba(0,242,234,0.6)]', ariaLabel: 'TikTok' },
 ];
 
-const Footer: React.FC<FooterProps> = ({ onAdminClick, onShippingClick, onTermsClick, onAboutClick, onPrivacyClick }) => {
+const Footer: React.FC<FooterProps> = ({ onShippingClick, onTermsClick, onAboutClick, onPrivacyClick }) => {
   const { drhopeData } = useUser();
   const { socialMediaLinks } = drhopeData;
 
@@ -122,14 +121,6 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick, onShippingClick, onTermsC
           <p dir="ltr" className="text-[9px] text-slate-400 font-medium opacity-60 text-center">
             &copy; {new Date().getFullYear()} <span className="text-white">Nawaya</span>. All Rights Reserved.
           </p>
-          
-          {/* Admin Button - Absolute Left on Desktop, Stacked on Mobile */}
-          <div className="mt-2 md:mt-0 md:absolute md:left-0 flex items-center gap-2">
-             <button onClick={onAdminClick} className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1 px-2 py-0.5 rounded-full hover:bg-white/5 opacity-70 hover:opacity-100">
-                <span className="w-1 h-1 rounded-full bg-fuchsia-500"></span> 
-                Admin
-             </button>
-          </div>
         </div>
       </div>
     </footer>

@@ -33,17 +33,30 @@ import ProductCheckoutModal from './components/ProductCheckoutModal';
 import LegalModal from './components/LegalModal';
 import { PrivacyPolicyContent, TermsContent, ShippingPolicyContent, AboutContent } from './components/LegalContent';
 
+type AppView = 'public' | 'admin';
+
 const App: React.FC = () => {
   const { currentUser, loginAsUser, workshops, addSubscription, products, placeOrder, activeTheme, addPendingGift, donateToPayItForward } = useUser();
+  
+  // Navigation & View State
+  const [currentView, setCurrentView] = useState<AppView>('public');
   const [currentPage, setCurrentPage] = useState<Page>(Page.WORKSHOPS);
+  
+  // Admin State
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+
+  // Common UI State
   const [showIntro, setShowIntro] = useState(true);
+  const [toasts, setToasts] = useState<{ id: string, message: string, type: 'success' | 'warning' | 'error' }[]>([]);
+
+  // Public View State
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalInitialView, setAuthModalInitialView] = useState<'login' | 'register'>('login');
+  
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [isNavigationHubOpen, setIsNavigationHubOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isPhotoAlbumModalOpen, setIsPhotoAlbumModalOpen] = useState(false);
@@ -56,22 +69,29 @@ const App: React.FC = () => {
   const [isBoutiqueModalOpen, setIsBoutiqueModalOpen] = useState(false);
   const [boutiqueInitialView, setBoutiqueInitialView] = useState<'products' | 'cart'>('products');
   const [isProductCheckoutOpen, setIsProductCheckoutOpen] = useState(false);
+  
   const [cart, setCart] = useState<Map<number, number>>(() => {
     const savedCart = localStorage.getItem('nawaya_cart');
     return savedCart ? new Map(JSON.parse(savedCart) as [number, number][]) : new Map();
   });
+
   const [openedWorkshopId, setOpenedWorkshopId] = useState<number | null>(null);
   const [zoomRedirectLink, setZoomRedirectLink] = useState<string | null>(null);
   const [attachmentToView, setAttachmentToView] = useState<NoteResource | null>(null);
   const [invoiceToView, setInvoiceToView] = useState<{ user: User; subscription: Subscription } | null>(null);
+  
+  // Shared between Admin and Profile
   const [userProfileToView, setUserProfileToView] = useState<User | null>(null);
+  
   const [watchData, setWatchData] = useState<{ workshop: Workshop, recording: Recording } | null>(null);
   const [paymentModalIntent, setPaymentModalIntent] = useState<PaymentIntent | null>(null);
   const [giftModalIntent, setGiftModalIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
   const [postLoginPaymentIntent, setPostLoginPaymentIntent] = useState<PaymentIntent | null>(null);
   const [postLoginGiftIntent, setPostLoginGiftIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
-  const [toasts, setToasts] = useState<{ id: string, message: string, type: 'success' | 'warning' | 'error' }[]>([]);
+  
   const initialHubOpenRef = useRef(false);
+
+  // --- Effects ---
 
   useEffect(() => {
     if (!activeTheme) return;
@@ -102,7 +122,13 @@ const App: React.FC = () => {
 
   useEffect(() => { localStorage.setItem('nawaya_cart', JSON.stringify(Array.from(cart.entries()))); }, [cart]);
   useEffect(() => { const timer = setTimeout(() => setShowIntro(false), 3500); return () => clearTimeout(timer); }, []);
-  useEffect(() => { if (!showIntro && !initialHubOpenRef.current) { setIsNavigationHubOpen(true); initialHubOpenRef.current = true; } }, [showIntro]);
+  useEffect(() => { 
+      if (!showIntro && !initialHubOpenRef.current && currentView === 'public') { 
+          setIsNavigationHubOpen(true); 
+          initialHubOpenRef.current = true; 
+      } 
+  }, [showIntro, currentView]);
+
   useEffect(() => {
       if (currentUser) {
           if (postLoginPaymentIntent) { setPaymentModalIntent(postLoginPaymentIntent); setIsPaymentModalOpen(true); setPostLoginPaymentIntent(null); }
@@ -110,14 +136,26 @@ const App: React.FC = () => {
       }
   }, [currentUser, postLoginPaymentIntent, postLoginGiftIntent]);
 
+  // --- Handlers ---
+
   const showToast = (message: string, type: 'success' | 'warning' | 'error' = 'success') => {
     const id = Date.now().toString();
     setToasts(prev => [...prev, { id, message, type }]);
   };
 
+  const handleLoginClick = () => {
+    setAuthModalInitialView('login');
+    setIsAuthModalOpen(true);
+  };
+
+  const handleRegisterClick = () => {
+    setAuthModalInitialView('register');
+    setIsAuthModalOpen(true);
+  };
+
   const handleNavigate = (target: Page | string) => {
     setIsMobileMenuOpen(false);
-    if (target === Page.PROFILE) { if (currentUser) setIsProfileOpen(true); else setIsAuthModalOpen(true); }
+    if (target === Page.PROFILE) { if (currentUser) setIsProfileOpen(true); else handleLoginClick(); }
     else if (target === Page.REVIEWS) setIsReviewsModalOpen(true);
     else if (target === Page.PARTNERS) setIsPartnersModalOpen(true);
     else if (target === Page.BOUTIQUE) { setBoutiqueInitialView('products'); setIsBoutiqueModalOpen(true); }
@@ -147,7 +185,7 @@ const App: React.FC = () => {
 
   const removeFromCart = (productId: number) => { setCart(prev => { const newCart = new Map(prev); newCart.delete(productId); return newCart; }); };
 
-  const handleCheckout = () => { if (currentUser) { setIsBoutiqueModalOpen(false); setIsProductCheckoutOpen(true); } else { setIsBoutiqueModalOpen(false); setIsAuthModalOpen(true); } };
+  const handleCheckout = () => { if (currentUser) { setIsBoutiqueModalOpen(false); setIsProductCheckoutOpen(true); } else { setIsBoutiqueModalOpen(false); handleLoginClick(); } };
 
   const handleProductOrderConfirm = (isCard: boolean) => {
     if (!currentUser) return;
@@ -164,7 +202,7 @@ const App: React.FC = () => {
   const handleEnrollRequest = (workshop: Workshop, selectedPackage: Package | null) => {
     setOpenedWorkshopId(null);
     const intent: PaymentIntent = { type: 'workshop', item: workshop, pkg: selectedPackage || undefined };
-    if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); setIsAuthModalOpen(true); }
+    if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(); }
   };
 
   const handleGiftRequest = (workshop: Workshop, selectedPackage: Package | null) => {
@@ -201,9 +239,54 @@ const App: React.FC = () => {
       if (!giftModalIntent) return;
       const { workshop, pkg } = giftModalIntent;
       const intent: PaymentIntent = { type: data.type === 'fund' ? 'payItForward' : 'gift', item: workshop, pkg: pkg || undefined, amount: data.totalAmount, recipientDetails: data };
-      if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); setIsAuthModalOpen(true); }
+      if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(); }
   };
 
+  // --- Render Logic ---
+
+  // Admin View
+  if (currentView === 'admin') {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-200">
+        <AdminPage 
+          isOpen={true} 
+          onClose={() => setCurrentView('public')} 
+          onCollapse={() => setCurrentView('public')} 
+          showToast={showToast} 
+          onViewUserProfile={(u) => setUserProfileToView(u)} 
+          onViewInvoice={(d) => setInvoiceToView(d)} 
+          isAdminAuthenticated={isAdminAuthenticated} 
+          onLoginSuccess={() => setIsAdminAuthenticated(true)} 
+          onLoginAsUserId={(uid) => { const user = useUser().users.find(u => u.id === uid); if (user) loginAsUser(user); setCurrentView('public'); showToast('تم تسجيل الدخول كمسؤول.'); }} 
+        />
+        
+        {/* Render Modals accessible from Admin */}
+        {userProfileToView && (
+          <ProfilePage 
+              isOpen={!!userProfileToView} 
+              onClose={() => setUserProfileToView(null)} 
+              user={userProfileToView} 
+              onZoomRedirect={(link) => setZoomRedirectLink(link)} 
+              onPlayRecording={(w, r) => setWatchData({ workshop: w, recording: r })} 
+              onViewAttachment={(note) => setAttachmentToView(note)} 
+              onViewRecommendedWorkshop={(id) => { setUserProfileToView(null); setCurrentView('public'); setOpenedWorkshopId(id); }} 
+              showToast={showToast} 
+              onPayForConsultation={() => {}} 
+              onViewInvoice={(details) => setInvoiceToView(details)} 
+          />
+        )}
+        {watchData && (
+            <div className="fixed inset-0 z-[100] bg-black">
+               <WatchPage workshop={watchData.workshop} recording={watchData.recording} onBack={() => setWatchData(null)} />
+            </div>
+        )}
+        {invoiceToView && <InvoiceModal isOpen={!!invoiceToView} onClose={() => setInvoiceToView(null)} user={invoiceToView.user} subscription={invoiceToView.subscription} workshop={workshops.find(w => w.id === invoiceToView.subscription.workshopId)!} />}
+        {toasts.map(t => <Toast key={t.id} message={t.message} type={t.type} onClose={() => setToasts(prev => prev.filter(item => item.id !== t.id))} />)}
+      </div>
+    );
+  }
+
+  // Public View
   const isHomePage = currentPage === Page.WORKSHOPS;
 
   return (
@@ -211,7 +294,8 @@ const App: React.FC = () => {
       {showIntro && <IntroAnimation />}
       
       <Header 
-        onLoginClick={() => setIsAuthModalOpen(true)}
+        onLoginClick={handleLoginClick}
+        onRegisterClick={handleRegisterClick}
         onNavigate={handleNavigate}
         onScrollToSection={handleScrollToSection}
         onShowVideo={() => setIsVideoModalOpen(true)}
@@ -233,7 +317,7 @@ const App: React.FC = () => {
             <>
                 {currentPage === Page.WORKSHOPS && (
                     <WorkshopsPage 
-                        onLiveStreamLoginRequest={() => setIsAuthModalOpen(true)}
+                        onLiveStreamLoginRequest={handleLoginClick}
                         onScrollToSection={handleScrollToSection}
                         onOpenWorkshopDetails={(id) => setOpenedWorkshopId(id)}
                         onZoomRedirect={(link, id) => { setZoomRedirectLink(link); }}
@@ -244,38 +328,26 @@ const App: React.FC = () => {
       </main>
 
       <Footer 
-        onAdminClick={() => setIsAdminOpen(true)}
+        onAdminClick={() => setCurrentView('admin')}
         onShippingClick={() => setLegalModalContent({ title: 'سياسة الشحن والتوصيل', content: <ShippingPolicyContent /> })}
         onTermsClick={() => setLegalModalContent({ title: 'الشروط والأحكام', content: <TermsContent /> })}
         onAboutClick={() => setLegalModalContent({ title: 'من نحن', content: <AboutContent /> })}
         onPrivacyClick={() => setLegalModalContent({ title: 'سياسة الخصوصية', content: <PrivacyPolicyContent /> })}
       />
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onSuccess={(user) => { setIsAuthModalOpen(false); showToast(`مرحباً ${user.fullName}`); }} />
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        onSuccess={(user) => { setIsAuthModalOpen(false); showToast(`مرحباً ${user.fullName}`); }} 
+        initialView={authModalInitialView}
+      />
       {openedWorkshopId && <WorkshopDetailsModal workshop={workshops.find(w => w.id === openedWorkshopId)!} onClose={() => setOpenedWorkshopId(null)} onEnrollRequest={handleEnrollRequest} onGiftRequest={handleGiftRequest} showToast={showToast} />}
-      {isPaymentModalOpen && paymentModalIntent && <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} onCardPaymentSubmit={() => handlePaymentSubmit('CARD')} onBankPaymentSubmit={() => handlePaymentSubmit('BANK_TRANSFER')} itemTitle={paymentModalIntent.item.title || paymentModalIntent.item.subject} itemPackageName={paymentModalIntent.pkg?.name} amount={paymentModalIntent.amount || 0} currentUser={currentUser} onRequestLogin={() => { setIsPaymentModalOpen(false); setIsAuthModalOpen(true); setPostLoginPaymentIntent(paymentModalIntent); }} paymentType={paymentModalIntent.type} />}
+      {isPaymentModalOpen && paymentModalIntent && <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} onCardPaymentSubmit={() => handlePaymentSubmit('CARD')} onBankPaymentSubmit={() => handlePaymentSubmit('BANK_TRANSFER')} itemTitle={paymentModalIntent.item.title || paymentModalIntent.item.subject} itemPackageName={paymentModalIntent.pkg?.name} amount={paymentModalIntent.amount || 0} currentUser={currentUser} onRequestLogin={() => { setIsPaymentModalOpen(false); handleLoginClick(); setPostLoginPaymentIntent(paymentModalIntent); }} paymentType={paymentModalIntent.type} />}
       {isGiftModalOpen && giftModalIntent && <UnifiedGiftModal workshop={giftModalIntent.workshop} selectedPackage={giftModalIntent.pkg} onClose={() => setIsGiftModalOpen(false)} onProceed={handleGiftProceed} />}
       {isBoutiqueModalOpen && <BoutiqueModal isOpen={isBoutiqueModalOpen} onClose={() => setIsBoutiqueModalOpen(false)} cart={cart} onAddToCart={handleAddToCart} updateCartQuantity={updateCartQuantity} removeFromCart={removeFromCart} onCheckout={handleCheckout} initialView={boutiqueInitialView} />}
-      {isProductCheckoutOpen && <ProductCheckoutModal isOpen={isProductCheckoutOpen} onClose={() => setIsProductCheckoutOpen(false)} cart={cart} onConfirm={() => handleProductOrderConfirm(false)} onCardPaymentConfirm={() => handleProductOrderConfirm(true)} onRequestLogin={() => { setIsProductCheckoutOpen(false); setIsAuthModalOpen(true); }} currentUser={currentUser} />}
+      {isProductCheckoutOpen && <ProductCheckoutModal isOpen={isProductCheckoutOpen} onClose={() => setIsProductCheckoutOpen(false)} cart={cart} onConfirm={() => handleProductOrderConfirm(false)} onCardPaymentConfirm={() => handleProductOrderConfirm(true)} onRequestLogin={() => { setIsProductCheckoutOpen(false); handleLoginClick(); }} currentUser={currentUser} />}
       {isProfileOpen && <ProfilePage isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={currentUser} onZoomRedirect={(link) => setZoomRedirectLink(link)} onPlayRecording={(w, r) => setWatchData({ workshop: w, recording: r })} onViewAttachment={(note) => setAttachmentToView(note)} onViewRecommendedWorkshop={(id) => { setIsProfileOpen(false); setOpenedWorkshopId(id); }} showToast={showToast} onPayForConsultation={() => {}} onViewInvoice={(details) => setInvoiceToView(details)} />}
       
-      {/* Admin Profile View */}
-      {userProfileToView && (
-        <ProfilePage 
-            isOpen={!!userProfileToView} 
-            onClose={() => setUserProfileToView(null)} 
-            user={userProfileToView} 
-            onZoomRedirect={(link) => setZoomRedirectLink(link)} 
-            onPlayRecording={(w, r) => setWatchData({ workshop: w, recording: r })} 
-            onViewAttachment={(note) => setAttachmentToView(note)} 
-            onViewRecommendedWorkshop={(id) => { setUserProfileToView(null); setOpenedWorkshopId(id); }} 
-            showToast={showToast} 
-            onPayForConsultation={() => {}} 
-            onViewInvoice={(details) => setInvoiceToView(details)} 
-        />
-      )}
-
-      {isAdminOpen && <AdminPage isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} onCollapse={() => setIsAdminOpen(false)} showToast={showToast} onViewUserProfile={(u) => setUserProfileToView(u)} onViewInvoice={(d) => setInvoiceToView(d)} isAdminAuthenticated={isAdminAuthenticated} onLoginSuccess={() => setIsAdminAuthenticated(true)} onLoginAsUserId={(uid) => { const user = useUser().users.find(u => u.id === uid); if (user) loginAsUser(user); setIsAdminOpen(false); showToast('تم تسجيل الدخول كمسؤول.'); }} />}
       {isVideoModalOpen && <VideoModal isOpen={isVideoModalOpen} onClose={() => setIsVideoModalOpen(false)} />}
       {isPhotoAlbumModalOpen && <PhotoAlbumModal isOpen={isPhotoAlbumModalOpen} onClose={() => setIsPhotoAlbumModalOpen(false)} />}
       {isInstagramModalOpen && <InstagramModal isOpen={isInstagramModalOpen} onClose={() => setIsInstagramModalOpen(false)} />}
@@ -286,7 +358,7 @@ const App: React.FC = () => {
       {zoomRedirectLink && <ZoomRedirectModal isOpen={!!zoomRedirectLink} zoomLink={zoomRedirectLink} onClose={() => setZoomRedirectLink(null)} />}
       {invoiceToView && <InvoiceModal isOpen={!!invoiceToView} onClose={() => setInvoiceToView(null)} user={invoiceToView.user} subscription={invoiceToView.subscription} workshop={workshops.find(w => w.id === invoiceToView.subscription.workshopId)!} />}
       {isCvModalOpen && <CvModal isOpen={isCvModalOpen} onClose={() => setIsCvModalOpen(false)} />}
-      {isNavigationHubOpen && <NavigationHubModal isOpen={isNavigationHubOpen} userFullName={currentUser?.fullName} onNavigate={(target) => { setIsNavigationHubOpen(false); if (target === 'profile') { if (currentUser) setIsProfileOpen(true); else { showToast('يجب تسجيل الدخول', 'warning'); setIsAuthModalOpen(true); } } else if (target === 'live') { setCurrentPage(Page.WORKSHOPS); setTimeout(() => handleScrollToSection('live_events'), 100); } else if (target === 'new') { setCurrentPage(Page.WORKSHOPS); setTimeout(() => handleScrollToSection('workshops_section'), 100); } }} />}
+      {isNavigationHubOpen && <NavigationHubModal isOpen={isNavigationHubOpen} userFullName={currentUser?.fullName} onNavigate={(target) => { setIsNavigationHubOpen(false); if (target === 'profile') { if (currentUser) setIsProfileOpen(true); else { showToast('يجب تسجيل الدخول', 'warning'); handleLoginClick(); } } else if (target === 'live') { setCurrentPage(Page.WORKSHOPS); setTimeout(() => handleScrollToSection('live_events'), 100); } else if (target === 'new') { setCurrentPage(Page.WORKSHOPS); setTimeout(() => handleScrollToSection('workshops_section'), 100); } }} />}
       {legalModalContent && <LegalModal isOpen={!!legalModalContent} onClose={() => setLegalModalContent(null)} title={legalModalContent.title} content={legalModalContent.content} />}
       <Chatbot />
       <WhatsAppButton />

@@ -16,6 +16,7 @@ interface AuthModalProps {
   showRegisterView?: boolean;
   loginOnlyTitle?: string;
   loginButtonText?: string;
+  initialView?: 'login' | 'register'; // New prop
 }
 
 type AuthView = 'login' | 'register';
@@ -49,9 +50,9 @@ const maskPhoneNumber = (phone: string): string => {
   return '****';
 };
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClosable = true, onBack, showRegisterView = true, loginOnlyTitle, loginButtonText = 'دخول' }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClosable = true, onBack, showRegisterView = true, loginOnlyTitle, loginButtonText = 'دخول', initialView = 'login' }) => {
   const { login, register, checkRegistrationAvailability, findUserByCredential, checkAndClaimPendingGifts } = useUser();
-  const [view, setView] = useState<AuthView>('login');
+  const [view, setView] = useState<AuthView>(initialView);
   
   // Form fields
   const [fullName, setFullName] = useState('');
@@ -72,9 +73,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClo
         setInfo('');
         setLoginHint(null);
         setIsVerified(false);
-        setView('login');
+        setView(initialView); // Use the initialView prop
     }
-  }, [isOpen]);
+  }, [isOpen, initialView]);
 
   if (!isOpen) return null;
   
@@ -139,9 +140,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClo
     // Auto-claim gifts on registration based on phone number
     const claimedCount = checkAndClaimPendingGifts(user);
     if (claimedCount > 0) {
-        // Notification is handled by the caller or App.tsx via toast usually, 
-        // but we can ensure the user knows via a direct alert or relying on the App toast logic.
-        // For now, we proceed to success.
+        // Notification is handled by the caller or App.tsx via toast usually
     }
 
     onSuccess(user);
@@ -318,7 +317,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClo
     );
   };
   
-  // FIX: Increased z-index to 200 to overlay other modals like PaymentModal
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-[200] p-4">
       <div className="bg-theme-gradient backdrop-blur-2xl text-slate-200 rounded-lg shadow-2xl w-full max-w-md border border-violet-500/50 relative">

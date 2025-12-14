@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
-import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, MenuIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, LoginIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon } from './icons';
+import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, MenuIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, LoginIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon, UserAddIcon } from './icons';
 import { useUser } from '../context/UserContext';
 import NotificationsPanel from './NotificationsPanel';
 
 interface HeaderProps {
   onLoginClick: () => void;
+  onRegisterClick: () => void; // New prop
   onNavigate: (target: Page | string) => void;
   onScrollToSection: (sectionId: string) => void;
   onShowVideo: () => void;
@@ -18,7 +19,7 @@ interface HeaderProps {
   onRequestConsultationClick: () => void;
   onOpenNavigationHub: () => void;
   isHomePage?: boolean;
-  isVisible?: boolean; // New prop for animation control
+  isVisible?: boolean; 
 }
 
 const LogoButton: React.FC<{ logoUrl?: string; onClick: () => void }> = ({ logoUrl, onClick }) => {
@@ -40,7 +41,7 @@ const LogoButton: React.FC<{ logoUrl?: string; onClick: () => void }> = ({ logoU
 };
 
 const Header: React.FC<HeaderProps> = ({ 
-    onLoginClick, onNavigate, onScrollToSection, onShowVideo, onShowPhotoAlbum, onShowInstagram, 
+    onLoginClick, onRegisterClick, onNavigate, onScrollToSection, onShowVideo, onShowPhotoAlbum, onShowInstagram, 
     isMobileMenuOpen, setIsMobileMenuOpen, onBoutiqueClick, onRequestConsultationClick, onOpenNavigationHub, isHomePage = false,
     isVisible = true
 }) => {
@@ -48,7 +49,6 @@ const Header: React.FC<HeaderProps> = ({
   const [isExploreMenuOpen, setIsExploreMenuOpen] = useState(false);
   const [isNotificationsPanelOpen, setIsNotificationsPanelOpen] = useState(false);
   const [isMobileNotificationsOpen, setIsMobileNotificationsOpen] = useState(false);
-  // Removed isScrolled state as we want solid header always
   const desktopNotificationContainerRef = useRef<HTMLDivElement>(null);
   
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -104,6 +104,7 @@ const Header: React.FC<HeaderProps> = ({
   const navLinkClasses = `py-2 px-4 rounded-md font-semibold transition-all duration-300 text-slate-200 hover:text-white hover:bg-white/10`;
   const iconButtonClasses = `p-2 rounded-full transition-all duration-300 transform hover:scale-110 text-slate-200 hover:bg-white/10 hover:text-fuchsia-400`;
   const primaryButtonClasses = "bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 border border-fuchsia-500/20 text-sm";
+  const outlineButtonClasses = "border border-white/20 hover:bg-white/10 text-white font-bold py-2.5 px-5 rounded-xl transition-all duration-300 text-sm hover:border-fuchsia-400";
 
   const headerLinks = drhopeData.headerLinks || {
     drhope: 'دكتور هوب',
@@ -218,17 +219,22 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
                 {isNotificationsPanelOpen && <div className="hidden md:block"><NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} /></div>}
               </div>
-               <div className="hidden md:flex">
+               <div className="hidden md:flex gap-x-3 items-center">
                 {user ? (
                       <button onClick={onLogout} className={`${primaryButtonClasses} group flex items-center gap-x-2`}>
                           <ArrowLeftOnRectangleIcon className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" />
                           <span>خروج</span>
                       </button>
                   ) : (
-                    <button onClick={onLoginClick} className={`${primaryButtonClasses} group flex items-center gap-x-2`}>
-                      <LoginIcon className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-                      <span>تسجيل الدخول</span>
-                    </button>
+                    <>
+                      <button onClick={onLoginClick} className={outlineButtonClasses}>
+                        تسجيل الدخول
+                      </button>
+                      <button onClick={onRegisterClick} className={`${primaryButtonClasses} group flex items-center gap-x-2`}>
+                        <UserAddIcon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                        <span>إنشاء حساب</span>
+                      </button>
+                    </>
                   )}
                </div>
             </div>
@@ -322,10 +328,16 @@ const Header: React.FC<HeaderProps> = ({
                         <span>خروج</span>
                     </a>
                 ) : (
-                    <a onClick={() => handleMobileLinkClick(onLoginClick)} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-medium text-fuchsia-300 hover:text-white hover:bg-fuchsia-500/20 cursor-pointer transition-colors">
-                        <LoginIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
-                        <span>تسجيل الدخول / إنشاء حساب</span>
-                    </a>
+                    <>
+                        <a onClick={() => handleMobileLinkClick(onLoginClick)} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-white hover:bg-white/5 cursor-pointer transition-colors">
+                            <LoginIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
+                            <span>تسجيل الدخول</span>
+                        </a>
+                        <a onClick={() => handleMobileLinkClick(onRegisterClick)} className="group flex items-center gap-x-4 px-4 py-3 rounded-lg text-base font-bold text-fuchsia-300 hover:text-white hover:bg-fuchsia-500/20 cursor-pointer transition-colors">
+                            <UserAddIcon className="w-6 h-6 transition-transform duration-300 group-hover:scale-110" />
+                            <span>إنشاء حساب جديد</span>
+                        </a>
+                    </>
                 )}
             </div>
         </nav>

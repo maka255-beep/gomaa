@@ -31,6 +31,7 @@ import BoutiqueModal from '../components/BoutiqueModal';
 import ProductCheckoutModal from '../components/ProductCheckoutModal';
 import LegalModal from '../components/LegalModal';
 import { PrivacyPolicyContent, TermsContent, ShippingPolicyContent, AboutContent } from '../components/LegalContent';
+import { isWorkshopExpired } from '../utils';
 
 const PublicApp: React.FC = () => {
   const { currentUser, workshops, products, placeOrder, addSubscription, addPendingGift, donateToPayItForward } = useUser();
@@ -76,8 +77,14 @@ const PublicApp: React.FC = () => {
   const [watchData, setWatchData] = useState<{ workshop: Workshop, recording: Recording } | null>(null);
   const [paymentModalIntent, setPaymentModalIntent] = useState<PaymentIntent | null>(null);
   const [giftModalIntent, setGiftModalIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
+  
+  // Authentication & Navigation Flow State
   const [postLoginPaymentIntent, setPostLoginPaymentIntent] = useState<PaymentIntent | null>(null);
   const [postLoginGiftIntent, setPostLoginGiftIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
+  
+  // New state to handle Navigation Hub logic
+  const [returnToHub, setReturnToHub] = useState(false);
+  const [pendingHubAction, setPendingHubAction] = useState<'profile' | 'live' | null>(null);
   
   const initialHubOpenRef = useRef(false);
 
@@ -113,6 +120,75 @@ const PublicApp: React.FC = () => {
   const handleRegisterClick = () => {
     setAuthModalInitialView('register');
     setIsAuthModalOpen(true);
+  };
+
+  // Helper to process Live Stream Access Logic
+  const processLiveStreamAccess = (user: User) => {
+      const nextLiveWorkshop = workshops
+          .filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w))
+          .sort((a, b) => new Date(`${a.startDate}T${a.startTime}:00Z`).getTime() - new Date(`${b.startDate}T${b.startTime}:00Z`).getTime())[0];
+
+      if (!nextLiveWorkshop) {
+          showToast('لا توجد ورش مباشرة متاحة حالياً', 'warning');
+          return;
+      }
+
+      const isSubscribed = user.subscriptions.some(
+          sub => sub.workshopId === nextLiveWorkshop.id && 
+          sub.status !== 'REFUNDED' && 
+          !sub.isPayItForwardDonation
+      );
+
+      if (isSubscribed) {
+          if (nextLiveWorkshop.zoomLink) {
+              setZoomRedirectLink(nextLiveWorkshop.zoomLink);
+          } else {
+              showToast('رابط البث غير متوفر حالياً، يرجى الانتظار', 'warning');
+          }
+      } else {
+          showToast('يجب الاشتراك في الورشة للوصول إلى البث المباشر', 'warning');
+          setCurrentPage(Page.WORKSHOPS);
+          setTimeout(() => handleScrollToSection('live_stream_card'), 100);
+      }
+  };
+
+  // Dedicated handler for clicking "Enter Broadcast" from the Card
+  const handleLiveStreamCardLogin = () => {
+      setPendingHubAction('live'); // Set intent to 'live'
+      setReturnToHub(false); // Do not return to hub on cancel, just stay on page
+      handleLoginClick();
+  };
+
+  // Handles Auth Modal Closing (X button)
+  const handleAuthModalClose = () => {
+      setIsAuthModalOpen(false);
+      // If the user came from Navigation Hub and closed without logging in
+      if (returnToHub) {
+          setReturnToHub(false);
+          setPendingHubAction(null);
+          // Small delay to ensure smooth transition
+          setTimeout(() => setIsNavigationHubOpen(true), 100);
+      } else {
+          // If simply closing modal and had a pending action (like from Card), clear it
+          setPendingHubAction(null);
+      }
+  };
+
+  // Handles Auth Modal Success (Login/Register)
+  const handleAuthModalSuccess = (user: User) => {
+      setIsAuthModalOpen(false);
+      showToast(`مرحباً ${user.fullName}`);
+      
+      // Check for pending actions (Shared between Hub and Card)
+      if (pendingHubAction === 'profile') {
+          setIsProfileOpen(true);
+      } else if (pendingHubAction === 'live') {
+          processLiveStreamAccess(user);
+      }
+      
+      // Cleanup
+      setReturnToHub(false);
+      setPendingHubAction(null);
   };
 
   const handleNavigate = (target: Page | string) => {
@@ -234,10 +310,11 @@ const PublicApp: React.FC = () => {
             <>
                 {currentPage === Page.WORKSHOPS && (
                     <WorkshopsPage 
-                        onLiveStreamLoginRequest={handleLoginClick}
+                        onLiveStreamLoginRequest={handleLiveStreamCardLogin}
                         onScrollToSection={handleScrollToSection}
                         onOpenWorkshopDetails={(id) => setOpenedWorkshopId(id)}
                         onZoomRedirect={(link, id) => { setZoomRedirectLink(link); }}
+                        showToast={showToast}
                     />
                 )}
             </>
@@ -253,8 +330,8 @@ const PublicApp: React.FC = () => {
 
       <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        onSuccess={(user) => { setIsAuthModalOpen(false); showToast(`مرحباً ${user.fullName}`); }} 
+        onClose={handleAuthModalClose} 
+        onSuccess={handleAuthModalSuccess} 
         initialView={authModalInitialView}
       />
       {openedWorkshopId && <WorkshopDetailsModal workshop={workshops.find(w => w.id === openedWorkshopId)!} onClose={() => setOpenedWorkshopId(null)} onEnrollRequest={handleEnrollRequest} onGiftRequest={handleGiftRequest} showToast={showToast} />}
@@ -274,7 +351,33 @@ const PublicApp: React.FC = () => {
       {zoomRedirectLink && <ZoomRedirectModal isOpen={!!zoomRedirectLink} zoomLink={zoomRedirectLink} onClose={() => setZoomRedirectLink(null)} />}
       {invoiceToView && <InvoiceModal isOpen={!!invoiceToView} onClose={() => setInvoiceToView(null)} user={invoiceToView.user} subscription={invoiceToView.subscription} workshop={workshops.find(w => w.id === invoiceToView.subscription.workshopId)!} />}
       {isCvModalOpen && <CvModal isOpen={isCvModalOpen} onClose={() => setIsCvModalOpen(false)} />}
-      {isNavigationHubOpen && <NavigationHubModal isOpen={isNavigationHubOpen} userFullName={currentUser?.fullName} onNavigate={(target) => { setIsNavigationHubOpen(false); if (target === 'profile') { if (currentUser) setIsProfileOpen(true); else { showToast('يجب تسجيل الدخول', 'warning'); handleLoginClick(); } } else if (target === 'live') { setCurrentPage(Page.WORKSHOPS); setTimeout(() => handleScrollToSection('live_events'), 100); } else if (target === 'new') { setCurrentPage(Page.WORKSHOPS); setTimeout(() => handleScrollToSection('workshops_section'), 100); } }} />}
+      {isNavigationHubOpen && <NavigationHubModal 
+        isOpen={isNavigationHubOpen} 
+        userFullName={currentUser?.fullName} 
+        onNavigate={(target) => { 
+            setIsNavigationHubOpen(false); 
+            if (target === 'profile') { 
+                if (currentUser) {
+                    setIsProfileOpen(true); 
+                } else { 
+                    setReturnToHub(true);
+                    setPendingHubAction('profile');
+                    handleLoginClick(); 
+                } 
+            } else if (target === 'live') { 
+                if (currentUser) {
+                    processLiveStreamAccess(currentUser);
+                } else {
+                    setReturnToHub(true);
+                    setPendingHubAction('live');
+                    handleLoginClick();
+                }
+            } else if (target === 'new') { 
+                setCurrentPage(Page.WORKSHOPS); 
+                setTimeout(() => handleScrollToSection('workshops_section'), 100); 
+            } 
+        }} 
+      />}
       {legalModalContent && <LegalModal isOpen={!!legalModalContent} onClose={() => setLegalModalContent(null)} title={legalModalContent.title} content={legalModalContent.content} />}
       <Chatbot />
       <WhatsAppButton />

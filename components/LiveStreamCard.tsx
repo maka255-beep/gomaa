@@ -10,9 +10,10 @@ interface LiveStreamCardProps {
     user: User | null;
     onLoginRequest: () => void;
     onZoomRedirect: (zoomLink: string, workshopId: number) => void;
+    onShowToast: (message: string, type?: 'success' | 'warning' | 'error') => void;
 }
 
-const LiveStreamCard: React.FC<LiveStreamCardProps> = ({ workshopId, workshopTitle, zoomLink, user, onLoginRequest, onZoomRedirect }) => {
+const LiveStreamCard: React.FC<LiveStreamCardProps> = ({ workshopId, workshopTitle, zoomLink, user, onLoginRequest, onZoomRedirect, onShowToast }) => {
     
     const isSubscribed = user?.subscriptions.some(
         sub => sub.workshopId === workshopId && 
@@ -29,7 +30,7 @@ const LiveStreamCard: React.FC<LiveStreamCardProps> = ({ workshopId, workshopTit
 
         if (!isSubscribed) {
             e.preventDefault();
-            alert(`عفواً، الوصول إلى بث ورشة "${workshopTitle}" متاح فقط للمشتركين.`);
+            onShowToast(`عفواً، الوصول إلى بث ورشة "${workshopTitle}" متاح فقط للمشتركين.`, 'warning');
         } else {
             onZoomRedirect(zoomLink, workshopId);
         }
@@ -82,7 +83,7 @@ const LiveStreamCard: React.FC<LiveStreamCardProps> = ({ workshopId, workshopTit
                 {user && !isSubscribed && (
                     <div className="mt-4 flex items-center gap-2 text-amber-300 bg-amber-900/30 px-3 py-1.5 rounded-lg border border-amber-500/30">
                         <span className="text-base">⚠️</span>
-                        <p className="text-[10px] sm:text-xs font-bold">للصول إلى البث، يرجى الاشتراك في هذه الورشة أولاً.</p>
+                        <p className="text-[10px] sm:text-xs font-bold">للوصول إلى البث، يرجى الاشتراك في هذه الورشة أولاً.</p>
                     </div>
                 )}
             </div>

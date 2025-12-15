@@ -7,6 +7,28 @@ import { trackEvent } from '../analytics';
 // Initial Data (Simulated Database)
 const initialWorkshops: Workshop[] = [
     {
+        id: 999,
+        title: '🔴 ورشة بث مباشر (تجربة النظام)',
+        instructor: 'فريق التطوير',
+        startDate: '2025-10-20',
+        startTime: '21:00',
+        location: 'أونلاين',
+        country: 'الإمارات العربية المتحدة',
+        isRecorded: false,
+        zoomLink: 'https://zoom.us/j/TEST_LINK_123',
+        isVisible: true,
+        price: 50,
+        paymentLink: 'https://example.com/payment',
+        description: 'هذه الورشة مخصصة لاختبار نظام البث المباشر الجديد. يمكنك الاشتراك بها لتجربة تدفق الدخول إلى Zoom والتأكد من عمل الميزات الجديدة (العداد التنازلي، التحقق من الاشتراك، التوجيه التلقائي).',
+        topics: ['اختبار العداد التنازلي', 'زر الدخول المباشر', 'حماية الرابط'],
+        packages: [
+            { id: 9991, name: 'تذكرة تجريبية', price: 50, features: ['دخول البث', 'تجربة النظام'] }
+        ],
+        reviews: [],
+        certificatesIssued: false,
+        payItForwardBalance: 0,
+    },
+    {
         id: 1,
         title: 'ورشة فنون الكتابة الإبداعية',
         instructor: 'دكتورة أمل العتيبي',
@@ -130,6 +152,7 @@ const initialUsers: User[] = [
         notifications: [],
         subscriptions: [
             { id: 'sub1', workshopId: 1, activationDate: '2025-09-15', expiryDate: '2099-10-15', pricePaid: 350, packageId: 1, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' },
+            { id: 'sub-test-live', workshopId: 999, activationDate: '2025-10-15', expiryDate: '2099-10-15', pricePaid: 50, packageId: 9991, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' },
         ],
         orders: [],
         internalCredit: 0,

@@ -12,6 +12,7 @@ interface WorkshopsPageProps {
   onScrollToSection: (sectionId: string) => void;
   onOpenWorkshopDetails: (workshopId: number | null) => void;
   onZoomRedirect: (zoomLink: string, workshopId: number) => void;
+  showToast: (message: string, type?: 'success' | 'warning' | 'error') => void;
 }
 
 const WorkshopsPage: React.FC<WorkshopsPageProps> = ({ 
@@ -19,6 +20,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
     onScrollToSection, 
     onOpenWorkshopDetails, 
     onZoomRedirect,
+    showToast
 }) => {
   const { currentUser: user, workshops } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,14 +70,17 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
       <div className="container mx-auto px-4 py-8">
         
         {liveStreamWorkshop && (
-          <LiveStreamCard 
-              workshopTitle={liveStreamWorkshop.title} 
-              workshopId={liveStreamWorkshop.id}
-              zoomLink={liveStreamWorkshop.zoomLink} 
-              user={user} 
-              onLoginRequest={onLiveStreamLoginRequest}
-              onZoomRedirect={onZoomRedirect}
-          />
+          <div id="live_stream_card">
+            <LiveStreamCard 
+                workshopTitle={liveStreamWorkshop.title} 
+                workshopId={liveStreamWorkshop.id}
+                zoomLink={liveStreamWorkshop.zoomLink} 
+                user={user} 
+                onLoginRequest={onLiveStreamLoginRequest}
+                onZoomRedirect={onZoomRedirect}
+                onShowToast={showToast}
+            />
+          </div>
         )}
         
         {/* Search and Filter UI - Updated for Light Mode */}
@@ -157,4 +162,3 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
 };
 
 export default WorkshopsPage;
-    

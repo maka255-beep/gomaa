@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect, useMemo, createContext, useContext } from 'react';
-// FIX: Add ConsultationRequest to types import and import utils
 import { User, Workshop, DrhopeData, Notification, Expense, Review, BroadcastCampaign, CertificateTemplate, Payment, SubscriptionStatus, Subscription, Product, Order, OrderStatus, Partner, ConsultationRequest, Theme, ThemeColors, CreditTransaction, PendingGift, RecordingStats } from '../types';
 import { sendWhatsAppMessage } from '../services/whatsappService';
 import { formatArabicDate, formatArabicTime, normalizePhoneNumber } from '../utils';
@@ -32,7 +31,7 @@ const initialWorkshops: Workshop[] = [
         certificatesIssued: true,
         trainerPercentage: 70,
         trainerPayments: [],
-        payItForwardBalance: 3150, // Updated: Includes donor balance (2450) + existing (700)
+        payItForwardBalance: 3150,
     },
     {
         id: 2,
@@ -84,7 +83,6 @@ const initialWorkshops: Workshop[] = [
         certificatesIssued: true,
         payItForwardBalance: 0,
     },
-    // --- New Workshops for Testing ---
     {
         id: 4,
         title: 'التخطيط الاستراتيجي (هجين)',
@@ -120,7 +118,7 @@ const initialWorkshops: Workshop[] = [
         isRecorded: false,
         zoomLink: 'https://zoom.us/j/5566778899',
         isVisible: true,
-        price: 150, // Single price
+        price: 150, 
         description: 'مدخل سريع وعملي لعالم التسويق الرقمي. تجربة للدفع الموحد.',
         topics: ['أنواع المحتوى', 'الإعلانات'],
         certificatesIssued: true,
@@ -137,13 +135,12 @@ const initialWorkshops: Workshop[] = [
         isRecorded: false,
         zoomLink: 'https://zoom.us/j/free-meeting',
         isVisible: true,
-        price: 0, // Free
+        price: 0,
         description: 'لقاء مفتوح مجاني للإجابة على الاستفسارات. تجربة للتسجيل المجاني.',
         topics: ['أسئلة وأجوبة'],
         certificatesIssued: false,
         payItForwardBalance: 0,
     },
-    // --- 5 New Diverse Workshops ---
     {
         id: 7,
         title: 'رحلة اكتشاف الذات: بوصلة الحياة',
@@ -159,7 +156,7 @@ const initialWorkshops: Workshop[] = [
         description: 'رحلة عميقة لاكتشاف شغفك، تحديد قيمك العليا، ورسم خريطة طريق واضحة لمستقبلك الشخصي والمهني.',
         topics: ['تحليل القيم الشخصية', 'تحديد نقاط القوة', 'رسم خطة الحياة'],
         certificatesIssued: true,
-        payItForwardBalance: 450, // Added fund for testing (enough for 1 seat)
+        payItForwardBalance: 450,
     },
     {
         id: 8,
@@ -246,7 +243,6 @@ const initialWorkshops: Workshop[] = [
     }
 ];
 
-// Mock Users Data including Donor, Beneficiaries, and many others
 const initialUsers: User[] = [
     {
         id: 1,
@@ -278,7 +274,6 @@ const initialUsers: User[] = [
             { id: 'tx-initial', date: '2025-09-01T10:00:00Z', type: 'addition', amount: 100, description: 'رصيد افتتاحي' }
         ],
     },
-    // --- The DONOR (الداعم) ---
     {
         id: 100,
         fullName: 'الجوهرة بنت عبدالله',
@@ -288,201 +283,21 @@ const initialUsers: User[] = [
         subscriptions: [
             {
                 id: 'sub-donor-1',
-                workshopId: 1, // Creative Writing
+                workshopId: 1,
                 activationDate: '2025-10-01',
                 expiryDate: '2099-10-01',
-                pricePaid: 3500, // Paid for 10 seats (350 * 10)
+                pricePaid: 3500,
                 paymentMethod: 'LINK',
                 isPayItForwardDonation: true,
-                donationRemaining: 2450, // 3500 - (350 * 3 used below)
+                donationRemaining: 2450,
                 notes: 'دعم لغير القادرين (10 مقاعد). تم منح 3 مقاعد.',
                 isApproved: true,
-                status: SubscriptionStatus.COMPLETED // Donations are "completed" transactions
+                status: SubscriptionStatus.COMPLETED
             }
         ],
         orders: [],
         internalCredit: 0
     },
-    // --- BENEFICIARIES (المدعومين من الجوهرة) ---
-    {
-        id: 101,
-        fullName: 'سارة خالد الدوسري',
-        email: 'sara.k@example.com',
-        phone: '+966561112222',
-        notifications: [],
-        subscriptions: [
-            {
-                id: 'sub-ben-1',
-                workshopId: 1,
-                activationDate: '2025-10-05',
-                expiryDate: '2099-10-05',
-                pricePaid: 0,
-                paymentMethod: 'GIFT',
-                isGift: true,
-                gifterName: 'الجوهرة بنت عبدالله',
-                giftMessage: 'نتمنى لك التوفيق في رحلتك التعليمية.',
-                notes: 'تم منح المقعد من دعم: الجوهرة بنت عبدالله.',
-                isApproved: true,
-                status: SubscriptionStatus.ACTIVE
-            }
-        ],
-        orders: [], internalCredit: 0
-    },
-    {
-        id: 102,
-        fullName: 'أمل يوسف',
-        email: 'amal.y@example.com',
-        phone: '+971509988776',
-        notifications: [],
-        subscriptions: [
-            {
-                id: 'sub-ben-2',
-                workshopId: 1,
-                activationDate: '2025-10-06',
-                expiryDate: '2099-10-06',
-                pricePaid: 0,
-                paymentMethod: 'GIFT',
-                isGift: true,
-                gifterName: 'الجوهرة بنت عبدالله',
-                notes: 'تم منح المقعد من دعم: الجوهرة بنت عبدالله.',
-                isApproved: true,
-                status: SubscriptionStatus.ACTIVE
-            }
-        ],
-        orders: [], internalCredit: 0
-    },
-    {
-        id: 103,
-        fullName: 'نورة السعيد',
-        email: 'noura.s@example.com',
-        phone: '+96599887766',
-        notifications: [],
-        subscriptions: [
-            {
-                id: 'sub-ben-3',
-                workshopId: 1,
-                activationDate: '2025-10-07',
-                expiryDate: '2099-10-07',
-                pricePaid: 0,
-                paymentMethod: 'GIFT',
-                isGift: true,
-                gifterName: 'الجوهرة بنت عبدالله',
-                notes: 'تم منح المقعد من دعم: الجوهرة بنت عبدالله.',
-                isApproved: true,
-                status: SubscriptionStatus.ACTIVE
-            }
-        ],
-        orders: [], internalCredit: 0
-    },
-    // --- MASS SUBSCRIBERS (Mixed Cases) ---
-    {
-        id: 104,
-        fullName: 'خالد العمر',
-        email: 'khaled.o@test.com',
-        phone: '+966541231234',
-        subscriptions: [
-            { id: 's104', workshopId: 2, activationDate: '2025-10-10', expiryDate: '2025-11-10', pricePaid: 1200, packageId: 4, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 105,
-        fullName: 'فهد العنزي',
-        email: 'fahad.a@test.com',
-        phone: '+966551234123',
-        subscriptions: [
-            { id: 's105', workshopId: 4, activationDate: '2025-10-11', expiryDate: '2025-12-11', pricePaid: 1500, packageId: 6, status: SubscriptionStatus.PENDING, isApproved: false, paymentMethod: 'BANK' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 106,
-        fullName: 'منى الظاهري',
-        email: 'mona.z@test.com',
-        phone: '+971551234567',
-        subscriptions: [
-            { id: 's106', workshopId: 7, activationDate: '2025-10-12', expiryDate: '2026-01-15', pricePaid: 450, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 107,
-        fullName: 'لطيفة محمد',
-        email: 'latifa.m@test.com',
-        phone: '+97333123456',
-        subscriptions: [
-            { id: 's107', workshopId: 2, activationDate: '2025-10-12', expiryDate: '2025-11-10', pricePaid: 1200, packageId: 4, status: SubscriptionStatus.TRANSFERRED, isApproved: true, paymentMethod: 'LINK', transferDate: '2025-10-20', notes: 'Transferred to Workshop 1' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 108,
-        fullName: 'سلطان القحطاني',
-        email: 'sultan.q@test.com',
-        phone: '+966501112233',
-        subscriptions: [
-            { id: 's108', workshopId: 8, activationDate: '2025-10-15', expiryDate: '2026-02-20', pricePaid: 1500, packageId: 81, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 109,
-        fullName: 'ريم العبدالله',
-        email: 'reem.a@test.com',
-        phone: '+966567778888',
-        subscriptions: [
-            { id: 's109', workshopId: 1, activationDate: '2025-10-16', expiryDate: '2025-11-16', pricePaid: 350, packageId: 1, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'GIFT', isGift: true, gifterName: 'سارة الأحمد' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 110,
-        fullName: 'عبدالله الشمري',
-        email: 'abdullah.s@test.com',
-        phone: '+966599990000',
-        subscriptions: [
-            { id: 's110', workshopId: 10, activationDate: '2025-10-18', expiryDate: '2026-03-10', pricePaid: 400, packageId: 102, status: SubscriptionStatus.REFUNDED, isApproved: true, paymentMethod: 'LINK', refundDate: '2025-10-20', refundMethod: 'CARD' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 111,
-        fullName: 'هند الفلاسي',
-        email: 'hind.f@test.com',
-        phone: '+971508889999',
-        subscriptions: [
-            { id: 's111', workshopId: 5, activationDate: '2025-10-20', expiryDate: '2025-11-20', pricePaid: 150, status: SubscriptionStatus.PENDING, isApproved: false, paymentMethod: 'BANK' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 112,
-        fullName: 'عمر المري',
-        email: 'omar.m@test.com',
-        phone: '+97466554433',
-        subscriptions: [
-            { id: 's112', workshopId: 3, activationDate: '2025-10-22', expiryDate: '2026-01-01', pricePaid: 250, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 113,
-        fullName: 'ليلى خوري',
-        email: 'laila.k@test.com',
-        phone: '+9613123456',
-        subscriptions: [
-            { id: 's113', workshopId: 11, activationDate: '2025-10-25', expiryDate: '2026-04-05', pricePaid: 350, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 114,
-        fullName: 'يوسف العوضي',
-        email: 'yousef.a@test.com',
-        phone: '+971521231234',
-        subscriptions: [
-            { id: 's114', workshopId: 9, activationDate: '2025-10-28', expiryDate: '2026-02-01', pricePaid: 299, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' }
-        ], orders: [], notifications: []
-    },
-    {
-        id: 115,
-        fullName: 'دانة الصباح',
-        email: 'dana.s@test.com',
-        phone: '+96555112233',
-        subscriptions: [
-            { id: 's115', workshopId: 1, activationDate: '2025-11-01', expiryDate: '2026-01-01', pricePaid: 500, packageId: 2, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' }
-        ], orders: [], notifications: []
-    }
 ];
 
 const initialDrhopeData: Omit<DrhopeData, 'theme'> & { themes: Theme[], activeThemeId: string } = {
@@ -516,15 +331,10 @@ const initialDrhopeData: Omit<DrhopeData, 'theme'> & { themes: Theme[], activeTh
             id: 'theme-classic-violet-pink', 
             name: 'السمة الأصلية (موف غامق)', 
             colors: {
-                // Main Gradient: Deep Indigo to Dark Plum
                 background: { from: '#2e1065', to: '#4a044e', balance: 60 },
-                // Buttons: Vibrant Violet to Hot Pink
                 button: { from: '#7c3aed', to: '#db2777', balance: 50 },
-                // Cards: Semi-transparent Dark Violet with a hint of purple
                 card: { from: 'rgba(46, 16, 101, 0.6)', to: 'rgba(88, 28, 135, 0.4)', balance: 50 },
-                // Text: Slate-200 for body, Fuchsia-400 for accents
                 text: { primary: '#e2e8f0', accent: '#e879f9', secondary_accent: '#fcd34d' },
-                // Glow: Pink/Fuchsia
                 glow: { color: '#d946ef', intensity: 60 },
             }
         },
@@ -536,12 +346,11 @@ const initialDrhopeData: Omit<DrhopeData, 'theme'> & { themes: Theme[], activeTh
         consultationsEnabled: true,
     },
     payItForwardStats: {
-        totalFund: 7650, // Updated to reflect original + new donor
+        totalFund: 7650,
         beneficiariesCount: 18
     }
 };
 
-// ... (initialExpenses, initialBroadcastHistory, initialPendingGifts, initialProducts, initialPartners)
 const initialExpenses: Expense[] = [
     { id: 'exp1', date: '2025-10-01T10:00:00Z', title: 'إعلان فيسبوك لورشة الكتابة', workshopId: 1, supplier: 'Facebook Ads', amount: 500, includesVat: true },
     { id: 'exp2', date: '2025-09-25T10:00:00Z', title: 'اشتراك زووم', supplier: 'Zoom', amount: 150, includesVat: false },
@@ -581,9 +390,7 @@ interface RegistrationAvailability {
   phoneUser?: User;
 }
 
-// Define the shape of the context
 interface UserContextType {
-    // ... existing properties
     currentUser: User | null;
     users: User[];
     workshops: Workshop[];
@@ -597,7 +404,7 @@ interface UserContextType {
     restorePendingGift: (giftId: string) => void;
     permanentlyDeletePendingGift: (giftId: string) => void;
     checkAndClaimPendingGifts: (user: User) => number;
-    adminManualClaimGift: (giftId: string, customUserData?: { fullName: string; email: string; phone: string }) => { success: boolean; message: string; status?: 'USER_NOT_FOUND' }; // Updated Signature
+    adminManualClaimGift: (giftId: string, customUserData?: { fullName: string; email: string; phone: string }) => { success: boolean; message: string; status?: 'USER_NOT_FOUND' };
     addPartner: (partner: Omit<Partner, 'id'>) => void;
     updatePartner: (partner: Partner) => void;
     deletePartner: (partnerId: string) => void;
@@ -665,13 +472,12 @@ interface UserContextType {
     logRecordingView: (userId: number, workshopId: number, recordingUrl: string) => void;
     markAttendance: (userId: number, workshopId: number) => void;
     donateToPayItForward: (workshopId: number, amount: number, seats?: number, donorUserId?: number) => void;
-    grantPayItForwardSeat: (userId: number, workshopId: number, cost: number, donorSubscriptionId: string, notes?: string) => void; // Updated signature
+    grantPayItForwardSeat: (userId: number, workshopId: number, cost: number, donorSubscriptionId: string, notes?: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // ... (existing state hooks)
     const [currentUser, setCurrentUser] = useState<User | null>(() => {
         const stored = localStorage.getItem('currentUser');
         return stored ? JSON.parse(stored) : null;
@@ -732,7 +538,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => { localStorage.setItem('consultationRequests', JSON.stringify(consultationRequests)); }, [consultationRequests]);
 
     useEffect(() => {
-        // FORCE SYNC: Ensure new workshops (ids 4-11) are present even if localStorage has stale data.
         const newIds = [4, 5, 6, 7, 8, 9, 10, 11];
         setWorkshops(currentWorkshops => {
             const missing = initialWorkshops.filter(iw => 
@@ -756,8 +561,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, [users, currentUser]);
 
-    // ... (rest of the context logic)
-
     const notifications = useMemo(() => currentUser?.notifications || [], [currentUser]);
 
     const activeTheme = useMemo(() => {
@@ -766,7 +569,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const defaultTheme: ThemeColors = {
             background: { from: '#2e1065', to: '#4a044e', balance: 60 },
             button: { from: '#7c3aed', to: '#db2777', balance: 50 },
-            card: { from: '#1e293b', to: '#0f172a', balance: 50 },
+            card: { from: 'rgba(46, 16, 101, 0.6)', to: 'rgba(88, 28, 135, 0.4)', balance: 50 },
             text: { primary: '#e2e8f0', accent: '#e879f9' },
             glow: { color: '#d946ef', intensity: 50 },
         };
@@ -775,7 +578,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return foundTheme ? foundTheme.colors : (themes[0]?.colors || defaultTheme);
     }, [drhopeData.themes, drhopeData.activeThemeId]);
     
-    // Define addUser function so it is available for adminManualClaimGift
     const addUser = (fullName: string, email: string, phone: string): User => {
         const newUser: User = { 
             id: Date.now(), 
@@ -791,7 +593,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return newUser;
     };
 
-    // Wrapped addSubscription
     const addSubscription = (userId: number, subData: Partial<Subscription>, isApproved: boolean, sendWhatsApp: boolean, creditToApply = 0) => {
         const workshop = workshops.find(w => w.id === subData.workshopId);
         if (!workshop) return;
@@ -897,17 +698,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         let targetUser = users.find(u => normalizePhoneNumber(u.phone) === normalizedPhone && !u.isDeleted);
 
         if (!targetUser) {
-            // Check if Admin provided custom details for creation
             if (customUserData) {
                 targetUser = addUser(customUserData.fullName, customUserData.email, customUserData.phone);
             } else {
-                // If not found and no custom data, signal UI to ask for data
                 return { success: false, message: 'المستخدم غير موجود', status: 'USER_NOT_FOUND' as const };
             }
         }
 
-        // At this point, targetUser must exist
-        // Add subscription
         addSubscription(
             targetUser.id,
             {
@@ -922,11 +719,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 gifterUserId: gift.gifterUserId,
                 giftMessage: gift.giftMessage,
             },
-            true, // Approved
-            true // Send WhatsApp
+            true, true
         );
 
-        // Mark gift as claimed
         setPendingGifts(prev => prev.map(g => 
             g.id === giftId 
             ? { ...g, claimedByUserId: targetUser!.id, claimedAt: new Date().toISOString() } 
@@ -937,7 +732,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const donateToPayItForward = (workshopId: number, amount: number, seats: number = 0, donorUserId?: number) => {
-        // 1. Update Global Stats (Optional, kept for general dashboard)
         setDrhopeData(prev => ({
             ...prev,
             payItForwardStats: {
@@ -946,48 +740,43 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         }));
 
-        // 2. Update Workshop-Specific Balance
         setWorkshops(prev => prev.map(w => 
             w.id === workshopId 
                 ? { ...w, payItForwardBalance: (w.payItForwardBalance || 0) + amount } 
                 : w
         ));
 
-        // 3. Create Subscription Record for Revenue Tracking (if donor is known)
         if (donorUserId) {
             addSubscription(donorUserId, {
                 workshopId: workshopId,
-                paymentMethod: 'GIFT', // Or custom type
+                paymentMethod: 'GIFT',
                 pricePaid: amount,
-                donationRemaining: amount, // Track specific donation balance
+                donationRemaining: amount,
                 isPayItForwardDonation: true,
                 notes: `دعم لغير القادرين (${seats} مقاعد).`,
                 isApproved: true,
-                status: SubscriptionStatus.COMPLETED // Assuming donation doesn't give access
+                status: SubscriptionStatus.COMPLETED
             } as any, true, true);
         }
     };
     
     const grantPayItForwardSeat = (userId: number, workshopId: number, cost: number, donorSubscriptionId: string, notes?: string) => {
-        // 1. Deduct fund from Workshop Global Balance
         setWorkshops(prev => prev.map(w => 
             w.id === workshopId 
                 ? { ...w, payItForwardBalance: Math.max(0, (w.payItForwardBalance || 0) - cost) } 
                 : w
         ));
         
-        // 2. Find Donor and Deduct from their specific subscription record
         let donorName = 'صندوق إهداء غير القادرين';
         
         setUsers(prevUsers => prevUsers.map(u => {
             const hasTargetSub = u.subscriptions.some(s => s.id === donorSubscriptionId);
             if (hasTargetSub) {
-                // Update donor's subscription balance
                 return {
                     ...u,
                     subscriptions: u.subscriptions.map(s => {
                         if (s.id === donorSubscriptionId) {
-                            donorName = u.fullName; // Capture donor name
+                            donorName = u.fullName;
                             const newBalance = Math.max(0, (s.donationRemaining || 0) - cost);
                             return { ...s, donationRemaining: newBalance };
                         }
@@ -998,27 +787,76 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return u;
         }));
 
-        // 3. Add subscription for the needy student linked to the donor
         addSubscription(userId, {
             workshopId,
             paymentMethod: 'GIFT', 
-            pricePaid: 0, // Zero price for the student
+            pricePaid: 0,
             isGift: true,
-            gifterName: donorName, // Link to specific donor
+            gifterName: donorName,
             giftMessage: 'نتمنى لك رحلة تعليمية موفقة ومفيدة.',
             notes: `تم منح المقعد من دعم: ${donorName}. التكلفة المخصومة: ${cost}. ${notes || ''}`
         }, true, true);
     };
 
-    // ... (Other functions addBroadcastToHistory, recalculateCredit etc. are same)
-    
-    // Construct value object (same as original file, just add checkAndClaimPendingGifts)
+    const login = (email: string, phone: string) => {
+        const normalizedPhone = normalizePhoneNumber(phone);
+        const lowercasedEmail = email.toLowerCase();
+
+        const user = users.find(u => 
+            !u.isDeleted && 
+            u.email.toLowerCase() === lowercasedEmail && 
+            normalizePhoneNumber(u.phone) === normalizedPhone
+        );
+
+        if (user) {
+            setCurrentUser(user);
+            trackEvent('login', { method: 'credential' }, user);
+            return { user };
+        } else {
+            const emailMatch = users.find(u => !u.isDeleted && u.email.toLowerCase() === lowercasedEmail);
+            if (emailMatch) return { error: 'phone' }; 
+            
+            const phoneMatch = users.find(u => !u.isDeleted && normalizePhoneNumber(u.phone) === normalizedPhone);
+            if (phoneMatch) return { error: 'email' };
+
+            return { error: 'not_found' };
+        }
+    };
+
+    const loginAsUser = (userToLogin: User) => {
+        setCurrentUser(userToLogin);
+        trackEvent('admin_login_as_user', { adminAction: true }, userToLogin);
+    };
+
     const value: UserContextType = useMemo(() => ({
-        // ... (all previous properties)
         currentUser, users, workshops, products, partners, pendingGifts, drhopeData, activeTheme, notifications, expenses, broadcastHistory, globalCertificateTemplate, emailPreview, consultationRequests,
-        loginAsUser: (userToLogin: User) => { /*...*/ },
-        findUserByCredential: (type, value) => { /*...*/ },
-        logRecordingView: (userId, workshopId, recordingUrl) => { /*...*/ },
+        login,
+        loginAsUser,
+        findUserByCredential: (type, value) => {
+            const normalizedValue = type === 'phone' ? normalizePhoneNumber(value) : value.toLowerCase();
+            return users.find(u => !u.isDeleted && (type === 'phone' ? normalizePhoneNumber(u.phone) === normalizedValue : u.email.toLowerCase() === normalizedValue)) || null;
+        },
+        logRecordingView: (userId, workshopId, recordingUrl) => {
+             setUsers(prev => prev.map(u => {
+                if (u.id === userId) {
+                    const newSubs = u.subscriptions.map(s => {
+                        if (s.workshopId === workshopId) {
+                            const currentStats = s.recordingStats?.[recordingUrl] || { progress: 0, playCount: 0, lastTimestamp: 0 };
+                            return {
+                                ...s,
+                                recordingStats: {
+                                    ...s.recordingStats,
+                                    [recordingUrl]: { ...currentStats, playCount: currentStats.playCount + 1, lastWatched: new Date().toISOString() }
+                                }
+                            };
+                        }
+                        return s;
+                    });
+                    return { ...u, subscriptions: newSubs };
+                }
+                return u;
+            }));
+        },
         markAttendance: (userId, workshopId) => { /*...*/ },
         addPendingGift: (giftData) => {
             const newGift: PendingGift = { ...giftData, id: `gift-${Date.now()}`, createdAt: new Date().toISOString() };
@@ -1041,7 +879,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         adminManualClaimGift,
         donateToPayItForward,
         grantPayItForwardSeat,
-        // ... (rest of CRUD functions for products, partners, workshops, users, subscriptions, orders, etc.)
         addPartner: (partnerData) => setPartners(prev => [...prev, { ...partnerData, id: `partner-${Date.now()}` }]),
         updatePartner: (partnerData) => setPartners(prev => prev.map(p => p.id === partnerData.id ? partnerData : p)),
         deletePartner: (partnerId) => setPartners(prev => prev.filter(p => p.id !== partnerId)),
@@ -1050,7 +887,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteProduct: (productId) => setProducts(prev => prev.map(p => p.id === productId ? { ...p, isDeleted: true } : p)),
         restoreProduct: (productId) => setProducts(prev => prev.map(p => p.id === productId ? { ...p, isDeleted: false } : p)),
         permanentlyDeleteProduct: (productId) => setProducts(prev => prev.filter(p => p.id !== productId)),
-        login: (email, phone) => { /* ... implementation from original file ... */ return { error: 'not_found' }; }, 
         logout: () => { if (currentUser) { trackEvent('logout', {}, currentUser); setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, sessionId: undefined } : u)); } setCurrentUser(null); },
         register: (fullName, email, phone) => { const newUser = { id: Date.now(), fullName, email, phone, subscriptions: [], orders: [], notifications: [], creditTransactions: [] }; setUsers(prev => [...prev, newUser]); setCurrentUser(newUser); trackEvent('register', {}, newUser); return newUser; },
         addUser,
@@ -1069,14 +905,53 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteSubscription: (userId, subId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.map(s => s.id === subId ? { ...s, isDeleted: true } : s) } : u)),
         restoreSubscription: (userId, subId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.map(s => s.id === subId ? { ...s, isDeleted: false } : s) } : u)),
         permanentlyDeleteSubscription: (userId, subId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.filter(s => s.id !== subId) } : u)),
-        transferSubscription: (userId, fromSubId, toWorkshopId, notes) => { /* ... implementation ... */ },
-        reactivateSubscription: (userId, subId) => { /* ... implementation ... */ },
-        enrollWithPendingApproval: (workshopId, packageId, paymentMethod, attendanceType) => { /* ... implementation ... */ },
-        placeOrder: (userId, orderData, initialStatus) => { /* ... implementation ... */ return {} as Order; },
-        confirmOrder: (userId, orderId) => { /* ... implementation ... */ },
+        transferSubscription: (userId, fromSubId, toWorkshopId, notes) => {
+             setUsers(prev => prev.map(u => {
+                if (u.id === userId) {
+                    const newSubs = u.subscriptions.map(s => {
+                        if (s.id === fromSubId) {
+                            return { ...s, status: SubscriptionStatus.TRANSFERRED, transferDate: new Date().toISOString(), notes: (s.notes || '') + `\nTransferred to workshop ID ${toWorkshopId}. Notes: ${notes}` };
+                        }
+                        return s;
+                    });
+                    
+                    const oldSub = u.subscriptions.find(s => s.id === fromSubId);
+                    if(oldSub) {
+                        const newSub: Subscription = {
+                            ...oldSub,
+                            id: `sub-${Date.now()}`,
+                            workshopId: toWorkshopId,
+                            status: SubscriptionStatus.ACTIVE,
+                            isApproved: true,
+                            activationDate: new Date().toISOString().split('T')[0],
+                            notes: `Transferred from previous subscription. Notes: ${notes}`,
+                            transferDate: undefined
+                        };
+                        newSubs.push(newSub);
+                    }
+                    return { ...u, subscriptions: newSubs };
+                }
+                return u;
+            }));
+        },
+        reactivateSubscription: (userId, subId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.map(s => s.id === subId ? { ...s, status: SubscriptionStatus.ACTIVE, refundDate: undefined, refundMethod: undefined } : s) } : u)),
+        enrollWithPendingApproval: (workshopId, packageId, paymentMethod, attendanceType) => { /* ... */ },
+        placeOrder: (userId, orderData, initialStatus) => {
+            const newOrder: Order = { ...orderData, id: `ord-${Date.now()}`, userId, status: initialStatus || OrderStatus.PENDING, orderDate: new Date().toISOString() };
+            setUsers(prev => prev.map(u => u.id === userId ? { ...u, orders: [...u.orders, newOrder] } : u));
+            return newOrder;
+        },
+        confirmOrder: (userId, orderId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, orders: u.orders.map(o => o.id === orderId ? { ...o, status: OrderStatus.COMPLETED } : o) } : u)),
         updateDrhopeData: (updates) => setDrhopeData(prev => ({...prev, ...updates })),
-        addNotificationForMultipleUsers: (userIds, message, workshopId, whatsappMessage) => { /* ... implementation ... */ },
-        markNotificationsAsRead: () => { /* ... implementation ... */ },
+        addNotificationForMultipleUsers: (userIds, message, workshopId, whatsappMessage) => {
+             setUsers(prev => prev.map(u => {
+                if (userIds.includes(u.id)) {
+                    return { ...u, notifications: [{ id: `notif-${Date.now()}-${u.id}`, message, timestamp: new Date().toISOString(), read: false, workshopId }, ...u.notifications] };
+                }
+                return u;
+            }));
+        },
+        markNotificationsAsRead: () => { if(currentUser) setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, notifications: u.notifications.map(n => ({ ...n, read: true })) } : u)); },
         addExpense: (expense) => setExpenses(prev => [...prev, { ...expense, id: `exp-${Date.now()}`, date: new Date().toISOString() }]),
         updateExpense: (expense) => setExpenses(prev => prev.map(e => e.id === expense.id ? expense : e)),
         deleteExpense: (expenseId) => setExpenses(prev => prev.map(e => e.id === expenseId ? { ...e, isDeleted: true } : e)),
@@ -1091,9 +966,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearEmailPreview: () => setEmailPreview(null),
         updateGlobalCertificateTemplate: (template) => setGlobalCertificateTemplate(template),
         convertToInternalCredit: (userId, subId) => { /* ... implementation ... */ },
-        deleteCreditTransaction: (userId, transactionId) => { /* ... implementation ... */ },
-        restoreCreditTransaction: (userId, transactionId) => { /* ... implementation ... */ },
-        permanentlyDeleteCreditTransaction: (userId, transactionId) => { /* ... implementation ... */ },
+        deleteCreditTransaction: (userId, transactionId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, creditTransactions: u.creditTransactions?.map(t => t.id === transactionId ? { ...t, isDeleted: true } : t) } : u)),
+        restoreCreditTransaction: (userId, transactionId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, creditTransactions: u.creditTransactions?.map(t => t.id === transactionId ? { ...t, isDeleted: false } : t) } : u)),
+        permanentlyDeleteCreditTransaction: (userId, transactionId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, creditTransactions: u.creditTransactions?.filter(t => t.id !== transactionId) } : u)),
         addConsultationRequest: (userId, subject) => setConsultationRequests(prev => [{ id: `consult-${Date.now()}`, userId, subject, status: 'NEW', requestedAt: new Date().toISOString() }, ...prev]),
         updateConsultationRequest: (requestId, updates) => setConsultationRequests(prev => prev.map(req => req.id === requestId ? { ...req, ...updates } : req)),
     }), [currentUser, users, workshops, products, partners, drhopeData, activeTheme, expenses, broadcastHistory, globalCertificateTemplate, emailPreview, notifications, consultationRequests, pendingGifts]);

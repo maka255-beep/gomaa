@@ -65,7 +65,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
         <div className="text-center min-h-[4.5rem] sm:min-h-[5.5rem] flex flex-col justify-center items-center">
             {/* Title Text: Dark Slate for readability on white */}
             <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug group-hover:text-pink-700 transition-colors">{workshop.title}</h3>
-            <div className="flex items-center justify-center gap-x-2 text-slate-500 text-xs mt-3 sm:mt-4 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
+            <div className="flex items-center justify-center gap-x-2 text-slate-500 text-xs sm:text-sm mt-3 sm:mt-4 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
                 <AcademicCapIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${iconColorClass}`} />
                 <span className="font-semibold">{workshop.instructor}</span>
             </div>

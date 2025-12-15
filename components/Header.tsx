@@ -120,8 +120,16 @@ const Header: React.FC<HeaderProps> = ({
     setIsMobileMenuOpen(true);
     setShowGuestNotificationMessage(false);
   }
+
+  const handleProfileClick = () => {
+      if (user) {
+          onNavigate(Page.PROFILE);
+      } else {
+          onLoginClick();
+      }
+  };
   
-  const navLinkClasses = `py-2 px-4 rounded-md font-semibold transition-all duration-300 text-slate-200 hover:text-white hover:bg-white/10`;
+  const navLinkClasses = `py-2 px-4 rounded-md font-semibold transition-all duration-300 text-slate-200 hover:text-white hover:bg-white/10 text-base`;
   const iconButtonClasses = `p-2 rounded-full transition-all duration-300 transform hover:scale-110 text-slate-200 hover:bg-white/10 hover:text-pink-400`;
   const primaryButtonClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 border border-white/10 text-sm";
 
@@ -202,7 +210,7 @@ const Header: React.FC<HeaderProps> = ({
                     {/* Column 1 */}
                     <a onClick={onShowVideo} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <VideoIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
-                      <div><span className="font-bold text-white text-sm">من هي دكتور هوب</span><span className="text-xs text-slate-400 block">تعرفي على مسيرتها</span></div>
+                      <div><span className="font-bold text-white text-base">من هي دكتور هوب</span><span className="text-xs text-slate-400 block">تعرفي على مسيرتها</span></div>
                     </a>
                     
                     <a onClick={() => onNavigate(Page.REVIEWS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
@@ -275,19 +283,29 @@ const Header: React.FC<HeaderProps> = ({
                 {!user && showGuestNotificationMessage && <GuestNotificationMessage />}
             </div>
 
+            {/* Explicit Profile Button on Desktop */}
+            <button
+                onClick={handleProfileClick}
+                className={`hidden md:flex items-center gap-x-2 ${navLinkClasses}`}
+            >
+                <UserIcon className="w-5 h-5" />
+                <span>الملف الشخصي</span>
+            </button>
+
             {user ? (
                 <>
                     <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
                         <GlobeAltIcon className="w-6 h-6"/>
                     </button>
+                    
+                    {/* Logout Button for Desktop */}
                     <button 
-                        onClick={() => onNavigate(Page.PROFILE)} 
-                        className={`hidden md:flex items-center gap-x-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full transition-all duration-300 border border-white/10`}
+                        onClick={onLogout} 
+                        className={`hidden md:flex items-center gap-x-2 text-red-400 hover:text-red-300 font-bold transition-colors py-2 px-3 hover:bg-white/5 rounded-md`}
+                        title="تسجيل الخروج"
                     >
-                        <span className="text-sm font-bold truncate max-w-[100px]">{user.fullName.split(' ')[0]}</span>
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-lg">
-                            <span className="font-bold text-xs">{user.fullName.charAt(0)}</span>
-                        </div>
+                        <ArrowLeftOnRectangleIcon className="w-5 h-5" />
+                        <span>خروج</span>
                     </button>
                 </>
             ) : (
@@ -340,7 +358,7 @@ const Header: React.FC<HeaderProps> = ({
                 <div className="bg-black/20 rounded-xl border border-fuchsia-500/20 mt-2 overflow-hidden transition-all duration-300">
                     <button 
                         onClick={() => setIsMobileDrHopeOpen(!isMobileDrHopeOpen)}
-                        className="w-full p-4 flex justify-between items-center text-fuchsia-400 font-bold text-sm hover:bg-white/5 transition-colors"
+                        className="w-full p-4 flex justify-between items-center text-fuchsia-400 font-bold text-base hover:bg-white/5 transition-colors"
                     >
                         <span>عالم دكتور هوب</span>
                         <ChevronDownIcon className={`w-4 h-4 transition-transform duration-300 ${isMobileDrHopeOpen ? 'rotate-180' : ''}`} />
@@ -371,17 +389,18 @@ const Header: React.FC<HeaderProps> = ({
                     </div>
                 </div>
 
+                <div className="h-px bg-white/10 my-1"></div>
+                
+                {/* Profile Button - Always visible */}
+                <button onClick={() => handleMobileLinkClick(handleProfileClick)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2 flex items-center gap-2">
+                    <UserIcon className="w-5 h-5"/> ملفي الشخصي
+                </button>
+
                 {user && (
-                    <>
-                        <div className="h-px bg-white/10 my-1"></div>
-                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PROFILE))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2 flex items-center gap-2">
-                            <UserIcon className="w-5 h-5"/> ملفي الشخصي
-                        </button>
-                        <button onClick={() => handleMobileLinkClick(onLogout)} className="text-right text-red-400 font-bold text-lg hover:text-red-300 transition-colors p-2 flex items-center gap-2">
-                            <ArrowLeftOnRectangleIcon className="w-5 h-5"/>
-                            تسجيل خروج
-                        </button>
-                    </>
+                    <button onClick={() => handleMobileLinkClick(onLogout)} className="text-right text-red-400 font-bold text-lg hover:text-red-300 transition-colors p-2 flex items-center gap-2">
+                        <ArrowLeftOnRectangleIcon className="w-5 h-5"/>
+                        تسجيل خروج
+                    </button>
                 )}
             </div>
 

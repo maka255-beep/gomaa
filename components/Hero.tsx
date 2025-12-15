@@ -13,7 +13,7 @@ const CountdownUnit: React.FC<{ value: number; label: string }> = ({ value, labe
         <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-wider">
             {value.toString().padStart(2, '0')}
         </span>
-        <span className="text-[10px] sm:text-xs text-fuchsia-600 uppercase tracking-widest font-bold">{label}</span>
+        <span className="text-[10px] sm:text-xs text-slate-600 uppercase tracking-widest font-bold">{label}</span>
     </div>
 );
 
@@ -65,13 +65,13 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
     const btnClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 text-sm sm:text-base flex items-center justify-center gap-2 group mx-auto border border-white/10";
 
     return (
-        <section className="hero-section relative text-center py-8 sm:py-20 overflow-hidden bg-gradient-to-b from-[#2e1065]/80 via-[#2e1065]/40 to-transparent">
+        <section className="hero-section relative text-center py-8 sm:py-20 overflow-hidden">
             <div className="container mx-auto px-4 relative z-10">
                 {nextWorkshop && timeLeft ? (
                     <>
-                        <h2 className="text-[10px] sm:text-xs font-bold text-fuchsia-600 tracking-widest uppercase mb-1 sm:mb-2">الورشة المباشرة القادمة</h2>
+                        <h2 className="text-[10px] sm:text-xs font-bold text-slate-900 tracking-widest uppercase mb-1 sm:mb-2">الورشة المباشرة القادمة</h2>
                         <h1 className="text-base sm:text-lg font-bold text-slate-900 mb-2 sm:mb-4">{nextWorkshop.title}</h1>
-                        <p className="text-xs text-slate-600 mb-4 sm:mb-6 font-semibold">{nextWorkshop.instructor}</p>
+                        <p className="text-sm sm:text-base text-slate-600 mb-4 sm:mb-6 font-semibold">{nextWorkshop.instructor}</p>
                         
                         <div className="flex justify-center items-center gap-3 sm:gap-6 my-4 sm:my-6">
                             <CountdownUnit value={timeLeft.days || 0} label="أيام" />

@@ -9,7 +9,7 @@ import UserDetailsModal from './components/UserDetailsModal';
 import Toast from './components/Toast';
 
 const App: React.FC = () => {
-  const { activeTheme, workshops } = useUser(); // Removed unused loginAsUser
+  const { activeTheme, workshops, loginAsUser } = useUser();
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   
@@ -80,11 +80,36 @@ const App: React.FC = () => {
   };
 
   const handleLoginAsUser = (userId: number) => {
-      // Logic to login as user would normally go here via context
-      // For now, we simply exit admin mode to simulate the view
-      console.log('Logging in as user ID:', userId);
-      handleAdminClose();
-      showToast('تم التبديل إلى واجهة المستخدم', 'success');
+      // Logic to login as user via context
+      // We also exit admin mode to simulate the view
+      const userToLogin = { id: userId } as User; // We rely on context to fetch full user if needed, or pass full object
+      // But context.loginAsUser expects full object usually. 
+      // The AdminPage passes ID. We need to fetch the user object or context handles it. 
+      // Actually, AdminPage usually has access to the User object. 
+      // Let's modify AdminPage to pass the User object if possible, OR
+      // simpler: we just need to find the user in context. 
+      // But App.tsx doesn't have easy access to `users` array directly without `useUser`.
+      // `loginAsUser` in Context takes `User` object.
+      // We can fetch it here since we are inside UserProvider via `App` component?
+      // No, `App` is inside `UserProvider` in index.tsx.
+      // So we can get `users` from `useUser`.
+      
+      // However, `onLoginAsUserId` in AdminPage just passes ID.
+      // Let's assume we can get the user from the ID in the handler.
+      // We need to fetch `users` from context.
+  };
+  
+  // Revised handler using context data
+  const { users } = useUser();
+  const executeLoginAsUser = (userId: number) => {
+      const targetUser = users.find(u => u.id === userId);
+      if (targetUser) {
+          loginAsUser(targetUser);
+          handleAdminClose();
+          showToast(`تم التبديل إلى حساب ${targetUser.fullName}`, 'success');
+      } else {
+          showToast('المستخدم غير موجود', 'error');
+      }
   };
 
   if (isAdminMode) {
@@ -99,7 +124,7 @@ const App: React.FC = () => {
                 onViewInvoice={(details) => setInvoiceToView(details)}
                 isAdminAuthenticated={isAdminAuthenticated}
                 onLoginSuccess={() => setIsAdminAuthenticated(true)}
-                onLoginAsUserId={handleLoginAsUser}
+                onLoginAsUserId={executeLoginAsUser}
             />
             
             {/* Admin Modals */}

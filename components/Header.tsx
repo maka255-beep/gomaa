@@ -181,12 +181,10 @@ const Header: React.FC<HeaderProps> = ({
                 <MenuIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-3" />
               </button>
             </div>
-            {/* Show Navigation Hub Button for logged in users (Mobile) */}
-            {user && (
-                <button onClick={onOpenNavigationHub} className={`md:hidden ${iconButtonClasses}`} title="إلى أين تود الذهاب؟">
-                    <GlobeAltIcon className="w-6 h-6"/>
-                </button>
-            )}
+            {/* Show Navigation Hub Button (Mobile) - Always visible */}
+            <button onClick={onOpenNavigationHub} className={`md:hidden ${iconButtonClasses}`} title="إلى أين تود الذهاب؟">
+                <GlobeAltIcon className="w-6 h-6"/>
+            </button>
             <div className="hidden md:block">
               <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} />
             </div>
@@ -303,12 +301,13 @@ const Header: React.FC<HeaderProps> = ({
                 <span>الملف الشخصي</span>
             </button>
 
+            {/* Navigation Hub - Always Visible Desktop */}
+            <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
+                <GlobeAltIcon className="w-6 h-6"/>
+            </button>
+
             {user ? (
                 <>
-                    <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
-                        <GlobeAltIcon className="w-6 h-6"/>
-                    </button>
-                    
                     {/* Logout Button for Desktop */}
                     <button 
                         onClick={onLogout} 

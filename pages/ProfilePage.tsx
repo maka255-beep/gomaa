@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Workshop, Subscription, User, NoteResource, Recording, ConsultationRequest, SubscriptionStatus } from '../types';
-import { CloseIcon, VideoIcon, CalendarIcon, ChevronDownIcon, EyeIcon, AcademicCapIcon, UserCircleIcon, LightBulbIcon, DocumentTextIcon, StarIcon, ChatBubbleLeftRightIcon, CreditCardIcon, ShieldCheckIcon, TrashIcon, PencilIcon, GlobeAltIcon, ReceiptTaxIcon, CheckCircleIcon, InformationCircleIcon, EnvelopeIcon, PhoneIcon, MusicalNoteIcon } from '../components/icons';
+import { CloseIcon, VideoIcon, CalendarIcon, ChevronDownIcon, EyeIcon, AcademicCapIcon, UserCircleIcon, LightBulbIcon, DocumentTextIcon, StarIcon, ChatBubbleLeftRightIcon, CreditCardIcon, ShieldCheckIcon, TrashIcon, PencilIcon, GlobeAltIcon, ReceiptTaxIcon, CheckCircleIcon, InformationCircleIcon, EnvelopeIcon, PhoneIcon, MusicalNoteIcon, ClockIcon } from '../components/icons';
 import { useUser } from '../context/UserContext';
 import { formatArabicDate, formatArabicTime, isWorkshopExpired } from '../utils';
 import { generateCertificate } from '../components/DynamicCertificateRenderer';
@@ -173,12 +173,28 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
             .sort((a,b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
     }, [consultationRequests, user]);
 
+    const nextLiveWorkshop = useMemo(() => {
+        const liveSub = subscriptions.find(sub => {
+            const w = workshops.find(wk => wk.id === sub.workshopId);
+            return w && !w.isRecorded && !isWorkshopExpired(w);
+        });
+        return liveSub ? workshops.find(w => w.id === liveSub.workshopId) : null;
+    }, [subscriptions, workshops]);
+
+    // Auto-expand the first upcoming live workshop
+    useEffect(() => {
+        if (isOpen && nextLiveWorkshop) {
+            setExpandedWorkshopId(nextLiveWorkshop.id);
+        }
+    }, [isOpen, nextLiveWorkshop]);
+
     useEffect(() => {
         // Reset view when modal is opened for a new user
-        setActiveView('my_workshops');
-        setRecommendations([]);
-        setExpandedWorkshopId(null);
-    }, [user]);
+        if (isOpen) {
+            setActiveView('my_workshops');
+            setRecommendations([]);
+        }
+    }, [user, isOpen]);
 
     const handleGenerateRecs = async () => {
         if (!process.env.API_KEY) {
@@ -247,7 +263,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
         generateCertificate(globalCertificateTemplate, workshop, user);
     };
 
-    const handleLiveStreamClick = (workshop: Workshop) => {
+    const handleLiveStreamClick = (workshop: Workshop, e?: React.MouseEvent) => {
+        e?.stopPropagation(); // Prevent toggling accordion
         if (workshop.zoomLink) {
             onZoomRedirect(workshop.zoomLink, workshop.id);
         } else {
@@ -296,10 +313,39 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                 <div className="flex-grow overflow-y-auto p-6 space-y-8">
                     {activeView === 'my_workshops' ? (
                         <>
-                           {/* Subscribed Workshops Section */}
+                           {/* Hero Section: Next Live Workshop */}
+                           {nextLiveWorkshop && (
+                                <div className="mb-6 p-6 bg-gradient-to-r from-purple-900 to-fuchsia-900 rounded-2xl border border-fuchsia-500 shadow-[0_0_30px_rgba(219,39,119,0.3)] relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-500/20 rounded-full blur-3xl -z-10 group-hover:bg-fuchsia-500/30 transition-all duration-700"></div>
+                                    
+                                    <div className="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
+                                        <div className="text-center md:text-right">
+                                            <div className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-3 animate-pulse shadow-lg">
+                                                <span className="w-2 h-2 bg-white rounded-full"></span>
+                                                بث مباشر قادم
+                                            </div>
+                                            <h3 className="text-2xl font-black text-white mb-2">{nextLiveWorkshop.title}</h3>
+                                            <p className="text-fuchsia-200 text-sm mb-4 flex items-center justify-center md:justify-start gap-2">
+                                                <CalendarIcon className="w-4 h-4"/>
+                                                {formatArabicDate(nextLiveWorkshop.startDate)} - {formatArabicTime(nextLiveWorkshop.startTime)}
+                                            </p>
+                                        </div>
+                                        
+                                        <button 
+                                            onClick={(e) => handleLiveStreamClick(nextLiveWorkshop, e)}
+                                            className="w-full md:w-auto bg-white text-fuchsia-800 font-black py-3 px-8 rounded-xl hover:bg-fuchsia-50 transition-all transform hover:scale-105 shadow-xl flex items-center justify-center gap-2"
+                                        >
+                                            <VideoIcon className="w-6 h-6" />
+                                            دخول البث الآن
+                                        </button>
+                                    </div>
+                                </div>
+                           )}
+
+                           {/* Subscribed Workshops List */}
                            <section>
-                               <h3 className="text-base font-bold text-fuchsia-300 mb-4">الورش المشترك بها ({subscriptions.length})</h3>
-                               <div className="flex flex-col">
+                               <h3 className="text-base font-bold text-fuchsia-300 mb-4">كل الورش ({subscriptions.length})</h3>
+                               <div className="flex flex-col space-y-4">
                                    {subscriptions.map((sub, index) => {
                                        const workshop = workshops.find(w => w.id === sub.workshopId);
                                        if (!workshop) return null;
@@ -332,139 +378,153 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                                         );
 
                                        return (
-                                           <React.Fragment key={sub.id}>
-                                               <div className={`bg-black/20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${isExpanded ? 'border-fuchsia-500/50 shadow-lg shadow-fuchsia-500/10' : 'border-slate-700/50 hover:border-fuchsia-500/30'}`}>
-                                                   <button onClick={() => setExpandedWorkshopId(isExpanded ? null : workshop.id)} className="w-full p-4 text-right flex justify-between items-center hover:bg-fuchsia-500/10 transition-colors">
-                                                       <span className="font-bold text-white">{workshop.title}</span>
-                                                       <div className="flex items-center gap-x-4">
-                                                            {showLiveStreamButton && sub.attended && (
-                                                                <span className="flex items-center gap-x-1 bg-green-500/20 text-green-300 text-xs font-bold px-2 py-1 rounded-full">
-                                                                    <CheckCircleIcon className="w-4 h-4" />
-                                                                    <span>تم الحضور</span>
-                                                                </span>
-                                                            )}
-                                                            <ChevronDownIcon className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
-                                                        </div>
-                                                   </button>
-                                                    <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[1500px]' : 'max-h-0'}`}>
-                                                        <div className="p-4 space-y-6 border-t-2 border-slate-700/50">
-                                                            <div>
-                                                                <h4 className="text-sm font-bold text-fuchsia-300 mb-3 text-right">تفاصيل الورشة</h4>
-                                                                <div className="space-y-3 text-sm text-slate-300 bg-black/20 p-3 rounded-md">
-                                                                    {!workshop.isRecorded && dateValue && (
-                                                                        <div className="flex items-center justify-start gap-x-3">
-                                                                            <CalendarIcon className="w-5 h-5 text-fuchsia-400 flex-shrink-0"/>
-                                                                            <p className="font-semibold text-white">{dateValue}</p>
-                                                                        </div>
-                                                                    )}
-                                                                    <div className="flex items-center justify-start gap-x-3">
-                                                                        <GlobeAltIcon className="w-5 h-5 text-fuchsia-400 flex-shrink-0"/>
-                                                                        <p className="font-semibold text-white">{locationValue}</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                           <div key={sub.id} className={`bg-black/20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${isExpanded ? 'border-fuchsia-500/50 shadow-lg shadow-fuchsia-500/10' : 'border-slate-700/50 hover:border-fuchsia-500/30'}`}>
+                                               {/* Header Row */}
+                                               <div className="w-full p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:bg-fuchsia-500/10 transition-colors cursor-pointer" onClick={() => setExpandedWorkshopId(isExpanded ? null : workshop.id)}>
+                                                   <div className="flex-grow">
+                                                       <span className="font-bold text-white text-lg">{workshop.title}</span>
+                                                       {showLiveStreamButton && (
+                                                           <span className="mr-2 inline-flex items-center gap-1 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+                                                       )}
+                                                   </div>
+                                                   
+                                                   <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                                                        {/* Direct Live Button - Visible when collapsed too! */}
+                                                        {showLiveStreamButton && (
+                                                            <button 
+                                                                onClick={(e) => handleLiveStreamClick(workshop, e)} 
+                                                                className="flex items-center gap-1.5 bg-gradient-to-r from-purple-700 to-pink-600 hover:from-purple-600 hover:to-pink-500 text-white font-bold py-1.5 px-4 rounded-lg shadow-lg text-xs transition-transform transform hover:scale-105 border border-white/20"
+                                                            >
+                                                                <VideoIcon className="w-4 h-4" />
+                                                                <span>دخول البث</span>
+                                                            </button>
+                                                        )}
 
-                                                            <div>
-                                                                <h4 className="text-sm font-bold text-fuchsia-300 mb-3 text-right">محتويات الورشة</h4>
-                                                                <div className="space-y-4">
-                                                                    {showLiveStreamButton && (
-                                                                        <div>
-                                                                            <button 
-                                                                                onClick={() => handleLiveStreamClick(workshop)} 
-                                                                                className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-blue-500/50 transition-all duration-300 transform hover:scale-[1.02] group"
-                                                                            >
-                                                                                <div className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500/10 text-blue-400 flex-shrink-0 group-hover:bg-blue-500/20 transition-colors">
-                                                                                    <VideoIcon className="w-6 h-6"/>
-                                                                                </div>
-                                                                                <div className="flex-grow">
-                                                                                    <span className="font-bold text-white text-base group-hover:text-blue-300 transition-colors">
-                                                                                        الدخول إلى البث المباشر عبر ZOOM
-                                                                                    </span>
-                                                                                </div>
-                                                                            </button>
-                                                                        </div>
-                                                                    )}
-                                                                    {workshop.recordings?.map((rec, index) => {
-                                                                        const access = checkRecordingAccess(rec, sub);
-                                                                        const disabled = access.status !== 'AVAILABLE';
-                                                                        
-                                                                        let dateString = '';
-                                                                        if (access.status === 'NOT_YET_AVAILABLE' && access.startDate) {
-                                                                            dateString = `سيكون متاحاً في: ${formatArabicDate(access.startDate)}`;
-                                                                        } else if (access.status === 'EXPIRED' && access.endDate) {
-                                                                            dateString = `انتهت صلاحية المشاهدة في: ${formatArabicDate(access.endDate)}`;
-                                                                        } else if (access.status === 'AVAILABLE') {
-                                                                            if (access.startDate && access.endDate) {
-                                                                                dateString = `متاح من ${formatArabicDate(access.startDate)} إلى ${formatArabicDate(access.endDate)}`;
-                                                                            } else if (access.endDate) {
-                                                                                dateString = `متاح حتى: ${formatArabicDate(access.endDate)}`;
-                                                                            } else {
-                                                                                dateString = "غير متاحة حاليا";
-                                                                            }
-                                                                        }
-
-                                                                        return (
-                                                                            <div key={index} className="space-y-2">
-                                                                                <button onClick={() => onPlayRecording(workshop, rec, index)} disabled={disabled} className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-purple-500/50 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed group">
-                                                                                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-500/10 text-purple-400 flex-shrink-0 group-hover:bg-purple-500/20 transition-colors"><VideoIcon className="w-6 h-6"/></div>
-                                                                                    <div className="flex-grow"><span className="font-bold text-white text-base group-hover:text-purple-300 transition-colors">مشاهدة: {rec.name}</span></div>
-                                                                                </button>
-                                                                                {dateString && (
-                                                                                    <div className="mt-2 text-xs text-yellow-400 flex items-center gap-x-2 pr-16">
-                                                                                        <CalendarIcon className="w-4 h-4 flex-shrink-0" />
-                                                                                        <span className="font-semibold">{dateString}</span>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                        );
-                                                                    })}
-                                                                    {workshop.notes?.map((note, index) => (
-                                                                        <button key={index} onClick={() => onViewAttachment(note)} className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-green-500/50 transition-all duration-300 transform hover:scale-[1.02] group">
-                                                                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-green-500/10 text-green-400 flex-shrink-0 group-hover:bg-green-500/20 transition-colors"><DocumentTextIcon className="w-6 h-6"/></div>
-                                                                            <div className="flex-grow"><span className="font-bold text-white text-base group-hover:text-green-300 transition-colors">{note.name}</span></div>
-                                                                        </button>
-                                                                    ))}
-                                                                    {workshop.mediaFiles && workshop.mediaFiles.length > 0 && workshop.mediaFiles.map((media, index) => (
-                                                                        <div key={index} className="p-4 rounded-lg bg-slate-800/70 border border-transparent hover:border-teal-500/50 transition-colors duration-300">
-                                                                            <div className="w-full flex items-center gap-x-4 text-right">
-                                                                                <div className="w-12 h-12 flex items-center justify-center rounded-full bg-teal-500/10 text-teal-400 flex-shrink-0">
-                                                                                    {media.type === 'audio' ? <MusicalNoteIcon className="w-6 h-6"/> : <VideoIcon className="w-6 h-6"/>}
-                                                                                </div>
-                                                                                <div className="flex-grow"><span className="font-bold text-white text-base">{media.name}</span></div>
-                                                                            </div>
-                                                                            <div className="mt-3 px-1">
-                                                                                {media.type === 'audio' ? (
-                                                                                    <audio controls src={media.value} className="w-full h-10">متصفحك لا يدعم تشغيل الصوت.</audio>
-                                                                                ) : (
-                                                                                    <video controls src={media.value} className="w-full rounded-md">متصفحك لا يدعم تشغيل الفيديو.</video>
-                                                                                )}
-                                                                            </div>
-                                                                            {media.notes && (
-                                                                                <p className="mt-2 text-sm text-slate-400 whitespace-pre-wrap px-1">{media.notes}</p>
-                                                                            )}
-                                                                        </div>
-                                                                    ))}
-                                                                    {workshop.certificatesIssued && (
-                                                                        <button onClick={() => handleDownloadCertificate(workshop, user)} className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-yellow-500/50 transition-all duration-300 transform hover:scale-[1.02] group">
-                                                                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-yellow-500/10 text-yellow-400 flex-shrink-0 group-hover:bg-yellow-500/20 transition-colors"><AcademicCapIcon className="w-6 h-6"/></div>
-                                                                            <div className="flex-grow"><span className="font-bold text-white text-base group-hover:text-yellow-300 transition-colors">الحصول على شهادة إتمام الورشة</span></div>
-                                                                        </button>
-                                                                    )}
-                                                                    <button onClick={() => onViewInvoice({ user, subscription: sub })} className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-teal-500/50 transition-all duration-300 transform hover:scale-[1.02] group">
-                                                                        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-teal-500/10 text-teal-400 flex-shrink-0 group-hover:bg-teal-500/20 transition-colors"><ReceiptTaxIcon className="w-6 h-6"/></div>
-                                                                        <div className="flex-grow"><span className="font-bold text-white text-base group-hover:text-teal-300 transition-colors">عرض الفاتورة الضريبية</span></div>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            {canAddReview && <AddReviewForm workshopId={workshop.id} onReviewAdded={handleReviewAdded} />}
-                                                        </div>
+                                                        {sub.attended && (
+                                                            <span className="flex items-center gap-x-1 text-green-400 text-xs font-bold" title="تم الحضور">
+                                                                <CheckCircleIcon className="w-5 h-5" />
+                                                            </span>
+                                                        )}
+                                                        <ChevronDownIcon className={`w-5 h-5 text-slate-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
                                                     </div>
                                                </div>
-                                               {index < subscriptions.length - 1 && (
-                                                   <div className="my-6 h-px bg-gradient-to-r from-transparent via-slate-700/50 to-transparent" />
-                                               )}
-                                           </React.Fragment>
+
+                                                <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isExpanded ? 'max-h-[1500px]' : 'max-h-0'}`}>
+                                                    <div className="p-4 space-y-6 border-t-2 border-slate-700/50">
+                                                        <div>
+                                                            <h4 className="text-sm font-bold text-fuchsia-300 mb-3 text-right">تفاصيل الورشة</h4>
+                                                            <div className="space-y-3 text-sm text-slate-300 bg-black/20 p-3 rounded-md">
+                                                                {!workshop.isRecorded && dateValue && (
+                                                                    <div className="flex items-center justify-start gap-x-3">
+                                                                        <CalendarIcon className="w-5 h-5 text-fuchsia-400 flex-shrink-0"/>
+                                                                        <p className="font-semibold text-white">{dateValue}</p>
+                                                                    </div>
+                                                                )}
+                                                                <div className="flex items-center justify-start gap-x-3">
+                                                                    <GlobeAltIcon className="w-5 h-5 text-fuchsia-400 flex-shrink-0"/>
+                                                                    <p className="font-semibold text-white">{locationValue}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <h4 className="text-sm font-bold text-fuchsia-300 mb-3 text-right">محتويات الورشة</h4>
+                                                            <div className="space-y-4">
+                                                                {showLiveStreamButton && (
+                                                                    <div>
+                                                                        <button 
+                                                                            onClick={(e) => handleLiveStreamClick(workshop, e)} 
+                                                                            className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-800 hover:to-slate-800 border border-fuchsia-500/30 hover:border-fuchsia-500 transition-all duration-300 transform hover:scale-[1.01] group shadow-lg"
+                                                                        >
+                                                                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-red-500/20 text-red-400 flex-shrink-0 group-hover:bg-red-500/30 transition-colors animate-pulse">
+                                                                                <VideoIcon className="w-6 h-6"/>
+                                                                            </div>
+                                                                            <div className="flex-grow">
+                                                                                <span className="font-bold text-white text-base group-hover:text-fuchsia-300 transition-colors">
+                                                                                    الدخول إلى البث المباشر عبر ZOOM
+                                                                                </span>
+                                                                                <p className="text-xs text-slate-400 mt-1">اضغط هنا للانضمام للقاعة</p>
+                                                                            </div>
+                                                                        </button>
+                                                                    </div>
+                                                                )}
+                                                                {workshop.recordings?.map((rec, index) => {
+                                                                    const access = checkRecordingAccess(rec, sub);
+                                                                    const disabled = access.status !== 'AVAILABLE';
+                                                                    
+                                                                    let dateString = '';
+                                                                    if (access.status === 'NOT_YET_AVAILABLE' && access.startDate) {
+                                                                        dateString = `سيكون متاحاً في: ${formatArabicDate(access.startDate)}`;
+                                                                    } else if (access.status === 'EXPIRED' && access.endDate) {
+                                                                        dateString = `انتهت صلاحية المشاهدة في: ${formatArabicDate(access.endDate)}`;
+                                                                    } else if (access.status === 'AVAILABLE') {
+                                                                        if (access.startDate && access.endDate) {
+                                                                            dateString = `متاح من ${formatArabicDate(access.startDate)} إلى ${formatArabicDate(access.endDate)}`;
+                                                                        } else if (access.endDate) {
+                                                                            dateString = `متاح حتى: ${formatArabicDate(access.endDate)}`;
+                                                                        } else {
+                                                                            dateString = "غير متاحة حاليا";
+                                                                        }
+                                                                    }
+
+                                                                    return (
+                                                                        <div key={index} className="space-y-2">
+                                                                            <button onClick={() => onPlayRecording(workshop, rec, index)} disabled={disabled} className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-purple-500/50 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed group">
+                                                                                <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-500/10 text-purple-400 flex-shrink-0 group-hover:bg-purple-500/20 transition-colors"><VideoIcon className="w-6 h-6"/></div>
+                                                                                <div className="flex-grow"><span className="font-bold text-white text-base group-hover:text-purple-300 transition-colors">مشاهدة: {rec.name}</span></div>
+                                                                            </button>
+                                                                            {dateString && (
+                                                                                <div className="mt-2 text-xs text-yellow-400 flex items-center gap-x-2 pr-16">
+                                                                                    <CalendarIcon className="w-4 h-4 flex-shrink-0" />
+                                                                                    <span className="font-semibold">{dateString}</span>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                                {workshop.notes?.map((note, index) => (
+                                                                    <button key={index} onClick={() => onViewAttachment(note)} className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-green-500/50 transition-all duration-300 transform hover:scale-[1.02] group">
+                                                                        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-green-500/10 text-green-400 flex-shrink-0 group-hover:bg-green-500/20 transition-colors"><DocumentTextIcon className="w-6 h-6"/></div>
+                                                                        <div className="flex-grow"><span className="font-bold text-white text-base group-hover:text-green-300 transition-colors">{note.name}</span></div>
+                                                                    </button>
+                                                                ))}
+                                                                {workshop.mediaFiles && workshop.mediaFiles.length > 0 && workshop.mediaFiles.map((media, index) => (
+                                                                    <div key={index} className="p-4 rounded-lg bg-slate-800/70 border border-transparent hover:border-teal-500/50 transition-colors duration-300">
+                                                                        <div className="w-full flex items-center gap-x-4 text-right">
+                                                                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-teal-500/10 text-teal-400 flex-shrink-0">
+                                                                                {media.type === 'audio' ? <MusicalNoteIcon className="w-6 h-6"/> : <VideoIcon className="w-6 h-6"/>}
+                                                                            </div>
+                                                                            <div className="flex-grow"><span className="font-bold text-white text-base">{media.name}</span></div>
+                                                                        </div>
+                                                                        <div className="mt-3 px-1">
+                                                                            {media.type === 'audio' ? (
+                                                                                <audio controls src={media.value} className="w-full h-10">متصفحك لا يدعم تشغيل الصوت.</audio>
+                                                                            ) : (
+                                                                                <video controls src={media.value} className="w-full rounded-md">متصفحك لا يدعم تشغيل الفيديو.</video>
+                                                                            )}
+                                                                        </div>
+                                                                        {media.notes && (
+                                                                            <p className="mt-2 text-sm text-slate-400 whitespace-pre-wrap px-1">{media.notes}</p>
+                                                                        )}
+                                                                    </div>
+                                                                ))}
+                                                                {workshop.certificatesIssued && (
+                                                                    <button onClick={() => handleDownloadCertificate(workshop, user)} className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-yellow-500/50 transition-all duration-300 transform hover:scale-[1.02] group">
+                                                                        <div className="w-12 h-12 flex items-center justify-center rounded-full bg-yellow-500/10 text-yellow-400 flex-shrink-0 group-hover:bg-yellow-500/20 transition-colors"><AcademicCapIcon className="w-6 h-6"/></div>
+                                                                        <div className="flex-grow"><span className="font-bold text-white text-base group-hover:text-yellow-300 transition-colors">الحصول على شهادة إتمام الورشة</span></div>
+                                                                    </button>
+                                                                )}
+                                                                <button onClick={() => onViewInvoice({ user, subscription: sub })} className="w-full flex items-center gap-x-4 p-4 text-right rounded-lg bg-slate-800/70 hover:bg-slate-800 border border-transparent hover:border-teal-500/50 transition-all duration-300 transform hover:scale-[1.02] group">
+                                                                    <div className="w-12 h-12 flex items-center justify-center rounded-full bg-teal-500/10 text-teal-400 flex-shrink-0 group-hover:bg-teal-500/20 transition-colors"><ReceiptTaxIcon className="w-6 h-6"/></div>
+                                                                    <div className="flex-grow"><span className="font-bold text-white text-base group-hover:text-teal-300 transition-colors">عرض الفاتورة الضريبية</span></div>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {canAddReview && <AddReviewForm workshopId={workshop.id} onReviewAdded={handleReviewAdded} />}
+                                                    </div>
+                                                </div>
+                                           </div>
                                        );
                                    })}
                                </div>

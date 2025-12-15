@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
-import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, MenuIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, LoginIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon, UserAddIcon, InformationCircleIcon } from './icons';
+import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon, InformationCircleIcon, LightBulbIcon, LoginIcon } from './icons';
 import { useUser } from '../context/UserContext';
 import NotificationsPanel from './NotificationsPanel';
 
@@ -22,8 +22,9 @@ interface HeaderProps {
   isVisible?: boolean; 
 }
 
-const LogoButton: React.FC<{ logoUrl?: string; onClick: () => void }> = ({ logoUrl, onClick }) => {
-  const btnClasses = `group w-14 h-14 md:w-20 md:h-20 flex items-center justify-center rounded-full text-xl font-bold tracking-wider transition-all duration-300 transform hover:scale-110 focus:outline-none shadow-lg hover:shadow-xl bg-white/5 text-pink-400 border border-white/10`;
+const LogoButton: React.FC<{ logoUrl?: string; onClick: () => void; isMobile?: boolean }> = ({ logoUrl, onClick, isMobile }) => {
+  const sizeClasses = isMobile ? 'w-12 h-12' : 'w-14 h-14 md:w-20 md:h-20';
+  const btnClasses = `group ${sizeClasses} flex items-center justify-center rounded-full text-xl font-bold tracking-wider transition-all duration-300 transform hover:scale-110 focus:outline-none shadow-lg hover:shadow-xl bg-white/5 text-pink-400 border border-white/10`;
 
   return (
     <button
@@ -46,13 +47,12 @@ const Header: React.FC<HeaderProps> = ({
     isVisible = true
 }) => {
   const { currentUser: user, logout: onLogout, notifications, drhopeData, markNotificationsAsRead } = useUser();
-  const [isExploreMenuOpen, setIsExploreMenuOpen] = useState(false);
   const [isNotificationsPanelOpen, setIsNotificationsPanelOpen] = useState(false);
   const [isMobileNotificationsOpen, setIsMobileNotificationsOpen] = useState(false);
-  const [isMobileDrHopeOpen, setIsMobileDrHopeOpen] = useState(false); // State for mobile accordion
-  const [showGuestNotificationMessage, setShowGuestNotificationMessage] = useState(false); // State for guest message
+  const [showGuestNotificationMessage, setShowGuestNotificationMessage] = useState(false); 
   const desktopNotificationContainerRef = useRef<HTMLDivElement>(null);
   const mobileNotificationContainerRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   
   const unreadCount = user ? notifications.filter(n => !n.read).length : 0;
 
@@ -68,16 +68,20 @@ const Header: React.FC<HeaderProps> = ({
       if (window.innerWidth < 768 && mobileNotificationContainerRef.current && !mobileNotificationContainerRef.current.contains(event.target as Node)) {
          setShowGuestNotificationMessage(false);
       }
+      // Close mobile menu if clicked outside
+      if (isMobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node) && !(event.target as Element).closest('.mobile-menu-trigger')) {
+          setIsMobileMenuOpen(false);
+      }
     };
 
-    if (isNotificationsPanelOpen || showGuestNotificationMessage) {
+    if (isNotificationsPanelOpen || showGuestNotificationMessage || isMobileMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isNotificationsPanelOpen, showGuestNotificationMessage]);
+  }, [isNotificationsPanelOpen, showGuestNotificationMessage, isMobileMenuOpen]);
 
   const handleCloseMobileMenu = () => setIsMobileMenuOpen(false);
 
@@ -114,10 +118,10 @@ const Header: React.FC<HeaderProps> = ({
     setShowGuestNotificationMessage(false);
   }
 
-  const handleHamburgerClick = () => {
+  const handleDrHopeMenuToggle = () => {
     setIsNotificationsPanelOpen(false);
     setIsMobileNotificationsOpen(false);
-    setIsMobileMenuOpen(true);
+    setIsMobileMenuOpen(!isMobileMenuOpen);
     setShowGuestNotificationMessage(false);
   }
 
@@ -131,6 +135,7 @@ const Header: React.FC<HeaderProps> = ({
   
   const navLinkClasses = `py-2 px-4 rounded-md font-semibold transition-all duration-300 text-slate-200 hover:text-white hover:bg-white/10 text-base`;
   const iconButtonClasses = `p-2 rounded-full transition-all duration-300 transform hover:scale-110 text-slate-200 hover:bg-white/10 hover:text-pink-400`;
+  const mobileIconButtonClasses = `p-2 rounded-lg bg-white/5 border border-white/5 text-slate-200 hover:bg-white/10 active:scale-95 transition-all`;
   const primaryButtonClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg shadow-purple-900/30 hover:shadow-pink-500/30 border border-white/10 text-sm";
 
   const headerLinks = drhopeData.headerLinks || {
@@ -171,112 +176,140 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
+      {/* 
+        HEADER STRUCTURE:
+        Mobile: Vertical Flex (Row 1: Icons, Row 2: Profile)
+        Desktop: Horizontal Flex
+      */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-1000 ease-in-out ${headerBgClass} ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
-        <nav className="container mx-auto px-4 sm:px-6 h-20 md:h-24 flex items-center justify-between">
-          
-          {/* Left section: Hamburger, NavHub (Mobile), Logo (Desktop) */}
+        
+        {/* MOBILE HEADER LAYOUT (Two Rows) */}
+        <div className="md:hidden flex flex-col p-3 gap-3">
+            {/* Row 1: Logo & Actions */}
+            <div className="flex items-center justify-between">
+                
+                {/* Right: Logo */}
+                <div className="flex-shrink-0">
+                    <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} isMobile={true} />
+                </div>
+
+                {/* Left: Action Icons Row */}
+                <div className="flex items-center gap-2">
+                    
+                    {/* Dr Hope Menu Trigger */}
+                    <button 
+                        onClick={handleDrHopeMenuToggle} 
+                        className={`mobile-menu-trigger flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full py-1.5 px-3 transition-all duration-300 ${isMobileMenuOpen ? 'bg-fuchsia-500/20 border-fuchsia-500/50 text-white' : 'text-slate-200'}`}
+                    >
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-md">
+                            <LightBulbIcon className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span className="text-[10px] font-bold">دكتور هوب</span>
+                        <ChevronDownIcon className={`w-3 h-3 transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {/* Navigation Hub */}
+                    <button onClick={onOpenNavigationHub} className={mobileIconButtonClasses} title="إلى أين تود الذهاب؟">
+                        <GlobeAltIcon className="w-5 h-5"/>
+                    </button>
+
+                    {/* Notifications */}
+                    <div className="relative" ref={mobileNotificationContainerRef}>
+                        <button onClick={handleMobileNotificationsToggle} className={`${mobileIconButtonClasses} relative`}>
+                            <BellIcon className="w-5 h-5" />
+                            {user && unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-fuchsia-600 rounded-full text-[9px] flex items-center justify-center text-white font-bold animate-pulse shadow-lg shadow-fuchsia-500/50">
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </button>
+                        {!user && showGuestNotificationMessage && <GuestNotificationMessage />}
+                    </div>
+
+                    {/* Login/Logout */}
+                    {user ? (
+                        <button 
+                            onClick={onLogout} 
+                            className={`${mobileIconButtonClasses} text-red-400 hover:bg-red-500/10 hover:border-red-500/30`}
+                            title="تسجيل الخروج"
+                        >
+                            <ArrowLeftOnRectangleIcon className="w-5 h-5" />
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={onLoginClick} 
+                            className={mobileIconButtonClasses}
+                            title="تسجيل الدخول"
+                        >
+                            <LoginIcon className="w-5 h-5" />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Row 2: Large Profile Button */}
+            <div className="w-full">
+                <button
+                    onClick={handleProfileClick}
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-800 to-fuchsia-700 hover:from-purple-700 hover:to-fuchsia-600 text-white font-bold py-2.5 rounded-xl shadow-lg border border-white/10 active:scale-[0.99] transition-all"
+                >
+                    <UserIcon className="w-5 h-5" />
+                    <span>{user ? 'الملف الشخصي' : 'تسجيل الدخول للملف الشخصي'}</span>
+                </button>
+            </div>
+        </div>
+
+
+        {/* DESKTOP HEADER LAYOUT (Original) */}
+        <nav className="hidden md:flex container mx-auto px-6 h-24 items-center justify-between">
           <div className="flex justify-start items-center gap-3 flex-1">
-            <div className="md:hidden">
-              <button onClick={handleHamburgerClick} className={iconButtonClasses}>
-                <MenuIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-3" />
-              </button>
-            </div>
-            {/* Show Navigation Hub Button (Mobile) - Always visible */}
-            <button onClick={onOpenNavigationHub} className={`md:hidden ${iconButtonClasses}`} title="إلى أين تود الذهاب؟">
-                <GlobeAltIcon className="w-6 h-6"/>
-            </button>
-            <div className="hidden md:block">
-              <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} />
-            </div>
+            <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} />
           </div>
 
-          {/* Center section: Logo (Mobile), Menu (Desktop) */}
-          <div className="flex justify-center items-center">
-            <div className="md:hidden absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} />
-            </div>
-            <div className="hidden md:flex items-center justify-center gap-x-6">
+          <div className="flex items-center justify-center gap-x-6">
               <div className="relative group">
                 <button className={`${navLinkClasses} flex items-center gap-x-1`}>
                   <span>دكتور هوب</span>
                   <ChevronDownIcon className="w-4 h-4 transition-transform group-hover:rotate-180" />
                 </button>
-                {/* Dropdown Menu */}
+                {/* Desktop Dropdown */}
                 <div className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform transition-all duration-300 ease-in-out group-hover:translate-y-2 translate-y-4 bg-theme-header-gradient backdrop-blur-2xl rounded-xl shadow-2xl mt-2 p-2 w-[550px] border border-white/10 z-10 ring-1 ring-black/20">
                   <div className="grid grid-cols-2 gap-2 text-slate-200">
-                    
-                    {/* Column 1 */}
                     <a onClick={onShowVideo} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <VideoIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-base">من هي دكتور هوب</span><span className="text-xs text-slate-400 block">تعرفي على مسيرتها</span></div>
                     </a>
-                    
                     <a onClick={() => onNavigate(Page.REVIEWS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <ChatBubbleLeftRightIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">{headerLinks.reviews}</span><span className="text-xs text-slate-400 block">تجارب حقيقية</span></div>
                     </a>
-
                     <a onClick={onShowPhotoAlbum} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <CollectionIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">ألبوم الصور</span><span className="text-xs text-slate-400 block">لحظات من ورشاتنا</span></div>
                     </a>
-
                     <a onClick={() => onNavigate(Page.PARTNERS)} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <UsersIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">شركاء النجاح</span><span className="text-xs text-slate-400 block">شركاؤنا في الرحلة</span></div>
                     </a>
-
-                    {/* Column 2 */}
                     <a onClick={onShowInstagram} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <InstagramIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">بثوث انستجرام</span><span className="text-xs text-slate-400 block">البثوث المباشرة</span></div>
                     </a>
-
                     <a onClick={onBoutiqueClick} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
                       <ShoppingCartIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">البوتيك</span><span className="text-xs text-slate-400 block">منتجات مختارة لك</span></div>
                     </a>
-
                      <a onClick={onRequestConsultationClick} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200 col-span-2 border-t border-white/5 mt-1">
                       <ChatBubbleIcon className="w-6 h-6 text-pink-400 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
                       <div><span className="font-bold text-white text-sm">طلب استشارة خاصة</span><span className="text-xs text-slate-400 block">تحدثي مباشرة مع المختصين</span></div>
                     </a>
-
                   </div>
                 </div>
               </div>
-            </div>
           </div>
 
-          {/* Right section: Profile, Notifications, Login/Logout */}
           <div className="flex justify-end items-center gap-3 flex-1">
-            
-            {/* Mobile Profile Button */}
-            <button
-                onClick={handleProfileClick}
-                className={`md:hidden flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-200 hover:bg-white/10 hover:text-pink-400 transition-all duration-300`}
-                title="الملف الشخصي"
-            >
-                <UserIcon className="w-5 h-5" />
-                <span className="text-xs font-bold">الملف الشخصي</span>
-            </button>
-
-            {/* Mobile Notifications Icon - Always Visible (Prompts guest message if guest) */}
-            <div className="md:hidden relative" ref={mobileNotificationContainerRef}>
-                <button onClick={handleMobileNotificationsToggle} className={`${iconButtonClasses} relative`}>
-                    <BellIcon className="w-6 h-6" />
-                    {user && unreadCount > 0 && (
-                        <span className="absolute top-0 right-0 h-4 w-4 bg-fuchsia-600 rounded-full text-[10px] flex items-center justify-center text-white font-bold animate-pulse shadow-lg shadow-fuchsia-500/50">
-                            {unreadCount}
-                        </span>
-                    )}
-                </button>
-                {/* Guest Hint for Mobile */}
-                {!user && showGuestNotificationMessage && <GuestNotificationMessage />}
-            </div>
-
-            {/* Desktop Notifications Icon - Always Visible (Prompts guest message if guest) */}
-            <div className="hidden md:block relative" ref={desktopNotificationContainerRef}>
+            <div className="relative" ref={desktopNotificationContainerRef}>
                 <button onClick={handleNotificationsToggle} className={`${iconButtonClasses} relative`}>
                     <BellIcon className="w-6 h-6" />
                     {user && unreadCount > 0 && (
@@ -286,37 +319,27 @@ const Header: React.FC<HeaderProps> = ({
                     )}
                 </button>
                 {user && isNotificationsPanelOpen && <NotificationsPanel onClose={() => setIsNotificationsPanelOpen(false)} />}
-                
-                {/* Guest Hint for Desktop */}
                 {!user && showGuestNotificationMessage && <GuestNotificationMessage />}
             </div>
 
-            {/* Explicit Profile Button on Desktop */}
-            <button
-                onClick={handleProfileClick}
-                className={`hidden md:flex items-center gap-x-2 ${navLinkClasses}`}
-            >
+            <button onClick={handleProfileClick} className={`hidden md:flex items-center gap-x-2 ${navLinkClasses}`}>
                 <UserIcon className="w-5 h-5" />
                 <span>الملف الشخصي</span>
             </button>
 
-            {/* Navigation Hub - Always Visible Desktop */}
-            <button onClick={onOpenNavigationHub} className={`${iconButtonClasses} hidden md:block`} title="إلى أين تود الذهاب؟">
+            <button onClick={onOpenNavigationHub} className={iconButtonClasses} title="إلى أين تود الذهاب؟">
                 <GlobeAltIcon className="w-6 h-6"/>
             </button>
 
             {user ? (
-                <>
-                    {/* Logout Button for Desktop */}
-                    <button 
-                        onClick={onLogout} 
-                        className={`hidden md:flex items-center gap-x-2 text-red-400 hover:text-red-300 font-bold transition-colors py-2 px-3 hover:bg-white/5 rounded-md`}
-                        title="تسجيل الخروج"
-                    >
-                        <ArrowLeftOnRectangleIcon className="w-5 h-5" />
-                        <span>خروج</span>
-                    </button>
-                </>
+                <button 
+                    onClick={onLogout} 
+                    className={`hidden md:flex items-center gap-x-2 text-red-400 hover:text-red-300 font-bold transition-colors py-2 px-3 hover:bg-white/5 rounded-md`}
+                    title="تسجيل الخروج"
+                >
+                    <ArrowLeftOnRectangleIcon className="w-5 h-5" />
+                    <span>خروج</span>
+                </button>
             ) : (
               <div className="hidden md:flex gap-3">
                 <button onClick={onLoginClick} className={primaryButtonClasses}>
@@ -326,6 +349,52 @@ const Header: React.FC<HeaderProps> = ({
             )}
           </div>
         </nav>
+
+        {/* Mobile Dropdown Menu (Replacing Sidebar) */}
+        {isMobileMenuOpen && (
+            <div 
+                ref={mobileMenuRef}
+                className="absolute top-full left-0 right-0 bg-theme-header-gradient border-b border-white/10 shadow-2xl overflow-hidden md:hidden z-40 animate-slide-down"
+            >
+                <div className="p-4 space-y-2 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                    <h3 className="text-xs font-bold text-fuchsia-300 uppercase tracking-widest px-2 mb-2">عالم دكتور هوب</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                        <button onClick={() => handleMobileLinkClick(onShowVideo)} className="bg-white/5 hover:bg-white/10 p-3 rounded-lg text-right flex flex-col gap-2 group transition-colors">
+                            <VideoIcon className="w-6 h-6 text-fuchsia-500 group-hover:scale-110 transition-transform"/>
+                            <span className="text-xs font-bold text-slate-200">من هي دكتور هوب</span>
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="bg-white/5 hover:bg-white/10 p-3 rounded-lg text-right flex flex-col gap-2 group transition-colors">
+                            <CollectionIcon className="w-6 h-6 text-fuchsia-500 group-hover:scale-110 transition-transform"/>
+                            <span className="text-xs font-bold text-slate-200">ألبوم الصور</span>
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onShowInstagram)} className="bg-white/5 hover:bg-white/10 p-3 rounded-lg text-right flex flex-col gap-2 group transition-colors">
+                            <InstagramIcon className="w-6 h-6 text-fuchsia-500 group-hover:scale-110 transition-transform"/>
+                            <span className="text-xs font-bold text-slate-200">بثوث انستجرام</span>
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="bg-white/5 hover:bg-white/10 p-3 rounded-lg text-right flex flex-col gap-2 group transition-colors">
+                            <ShoppingCartIcon className="w-6 h-6 text-fuchsia-500 group-hover:scale-110 transition-transform"/>
+                            <span className="text-xs font-bold text-slate-200">البوتيك</span>
+                        </button>
+                    </div>
+
+                    <div className="space-y-1 mt-2">
+                        <button onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors text-slate-200">
+                            <ChatBubbleIcon className="w-5 h-5 text-fuchsia-400"/>
+                            <span className="text-sm font-semibold">طلب استشارة خاصة</span>
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors text-slate-200">
+                            <ChatBubbleLeftRightIcon className="w-5 h-5 text-fuchsia-400"/>
+                            <span className="text-sm font-semibold">آراء المشتركات</span>
+                        </button>
+                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors text-slate-200">
+                            <UsersIcon className="w-5 h-5 text-fuchsia-400"/>
+                            <span className="text-sm font-semibold">شركاء النجاح</span>
+                        </button>
+                    </div>
+                    <div className="h-1 bg-gradient-to-r from-purple-500 via-fuchsia-500 to-pink-500 mt-2"></div>
+                </div>
+            </div>
+        )}
       </header>
 
       {/* Mobile Notifications Fullscreen Overlay */}
@@ -334,92 +403,17 @@ const Header: React.FC<HeaderProps> = ({
             <NotificationsPanel onClose={() => setIsMobileNotificationsOpen(false)} isMobile={true} />
         </div>
       )}
-
-      {/* Mobile Menu Overlay */}
-      <div className={`fixed inset-0 bg-black/90 z-[60] transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-        <div className={`fixed inset-y-0 right-0 w-[85%] max-w-sm bg-theme-header-gradient shadow-2xl transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} overflow-y-auto flex flex-col`}>
-            
-            <div className="p-5 flex justify-between items-center border-b border-white/10">
-                <span className="text-xl font-bold text-white">القائمة</span>
-                <button onClick={handleCloseMobileMenu} className="p-2 rounded-full hover:bg-white/10 text-white">
-                    <CloseIcon className="w-6 h-6" />
-                </button>
-            </div>
-
-            <div className="p-5 flex flex-col gap-4 flex-grow">
-                {user && (
-                    <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/5 mb-2">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-lg text-xl font-bold text-white">
-                            {user.fullName.charAt(0)}
-                        </div>
-                        <div>
-                            <p className="font-bold text-white text-lg">{user.fullName}</p>
-                            <p className="text-xs text-slate-400">{user.email}</p>
-                        </div>
-                    </div>
-                )}
-
-                <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.WORKSHOPS))} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2 bg-white/5 rounded-lg border border-white/5">
-                    الرئيسية
-                </button>
-
-                {/* Collapsible Dr Hope Section */}
-                <div className="bg-black/20 rounded-xl border border-fuchsia-500/20 mt-2 overflow-hidden transition-all duration-300">
-                    <button 
-                        onClick={() => setIsMobileDrHopeOpen(!isMobileDrHopeOpen)}
-                        className="w-full p-4 flex justify-between items-center text-fuchsia-400 font-bold text-base hover:bg-white/5 transition-colors"
-                    >
-                        <span>عالم دكتور هوب</span>
-                        <ChevronDownIcon className={`w-4 h-4 transition-transform duration-300 ${isMobileDrHopeOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    
-                    <div className={`flex flex-col gap-1 px-4 pb-4 ${isMobileDrHopeOpen ? 'block' : 'hidden'}`}>
-                        <button onClick={() => handleMobileLinkClick(onShowVideo)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
-                            <VideoIcon className="w-4 h-4 text-fuchsia-500"/> من هي دكتور هوب
-                        </button>
-                        <button onClick={() => handleMobileLinkClick(onShowPhotoAlbum)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
-                            <CollectionIcon className="w-4 h-4 text-fuchsia-500"/> ألبوم الصور
-                        </button>
-                        <button onClick={() => handleMobileLinkClick(onShowInstagram)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
-                            <InstagramIcon className="w-4 h-4 text-fuchsia-500"/> بثوث انستجرام
-                        </button>
-                        <button onClick={() => handleMobileLinkClick(onRequestConsultationClick)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
-                            <ChatBubbleIcon className="w-4 h-4 text-fuchsia-500"/> طلب استشارة
-                        </button>
-                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.REVIEWS))} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
-                            <ChatBubbleLeftRightIcon className="w-4 h-4 text-fuchsia-500"/> آراء المشتركات
-                        </button>
-                        <button onClick={() => handleMobileLinkClick(() => onNavigate(Page.PARTNERS))} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
-                            <UsersIcon className="w-4 h-4 text-fuchsia-500"/> شركاء النجاح
-                        </button>
-                        <button onClick={() => handleMobileLinkClick(onBoutiqueClick)} className="text-right text-slate-200 font-medium text-sm hover:text-white hover:bg-white/5 p-2 rounded-lg transition-colors flex items-center gap-2">
-                            <ShoppingCartIcon className="w-4 h-4 text-fuchsia-500"/> البوتيك
-                        </button>
-                    </div>
-                </div>
-
-                <div className="h-px bg-white/10 my-1"></div>
-                
-                {/* Profile Button - Always visible */}
-                <button onClick={() => handleMobileLinkClick(handleProfileClick)} className="text-right text-slate-200 font-bold text-lg hover:text-fuchsia-400 transition-colors p-2 flex items-center gap-2">
-                    <UserIcon className="w-5 h-5"/> ملفي الشخصي
-                </button>
-
-                {user && (
-                    <button onClick={() => handleMobileLinkClick(onLogout)} className="text-right text-red-400 font-bold text-lg hover:text-red-300 transition-colors p-2 flex items-center gap-2">
-                        <ArrowLeftOnRectangleIcon className="w-5 h-5"/>
-                        تسجيل خروج
-                    </button>
-                )}
-            </div>
-
-            {!user && (
-                <div className="p-5 border-t border-white/10 bg-black/20">
-                    <button onClick={() => handleMobileLinkClick(onLoginClick)} className="w-full bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg">تسجيل دخول / انشاء حساب</button>
-                </div>
-            )}
-        </div>
-      </div>
+      
+      {/* Animation Style */}
+      <style>{`
+        @keyframes slide-down {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-down {
+            animation: slide-down 0.3s ease-out forwards;
+        }
+      `}</style>
     </>
   );
 };

@@ -9,11 +9,11 @@ interface HeroProps {
 }
 
 const CountdownUnit: React.FC<{ value: number; label: string }> = ({ value, label }) => (
-    <div className="flex flex-col items-center mx-2 sm:mx-3">
-        <span className="text-xl sm:text-3xl font-bold text-black tracking-tight">
+    <div className="flex flex-col items-center mx-1.5 sm:mx-2">
+        <span className="text-lg sm:text-xl font-bold text-black tracking-tight">
             {value.toString().padStart(2, '0')}
         </span>
-        <span className="text-[9px] text-slate-500 uppercase tracking-wide mt-1 font-bold">{label}</span>
+        <span className="text-[8px] text-slate-500 uppercase tracking-wide mt-0.5 font-bold">{label}</span>
     </div>
 );
 
@@ -61,41 +61,41 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
         return () => clearInterval(timer);
     }, [nextWorkshop]);
 
-    const btnClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-2 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-xs sm:text-sm flex items-center justify-center gap-2 group mx-auto";
+    const btnClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-1.5 px-5 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-[10px] sm:text-xs flex items-center justify-center gap-2 group mx-auto";
 
     return (
-        <section className="hero-section relative text-center pt-28 pb-10 overflow-hidden min-h-[50vh] flex flex-col justify-center">
+        <section className="hero-section relative text-center pt-24 pb-8 overflow-hidden min-h-[40vh] flex flex-col justify-center">
             
             <div className="container mx-auto px-4 relative z-10">
                 {nextWorkshop && timeLeft ? (
-                    <div className="animate-fade-in-up max-w-2xl mx-auto">
+                    <div className="animate-fade-in-up max-w-xl mx-auto">
                         {/* White Card Container for Black Text visibility */}
-                        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden text-slate-900 border border-slate-100">
+                        <div className="bg-white rounded-xl p-4 shadow-xl relative overflow-hidden text-slate-900 border border-slate-100">
                             
                             <div className="relative z-10">
-                                <div className="inline-block mb-3">
-                                    <span className="bg-fuchsia-100 text-fuchsia-700 text-[9px] font-bold px-3 py-1 rounded-full tracking-wide">
+                                <div className="inline-block mb-2">
+                                    <span className="bg-fuchsia-100 text-fuchsia-700 text-[8px] font-bold px-2 py-0.5 rounded-full tracking-wide">
                                         ✨ الورشة القادمة
                                     </span>
                                 </div>
                                 
-                                <h1 className="text-xl sm:text-3xl font-black text-black mb-2 leading-snug">
+                                <h1 className="text-lg sm:text-xl font-black text-black mb-1 leading-snug">
                                     {nextWorkshop.title}
                                 </h1>
                                 
-                                <p className="text-xs sm:text-sm text-slate-600 mb-6 font-bold flex items-center justify-center gap-1">
+                                <p className="text-[10px] sm:text-xs text-slate-600 mb-4 font-bold flex items-center justify-center gap-1">
                                     <span className="text-fuchsia-600">تقديم:</span> 
                                     {nextWorkshop.instructor}
                                 </p>
                                 
                                 {/* Countdown with Black Numbers and Small Font */}
-                                <div className="flex justify-center items-start gap-2 sm:gap-4 mb-6" dir="ltr">
+                                <div className="flex justify-center items-start gap-2 sm:gap-3 mb-4" dir="ltr">
                                     <CountdownUnit value={timeLeft.days || 0} label="أيام" />
-                                    <span className="text-xl sm:text-3xl font-light text-slate-300 mt-[-2px]">:</span>
+                                    <span className="text-lg sm:text-xl font-light text-slate-300 mt-[-2px]">:</span>
                                     <CountdownUnit value={timeLeft.hours || 0} label="ساعات" />
-                                    <span className="text-xl sm:text-3xl font-light text-slate-300 mt-[-2px]">:</span>
+                                    <span className="text-lg sm:text-xl font-light text-slate-300 mt-[-2px]">:</span>
                                     <CountdownUnit value={timeLeft.minutes || 0} label="دقائق" />
-                                    <span className="text-xl sm:text-3xl font-light text-slate-300 mt-[-2px]">:</span>
+                                    <span className="text-lg sm:text-xl font-light text-slate-300 mt-[-2px]">:</span>
                                     <CountdownUnit value={timeLeft.seconds || 0} label="ثواني" />
                                 </div>
 
@@ -104,7 +104,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                                     className={btnClasses}
                                 >
                                     <span>احجز مقعدك الآن</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 transform transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
                                     </svg>
                                 </button>
@@ -112,12 +112,12 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                         </div>
                     </div>
                 ) : (
-                    <div className="py-6 max-w-2xl mx-auto">
-                        <div className="bg-white rounded-2xl p-6 shadow-xl border border-slate-100">
-                            <h1 className="text-2xl sm:text-3xl font-black mb-3 text-black leading-tight">
+                    <div className="py-4 max-w-xl mx-auto">
+                        <div className="bg-white rounded-xl p-5 shadow-xl border border-slate-100">
+                            <h1 className="text-xl sm:text-2xl font-black mb-2 text-black leading-tight">
                                 نوايا.. حيث يبدأ الأثر
                             </h1>
-                            <p className="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto mb-6 font-medium leading-relaxed">
+                            <p className="text-[10px] sm:text-xs text-slate-600 max-w-md mx-auto mb-4 font-medium leading-relaxed">
                                 اكتشف ورش عمل مباشرة ومسجلة تمنحك المهارات والمعرفة لتحقيق أهدافك.
                             </p>
                             <button
@@ -125,7 +125,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                                 className={btnClasses}
                             >
                                 <span>تصفح جميع الورش</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 transform transition-transform group-hover:-translate-x-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
                                 </svg>
                             </button>

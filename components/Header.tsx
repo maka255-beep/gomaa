@@ -24,7 +24,7 @@ interface HeaderProps {
 
 const LogoButton: React.FC<{ logoUrl?: string; onClick: () => void; isMobile?: boolean }> = ({ logoUrl, onClick, isMobile }) => {
   const sizeClasses = isMobile ? 'w-12 h-12' : 'w-14 h-14 md:w-20 md:h-20';
-  const btnClasses = `group ${sizeClasses} flex items-center justify-center rounded-full text-xl font-bold tracking-wider transition-all duration-300 transform hover:scale-110 focus:outline-none shadow-lg hover:shadow-xl bg-white/5 text-pink-400 border border-white/10`;
+  const btnClasses = `group ${sizeClasses} flex items-center justify-center rounded-full text-xl font-bold tracking-wider transition-all duration-300 transform hover:scale-110 focus:outline-none shadow-lg hover:shadow-xl bg-white/5 text-pink-400 border border-white/10 hover:shadow-[0_0_20px_rgba(236,72,153,0.6)]`;
 
   return (
     <button

@@ -790,7 +790,7 @@ const TransfersPage: React.FC<TransfersPageProps> = ({ showToast, onViewUserProf
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <button onClick={() => setBeneficiariesModal({ isOpen: true, donorName: item.user.fullName, workshop: item.workshop, allUsers: users })} className="px-3 py-1 bg-sky-600 hover:bg-sky-500 rounded text-xs font-bold text-white">المستفيدين</button>
+                                                <button onClick={() => setBeneficiariesModal({ isOpen: true, donorName: item.user.fullName, workshop: item.workshop })} className="px-3 py-1 bg-sky-600 hover:bg-sky-500 rounded text-xs font-bold text-white">المستفيدين</button>
                                                 <button onClick={() => dispatch({ type: 'OPEN_MODAL', payload: { type: 'manageDonation', data: { donor: item.user, subscription: item.subscription, workshop: item.workshop } } })} className="px-3 py-1 bg-slate-600 hover:bg-slate-500 rounded text-xs font-bold text-white">إدارة</button>
                                             </div>
                                         </div>

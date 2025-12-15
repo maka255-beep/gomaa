@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect, useMemo, createContext, useContext } from 'react';
-import { User, Workshop, DrhopeData, Notification, Expense, Review, BroadcastCampaign, CertificateTemplate, Payment, SubscriptionStatus, Subscription, Product, Order, OrderStatus, Partner, ConsultationRequest, Theme, ThemeColors, CreditTransaction, PendingGift, RecordingStats } from '../types';
-import { sendWhatsAppMessage } from '../services/whatsappService';
-import { formatArabicDate, formatArabicTime, normalizePhoneNumber } from '../utils';
+import { User, Workshop, DrhopeData, Notification, SubscriptionStatus, Subscription, Product, Order, OrderStatus, Partner, ConsultationRequest, Theme, ThemeColors, CreditTransaction, PendingGift, Expense, BroadcastCampaign } from '../types';
+import { normalizePhoneNumber } from '../utils';
 import { trackEvent } from '../analytics';
 
+// Initial Data (Simulated Database)
 const initialWorkshops: Workshop[] = [
     {
         id: 1,
@@ -29,8 +29,6 @@ const initialWorkshops: Workshop[] = [
             { id: 'rev1', workshopId: 1, fullName: 'نورة عبدالله', rating: 5, comment: 'ورشة رائعة ومفيدة جداً!', date: '2025-09-01T10:00:00Z' }
         ],
         certificatesIssued: true,
-        trainerPercentage: 70,
-        trainerPayments: [],
         payItForwardBalance: 3150,
     },
     {
@@ -84,64 +82,6 @@ const initialWorkshops: Workshop[] = [
         payItForwardBalance: 0,
     },
     {
-        id: 4,
-        title: 'التخطيط الاستراتيجي (هجين)',
-        instructor: 'DRHOPE',
-        startDate: '2025-12-10',
-        startTime: '10:00',
-        location: 'أونلاين وحضوري',
-        country: 'الإمارات العربية المتحدة',
-        city: 'أبوظبي',
-        hotelName: 'فندق قصر الإمارات',
-        hallName: 'قاعة الذهب',
-        isRecorded: false,
-        zoomLink: 'https://zoom.us/j/1122334455',
-        isVisible: true,
-        description: 'ورشة شاملة لبناء خطة استراتيجية. تجربة للدفع المختلط.',
-        topics: ['تحليل الواقع', 'صياغة الأهداف'],
-        packages: [
-            { id: 5, name: 'حضور VIP (حضوري)', price: 2000, features: ['مقعد أمامي', 'غداء عمل'], attendanceType: 'حضوري' },
-            { id: 6, name: 'حضور عام (حضوري)', price: 1500, features: ['مقعد في القاعة', 'ضيافة'], attendanceType: 'حضوري' },
-            { id: 7, name: 'حضور عن بعد (أونلاين)', price: 800, features: ['بث مباشر', 'مذكرة إلكترونية'], attendanceType: 'أونلاين' },
-        ],
-        certificatesIssued: true,
-        payItForwardBalance: 0,
-    },
-    {
-        id: 5,
-        title: 'أساسيات التسويق (سعر موحد)',
-        instructor: 'سارة خالد',
-        startDate: '2025-11-20',
-        startTime: '16:00',
-        location: 'أونلاين',
-        country: 'عالمي',
-        isRecorded: false,
-        zoomLink: 'https://zoom.us/j/5566778899',
-        isVisible: true,
-        price: 150, 
-        description: 'مدخل سريع وعملي لعالم التسويق الرقمي. تجربة للدفع الموحد.',
-        topics: ['أنواع المحتوى', 'الإعلانات'],
-        certificatesIssued: true,
-        payItForwardBalance: 0,
-    },
-    {
-        id: 6,
-        title: 'لقاء مفتوح (مجاني)',
-        instructor: 'د. هوب',
-        startDate: '2025-11-25',
-        startTime: '20:00',
-        location: 'أونلاين',
-        country: 'عالمي',
-        isRecorded: false,
-        zoomLink: 'https://zoom.us/j/free-meeting',
-        isVisible: true,
-        price: 0,
-        description: 'لقاء مفتوح مجاني للإجابة على الاستفسارات. تجربة للتسجيل المجاني.',
-        topics: ['أسئلة وأجوبة'],
-        certificatesIssued: false,
-        payItForwardBalance: 0,
-    },
-    {
         id: 7,
         title: 'رحلة اكتشاف الذات: بوصلة الحياة',
         instructor: 'د. هوب',
@@ -157,29 +97,6 @@ const initialWorkshops: Workshop[] = [
         topics: ['تحليل القيم الشخصية', 'تحديد نقاط القوة', 'رسم خطة الحياة'],
         certificatesIssued: true,
         payItForwardBalance: 450,
-    },
-    {
-        id: 8,
-        title: 'أساسيات الرسم بالألوان الزيتية',
-        instructor: 'فنانة. سارة النجار',
-        startDate: '2026-02-20',
-        startTime: '16:00',
-        location: 'حضوري',
-        country: 'المملكة العربية السعودية',
-        city: 'الرياض',
-        hotelName: 'فندق نارسيس',
-        hallName: 'قاعة الفنون',
-        isRecorded: false,
-        zoomLink: '',
-        isVisible: true,
-        description: 'ورشة عملية ممتعة لتعلم تقنيات الرسم بالزيت، دمج الألوان، وتكوين اللوحات الفنية.',
-        topics: ['الأدوات والخامات', 'نظرية الألوان', 'رسم الطبيعة الصامتة'],
-        packages: [
-            { id: 81, name: 'شامل الأدوات', price: 1500, features: ['حضور 3 أيام', 'حقيبة أدوات رسم كاملة', 'شهادة'] },
-            { id: 82, name: 'بدون أدوات', price: 1200, features: ['حضور 3 أيام', 'شهادة'] }
-        ],
-        certificatesIssued: true,
-        payItForwardBalance: 0,
     },
     {
         id: 9,
@@ -201,45 +118,6 @@ const initialWorkshops: Workshop[] = [
         ],
         certificatesIssued: true,
         payItForwardBalance: 0,
-    },
-    {
-        id: 10,
-        title: 'التوازن الصحي واليوغا',
-        instructor: 'كوتش ندى',
-        startDate: '2026-03-10',
-        startTime: '09:00',
-        location: 'أونلاين وحضوري',
-        country: 'الإمارات العربية المتحدة',
-        city: 'دبي',
-        hotelName: 'ستوديو الحياة',
-        isRecorded: false,
-        zoomLink: 'https://zoom.us/j/yoga123',
-        isVisible: true,
-        description: 'جلسات يوغا وتأمل لتعزيز الصحة النفسية والجسدية، متاحة للحضور في الاستوديو أو عبر البث المباشر.',
-        topics: ['تمارين التنفس', 'وضعيات اليوغا الأساسية', 'التغذية الصحية'],
-        packages: [
-            { id: 101, name: 'حضور في الاستوديو', price: 800, features: ['4 جلسات حضورية', 'سناك صحي'], attendanceType: 'حضوري' },
-            { id: 102, name: 'بث مباشر', price: 400, features: ['4 جلسات أونلاين', 'تسجيل الجلسات'], attendanceType: 'أونلاين' }
-        ],
-        certificatesIssued: false,
-        payItForwardBalance: 0,
-    },
-    {
-        id: 11,
-        title: 'التربية الإيجابية للأطفال',
-        instructor: 'د. مريم العلي',
-        startDate: '2026-04-05',
-        startTime: '20:00',
-        location: 'أونلاين',
-        country: 'عالمي',
-        isRecorded: false,
-        zoomLink: 'https://zoom.us/j/parenting101',
-        isVisible: true,
-        price: 350,
-        description: 'كيف نبني علاقة قوية مع أبنائنا تقوم على الاحترام المتبادل والحب غير المشروط.',
-        topics: ['فهم سلوك الطفل', 'بدائل العقاب', 'التواصل الفعال'],
-        certificatesIssued: true,
-        payItForwardBalance: 0,
     }
 ];
 
@@ -252,56 +130,15 @@ const initialUsers: User[] = [
         notifications: [],
         subscriptions: [
             { id: 'sub1', workshopId: 1, activationDate: '2025-09-15', expiryDate: '2099-10-15', pricePaid: 350, packageId: 1, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' },
-            { id: 'sub2', workshopId: 3, activationDate: '2025-09-10', expiryDate: '2025-12-10', pricePaid: 250, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'BANK'},
-            { id: 'sub-audio', workshopId: 13, activationDate: '2025-03-01', expiryDate: '2099-03-01', pricePaid: 150, status: SubscriptionStatus.ACTIVE, isApproved: true, paymentMethod: 'LINK' }
         ],
         orders: [],
         internalCredit: 0,
         creditTransactions: [],
-    },
-    {
-        id: 2,
-        fullName: 'مريم أحمد',
-        email: 'maryam@example.com',
-        phone: '+966559876543',
-        notifications: [],
-        subscriptions: [
-            { id: 'sub3', workshopId: 1, activationDate: '2025-09-18', expiryDate: '2099-10-18', pricePaid: 450, packageId: 2, status: SubscriptionStatus.PENDING, isApproved: false, paymentMethod: 'BANK' }
-        ],
-        orders: [],
-        internalCredit: 100,
-        creditTransactions: [
-            { id: 'tx-initial', date: '2025-09-01T10:00:00Z', type: 'addition', amount: 100, description: 'رصيد افتتاحي' }
-        ],
-    },
-    {
-        id: 100,
-        fullName: 'الجوهرة بنت عبدالله',
-        email: 'aljawhara@donor.com',
-        phone: '+966505555555',
-        notifications: [],
-        subscriptions: [
-            {
-                id: 'sub-donor-1',
-                workshopId: 1,
-                activationDate: '2025-10-01',
-                expiryDate: '2099-10-01',
-                pricePaid: 3500,
-                paymentMethod: 'LINK',
-                isPayItForwardDonation: true,
-                donationRemaining: 2450,
-                notes: 'دعم لغير القادرين (10 مقاعد). تم منح 3 مقاعد.',
-                isApproved: true,
-                status: SubscriptionStatus.COMPLETED
-            }
-        ],
-        orders: [],
-        internalCredit: 0
-    },
+    }
 ];
 
 const initialDrhopeData: Omit<DrhopeData, 'theme'> & { themes: Theme[], activeThemeId: string } = {
-     videos: [{id: 'vid1', title: 'فيديو تعريفي', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'}],
+    videos: [{id: 'vid1', title: 'فيديو تعريفي', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'}],
     photos: ['https://picsum.photos/400/400?random=1', 'https://picsum.photos/400/400?random=2'],
     instagramLinks: [{id: 'insta1', title: 'بث مباشر #1', url: 'https://instagram.com'}],
     socialMediaLinks: { instagram: 'https://instagram.com', twitter: 'https://twitter.com', snapchat: 'https://snapchat.com', tiktok: 'https://tiktok.com', facebook: 'https://facebook.com' },
@@ -309,7 +146,7 @@ const initialDrhopeData: Omit<DrhopeData, 'theme'> & { themes: Theme[], activeTh
     backgroundMusicUrl: '',
     backgroundMusicName: '',
     introText: 'يُحِبُّهُمْ وَيُحِبُّهُونَهُۥٓ',
-    logoUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibG9nby1ncmFkaWVudCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNlYzQ4OTk7IiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM1YjIxYjY7IiAvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0idXJsKCNsb2dvLWdyYWRpZW50KSIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iJ05vdG8gU2FucyBBcmFiaWMnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjUwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7jg4E8L3RleHQ+Cjwvc3ZnPg==',
+    logoUrl: '',
     cvUrl: '',
     headerLinks: { drhope: 'دكتور هوب', reviews: 'آراء المشتركات', profile: 'ملفي الشخصي' },
     accountHolderName: 'مؤسسة نوايا للفعاليات',
@@ -351,29 +188,6 @@ const initialDrhopeData: Omit<DrhopeData, 'theme'> & { themes: Theme[], activeTh
     }
 };
 
-const initialExpenses: Expense[] = [
-    { id: 'exp1', date: '2025-10-01T10:00:00Z', title: 'إعلان فيسبوك لورشة الكتابة', workshopId: 1, supplier: 'Facebook Ads', amount: 500, includesVat: true },
-    { id: 'exp2', date: '2025-09-25T10:00:00Z', title: 'اشتراك زووم', supplier: 'Zoom', amount: 150, includesVat: false },
-];
-
-const initialBroadcastHistory: BroadcastCampaign[] = [];
-
-const initialPendingGifts: PendingGift[] = [
-    {
-      id: 'gift-test-123',
-      workshopId: 1,
-      gifterName: 'مرسل الهدية التجريبي',
-      gifterPhone: '+966500000001',
-      gifterEmail: 'gifter@test.com',
-      gifterUserId: 1,
-      giftMessage: 'هذه رسالة هدية تجريبية للتأكد من أن كل شيء يعمل بشكل صحيح.',
-      recipientName: 'مستلم الهدية التجريبي',
-      recipientWhatsapp: '+966500000002',
-      pricePaid: 350,
-      createdAt: new Date().toISOString(),
-    }
-];
-
 const initialProducts: Product[] = [
     { id: 101, name: 'دفتر يوميات نوايا', price: 75, imageUrl: 'https://picsum.photos/id/101/400/400' },
     { id: 102, name: 'مخطط سنوي 2025', price: 120, imageUrl: 'https://picsum.photos/id/102/400/400' },
@@ -382,7 +196,6 @@ const initialProducts: Product[] = [
 
 const initialPartners: Partner[] = [
     { id: 'partner1', name: 'شريك النجاح الأول', logo: 'https://picsum.photos/id/201/200/200', description: 'نبذة مفصلة عن شريك النجاح الأول وما يقدمه من خدمات مميزة.', websiteUrl: 'https://example.com', instagramUrl: 'https://instagram.com' },
-    { id: 'partner2', name: 'الشريك الثاني', logo: 'https://picsum.photos/id/202/200/200', description: 'تفاصيل حول الشريك الثاني ودوره في دعم المنصة.', websiteUrl: 'https://example.com' },
 ];
 
 interface RegistrationAvailability {
@@ -396,32 +209,16 @@ interface UserContextType {
     workshops: Workshop[];
     products: Product[];
     partners: Partner[];
-    pendingGifts: PendingGift[];
-    addPendingGift: (giftData: Omit<PendingGift, 'id' | 'createdAt'>) => PendingGift;
-    updatePendingGift: (giftId: string, updates: Partial<PendingGift>) => void;
-    claimGift: (giftId: string, claimingUserId: number) => { success: boolean; message?: string };
-    deletePendingGift: (giftId: string) => void;
-    restorePendingGift: (giftId: string) => void;
-    permanentlyDeletePendingGift: (giftId: string) => void;
-    checkAndClaimPendingGifts: (user: User) => number;
-    adminManualClaimGift: (giftId: string, customUserData?: { fullName: string; email: string; phone: string }) => { success: boolean; message: string; status?: 'USER_NOT_FOUND' };
-    addPartner: (partner: Omit<Partner, 'id'>) => void;
-    updatePartner: (partner: Partner) => void;
-    deletePartner: (partnerId: string) => void;
-    addProduct: (product: Omit<Product, 'id'>) => void;
-    updateProduct: (product: Product) => void;
-    deleteProduct: (productId: number) => void;
-    restoreProduct: (productId: number) => void;
-    permanentlyDeleteProduct: (productId: number) => void;
     drhopeData: DrhopeData;
     activeTheme: ThemeColors;
     notifications: Notification[];
+    globalCertificateTemplate: any | null;
     expenses: Expense[];
     broadcastHistory: BroadcastCampaign[];
-    globalCertificateTemplate: CertificateTemplate | null;
-    emailPreview: { title: string; subject: string; messageHtml: string } | null;
+    pendingGifts: PendingGift[]; // Add pendingGifts to context type
+
+    // Auth & User Actions
     login: (email: string, phone: string) => { user?: User; error?: string };
-    loginAsUser: (userToLogin: User) => void;
     logout: () => void;
     register: (fullName: string, email: string, phone: string) => User;
     checkRegistrationAvailability: (email: string, phone: string) => RegistrationAvailability;
@@ -431,48 +228,82 @@ interface UserContextType {
     deleteUser: (userId: number) => void;
     restoreUser: (userId: number) => void;
     permanentlyDeleteUser: (userId: number) => void;
-    addWorkshop: (workshop: Omit<Workshop, 'id'>) => void;
-    updateWorkshop: (workshop: Workshop) => void;
-    deleteWorkshop: (workshopId: number) => void;
-    restoreWorkshop: (workshopId: number) => void;
-    permanentlyDeleteWorkshop: (workshopId: number) => void;
+    convertToInternalCredit: (userId: number, amount: number) => void;
+
+    // Store Actions & Data Management
     addSubscription: (userId: number, subscriptionData: Partial<Subscription>, isApproved: boolean, sendWhatsApp: boolean, creditToApply?: number) => void;
-    updateSubscription: (userId: number, subscriptionId: string, updates: Partial<Subscription>) => void;
-    deleteSubscription: (userId: number, subscriptionId: string) => void;
-    restoreSubscription: (userId: number, subscriptionId: string) => void;
-    permanentlyDeleteSubscription: (userId: number, subscriptionId: string) => void;
-    transferSubscription: (userId: number, fromSubId: string, toWorkshopId: number, notes: string) => void;
-    reactivateSubscription: (userId: number, subscriptionId: string) => void;
-    enrollWithPendingApproval: (workshopId: number, packageId: number | undefined, paymentMethod: 'BANK' | 'LINK', attendanceType?: 'أونلاين' | 'حضوري') => void;
+    updateSubscription: (userId: number, subId: string, updates: Partial<Subscription>) => void;
+    deleteSubscription: (userId: number, subId: string) => void;
+    restoreSubscription: (userId: number, subId: string) => void;
+    permanentlyDeleteSubscription: (userId: number, subId: string) => void;
+    transferSubscription: (userId: number, subId: string, toWorkshopId: number, notes: string) => void;
+    reactivateSubscription: (userId: number, subId: string) => void;
+
     placeOrder: (userId: number, order: Omit<Order, 'id' | 'userId' | 'status' | 'orderDate'>, initialStatus?: OrderStatus) => Order;
     confirmOrder: (userId: number, orderId: string) => void;
-    updateDrhopeData: (updates: Partial<DrhopeData>) => void;
-    addNotificationForMultipleUsers: (userIds: number[], message: string, workshopId?: number, whatsappMessage?: string) => void;
-    markNotificationsAsRead: () => void;
-    addExpense: (expense: Omit<Expense, 'id' | 'date'>) => void;
-    updateExpense: (expense: Expense) => void;
-    deleteExpense: (expenseId: string) => void;
-    restoreExpense: (expenseId: string) => void;
-    permanentlyDeleteExpense: (expenseId: string) => void;
+
     addReview: (workshopId: number, review: { fullName: string; rating: number; comment: string }) => void;
     deleteReview: (workshopId: number, reviewId: string) => void;
     restoreReview: (workshopId: number, reviewId: string) => void;
     permanentlyDeleteReview: (workshopId: number, reviewId: string) => void;
-    addBroadcastToHistory: (campaign: Omit<BroadcastCampaign, 'id' | 'timestamp'>) => BroadcastCampaign;
-    previewEmail: (title: string, subject: string, messageHtml: string) => void;
-    clearEmailPreview: () => void;
-    updateGlobalCertificateTemplate: (template: CertificateTemplate) => void;
-    convertToInternalCredit: (userId: number, subscriptionId: string) => void;
-    deleteCreditTransaction: (userId: number, transactionId: string) => void;
-    restoreCreditTransaction: (userId: number, transactionId: string) => void;
-    permanentlyDeleteCreditTransaction: (userId: number, transactionId: string) => void;
-    consultationRequests: ConsultationRequest[];
+
     addConsultationRequest: (userId: number, subject: string) => void;
-    updateConsultationRequest: (requestId: string, updates: Partial<Omit<ConsultationRequest, 'id' | 'userId' | 'requestedAt'>>) => void;
-    logRecordingView: (userId: number, workshopId: number, recordingUrl: string) => void;
-    markAttendance: (userId: number, workshopId: number) => void;
+    updateConsultationRequest: (id: string, updates: Partial<ConsultationRequest>) => void;
+    
+    // Gifting & Features
+    addPendingGift: (giftData: Omit<PendingGift, 'id' | 'createdAt'>) => PendingGift;
+    updatePendingGift: (id: string, updates: Partial<PendingGift>) => void;
+    deletePendingGift: (id: string) => void;
+    restorePendingGift: (id: string) => void;
+    permanentlyDeletePendingGift: (id: string) => void;
+    checkAndClaimPendingGifts: (user: User) => number;
+    adminManualClaimGift: (giftId: string, recipientData: { name: string, email: string, phone: string }) => { success: boolean; message: string };
+    
     donateToPayItForward: (workshopId: number, amount: number, seats?: number, donorUserId?: number) => void;
-    grantPayItForwardSeat: (userId: number, workshopId: number, cost: number, donorSubscriptionId: string, notes?: string) => void;
+    grantPayItForwardSeat: (userId: number, workshopId: number, amount: number, donorSubscriptionId: string, notes: string) => void;
+    
+    markNotificationsAsRead: () => void;
+    addNotificationForMultipleUsers: (userIds: number[], message: string) => void;
+
+    // Workshops
+    addWorkshop: (workshopData: Omit<Workshop, 'id'>) => void;
+    updateWorkshop: (updatedWorkshop: Workshop) => void;
+    deleteWorkshop: (id: number) => void;
+    restoreWorkshop: (id: number) => void;
+    permanentlyDeleteWorkshop: (id: number) => void;
+
+    // Products
+    addProduct: (productData: Omit<Product, 'id'>) => void;
+    updateProduct: (updatedProduct: Product) => void;
+    deleteProduct: (id: number) => void;
+    restoreProduct: (id: number) => void;
+    permanentlyDeleteProduct: (id: number) => void;
+
+    // Partners
+    addPartner: (partnerData: Omit<Partner, 'id'>) => void;
+    updatePartner: (updatedPartner: Partner) => void;
+    deletePartner: (id: string) => void;
+
+    // Expenses
+    addExpense: (expense: Omit<Expense, 'id' | 'date'>) => void;
+    updateExpense: (expense: Expense) => void;
+    deleteExpense: (id: string) => void;
+    restoreExpense: (id: string) => void;
+    permanentlyDeleteExpense: (id: string) => void;
+
+    // DrhopeData
+    updateDrhopeData: (updates: Partial<DrhopeData>) => void;
+
+    // Broadcast
+    addBroadcastToHistory: (campaign: Omit<BroadcastCampaign, 'id' | 'timestamp'>) => BroadcastCampaign;
+
+    // Credit Transactions
+    deleteCreditTransaction: (userId: number, txId: string) => void;
+    restoreCreditTransaction: (userId: number, txId: string) => void;
+    permanentlyDeleteCreditTransaction: (userId: number, txId: string) => void;
+
+    // Read-only Data Access
+    consultationRequests: ConsultationRequest[];
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -492,63 +323,43 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     const [products, setProducts] = useState<Product[]>(() => {
         const stored = localStorage.getItem('products');
-        return stored ? (JSON.parse(stored) || []).filter(Boolean) : initialProducts;
+        return stored ? JSON.parse(stored) : initialProducts;
     });
     const [partners, setPartners] = useState<Partner[]>(() => {
         const stored = localStorage.getItem('partners');
-        return stored ? (JSON.parse(stored) || []).filter(Boolean) : initialPartners;
+        return stored ? JSON.parse(stored) : initialPartners;
     });
     const [pendingGifts, setPendingGifts] = useState<PendingGift[]>(() => {
         const stored = localStorage.getItem('pendingGifts');
-        return stored ? (JSON.parse(stored) || []).filter(Boolean) : initialPendingGifts;
+        return stored ? (JSON.parse(stored) || []).filter(Boolean) : [];
     });
     const [drhopeData, setDrhopeData] = useState<DrhopeData>(() => {
         const stored = localStorage.getItem('drhopeData');
         return stored ? JSON.parse(stored) : (initialDrhopeData as DrhopeData);
     });
-    const [expenses, setExpenses] = useState<Expense[]>(() => {
-        const stored = localStorage.getItem('expenses');
-        return stored ? (JSON.parse(stored) || []).filter(Boolean) : initialExpenses;
-    });
-    const [broadcastHistory, setBroadcastHistory] = useState<BroadcastCampaign[]>(() => {
-        const stored = localStorage.getItem('broadcastHistory');
-        return stored ? (JSON.parse(stored) || []).filter(Boolean) : initialBroadcastHistory;
-    });
-    const [globalCertificateTemplate, setGlobalCertificateTemplate] = useState<CertificateTemplate | null>(() => {
-        const stored = localStorage.getItem('globalCertificateTemplate');
-        return stored ? JSON.parse(stored) : null;
-    });
-    const [emailPreview, setEmailPreview] = useState<{ title: string; subject: string; messageHtml: string } | null>(null);
-
     const [consultationRequests, setConsultationRequests] = useState<ConsultationRequest[]>(() => {
         const stored = localStorage.getItem('consultationRequests');
         return stored ? (JSON.parse(stored) || []).filter(Boolean) : [];
+    });
+    const [expenses, setExpenses] = useState<Expense[]>(() => {
+        const stored = localStorage.getItem('expenses');
+        return stored ? JSON.parse(stored) : [];
+    });
+    const [broadcastHistory, setBroadcastHistory] = useState<BroadcastCampaign[]>(() => {
+        const stored = localStorage.getItem('broadcastHistory');
+        return stored ? JSON.parse(stored) : [];
     });
 
     useEffect(() => { localStorage.setItem('currentUser', JSON.stringify(currentUser)); }, [currentUser]);
     useEffect(() => { localStorage.setItem('users', JSON.stringify(users)); }, [users]);
     useEffect(() => { localStorage.setItem('workshops', JSON.stringify(workshops)); }, [workshops]);
+    useEffect(() => { localStorage.setItem('pendingGifts', JSON.stringify(pendingGifts)); }, [pendingGifts]);
+    useEffect(() => { localStorage.setItem('consultationRequests', JSON.stringify(consultationRequests)); }, [consultationRequests]);
     useEffect(() => { localStorage.setItem('products', JSON.stringify(products)); }, [products]);
     useEffect(() => { localStorage.setItem('partners', JSON.stringify(partners)); }, [partners]);
-    useEffect(() => { localStorage.setItem('pendingGifts', JSON.stringify(pendingGifts)); }, [pendingGifts]);
     useEffect(() => { localStorage.setItem('drhopeData', JSON.stringify(drhopeData)); }, [drhopeData]);
     useEffect(() => { localStorage.setItem('expenses', JSON.stringify(expenses)); }, [expenses]);
     useEffect(() => { localStorage.setItem('broadcastHistory', JSON.stringify(broadcastHistory)); }, [broadcastHistory]);
-    useEffect(() => { localStorage.setItem('globalCertificateTemplate', JSON.stringify(globalCertificateTemplate)); }, [globalCertificateTemplate]);
-    useEffect(() => { localStorage.setItem('consultationRequests', JSON.stringify(consultationRequests)); }, [consultationRequests]);
-
-    useEffect(() => {
-        const newIds = [4, 5, 6, 7, 8, 9, 10, 11];
-        setWorkshops(currentWorkshops => {
-            const missing = initialWorkshops.filter(iw => 
-                newIds.includes(iw.id) && !currentWorkshops.some(cw => cw.id === iw.id)
-            );
-            if (missing.length > 0) {
-                return [...currentWorkshops, ...missing];
-            }
-            return currentWorkshops;
-        });
-    }, []);
 
     useEffect(() => {
         if (currentUser) {
@@ -573,11 +384,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             text: { primary: '#e2e8f0', accent: '#e879f9' },
             glow: { color: '#d946ef', intensity: 50 },
         };
-        if (themes.length === 0) return defaultTheme;
         const foundTheme = themes.find(t => t.id === activeId);
-        return foundTheme ? foundTheme.colors : (themes[0]?.colors || defaultTheme);
+        return foundTheme ? foundTheme.colors : defaultTheme;
     }, [drhopeData.themes, drhopeData.activeThemeId]);
     
+    // User Actions
     const addUser = (fullName: string, email: string, phone: string): User => {
         const newUser: User = { 
             id: Date.now(), 
@@ -593,6 +404,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return newUser;
     };
 
+    const updateUser = (userId: number, updates: Partial<User>) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updates } : u));
+    
+    const deleteUser = (userId: number) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, isDeleted: true } : u));
+    const restoreUser = (userId: number) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, isDeleted: false } : u));
+    const permanentlyDeleteUser = (userId: number) => setUsers(prev => prev.filter(u => u.id !== userId));
+    const convertToInternalCredit = (userId: number, amount: number) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, internalCredit: (u.internalCredit || 0) + amount } : u));
+
+    // Subscription Actions
     const addSubscription = (userId: number, subData: Partial<Subscription>, isApproved: boolean, sendWhatsApp: boolean, creditToApply = 0) => {
         const workshop = workshops.find(w => w.id === subData.workshopId);
         if (!workshop) return;
@@ -649,6 +468,57 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }));
     };
 
+    const updateSubscription = (userId: number, subId: string, updates: Partial<Subscription>) => {
+        setUsers(prev => prev.map(u => {
+            if (u.id === userId) {
+                return {
+                    ...u,
+                    subscriptions: u.subscriptions.map(s => s.id === subId ? { ...s, ...updates } : s)
+                };
+            }
+            return u;
+        }));
+    };
+    const deleteSubscription = (userId: number, subId: string) => updateSubscription(userId, subId, { isDeleted: true });
+    const restoreSubscription = (userId: number, subId: string) => updateSubscription(userId, subId, { isDeleted: false });
+    const permanentlyDeleteSubscription = (userId: number, subId: string) => {
+        setUsers(prev => prev.map(u => {
+            if (u.id === userId) {
+                return { ...u, subscriptions: u.subscriptions.filter(s => s.id !== subId) };
+            }
+            return u;
+        }));
+    };
+    const reactivateSubscription = (userId: number, subId: string) => updateSubscription(userId, subId, { status: SubscriptionStatus.ACTIVE, refundDate: undefined, refundMethod: undefined });
+    const transferSubscription = (userId: number, subId: string, toWorkshopId: number, notes: string) => {
+        const user = users.find(u => u.id === userId);
+        if (!user) return;
+        const oldSub = user.subscriptions.find(s => s.id === subId);
+        if (!oldSub) return;
+
+        updateSubscription(userId, subId, { status: SubscriptionStatus.TRANSFERRED, transferDate: new Date().toISOString(), notes: (oldSub.notes || '') + '\n' + notes });
+        
+        addSubscription(userId, {
+            workshopId: toWorkshopId,
+            paymentMethod: oldSub.paymentMethod,
+            pricePaid: oldSub.pricePaid,
+            notes: `Transferred from workshop ${oldSub.workshopId}. ${notes}`,
+            isApproved: true,
+            status: SubscriptionStatus.ACTIVE
+        } as any, true, false);
+    };
+
+    // Gift Actions
+    const addPendingGift = (giftData: Omit<PendingGift, 'id' | 'createdAt'>) => {
+        const newGift: PendingGift = { ...giftData, id: `gift-${Date.now()}`, createdAt: new Date().toISOString() };
+        setPendingGifts(prev => [newGift, ...prev]);
+        return newGift;
+    };
+    const updatePendingGift = (id: string, updates: Partial<PendingGift>) => setPendingGifts(prev => prev.map(g => g.id === id ? { ...g, ...updates } : g));
+    const deletePendingGift = (id: string) => setPendingGifts(prev => prev.map(g => g.id === id ? { ...g, isDeleted: true } : g));
+    const restorePendingGift = (id: string) => setPendingGifts(prev => prev.map(g => g.id === id ? { ...g, isDeleted: false } : g));
+    const permanentlyDeletePendingGift = (id: string) => setPendingGifts(prev => prev.filter(g => g.id !== id));
+    
     const checkAndClaimPendingGifts = (user: User) => {
         const userPhoneNormalized = normalizePhoneNumber(user.phone);
         const giftsToClaim = pendingGifts.filter(g => 
@@ -690,23 +560,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return claimedCount;
     };
 
-    const adminManualClaimGift = (giftId: string, customUserData?: { fullName: string; email: string; phone: string }) => {
+    const adminManualClaimGift = (giftId: string, recipientData: { name: string, email: string, phone: string }) => {
         const gift = pendingGifts.find(g => g.id === giftId);
-        if (!gift) return { success: false, message: 'الهدية غير موجودة' };
-
-        const normalizedPhone = normalizePhoneNumber(gift.recipientWhatsapp);
-        let targetUser = users.find(u => normalizePhoneNumber(u.phone) === normalizedPhone && !u.isDeleted);
-
-        if (!targetUser) {
-            if (customUserData) {
-                targetUser = addUser(customUserData.fullName, customUserData.email, customUserData.phone);
-            } else {
-                return { success: false, message: 'المستخدم غير موجود', status: 'USER_NOT_FOUND' as const };
-            }
+        if(!gift) return { success: false, message: 'الهدية غير موجودة' };
+        
+        let user = users.find(u => !u.isDeleted && (u.email === recipientData.email || normalizePhoneNumber(u.phone) === normalizePhoneNumber(recipientData.phone)));
+        if (!user) {
+            user = addUser(recipientData.name, recipientData.email, recipientData.phone);
         }
-
+        
+        updatePendingGift(giftId, { claimedByUserId: user.id, claimedAt: new Date().toISOString() });
         addSubscription(
-            targetUser.id,
+            user.id,
             {
                 workshopId: gift.workshopId,
                 packageId: gift.packageId,
@@ -721,25 +586,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             },
             true, true
         );
-
-        setPendingGifts(prev => prev.map(g => 
-            g.id === giftId 
-            ? { ...g, claimedByUserId: targetUser!.id, claimedAt: new Date().toISOString() } 
-            : g
-        ));
-
-        return { success: true, message: `تم تفعيل الهدية بنجاح للمستفيد: ${targetUser.fullName}` };
+        return { success: true, message: `تم تفعيل الهدية للمستخدم ${user.fullName}` };
     };
 
     const donateToPayItForward = (workshopId: number, amount: number, seats: number = 0, donorUserId?: number) => {
-        setDrhopeData(prev => ({
-            ...prev,
-            payItForwardStats: {
-                totalFund: (prev.payItForwardStats?.totalFund || 0) + amount,
-                beneficiariesCount: (prev.payItForwardStats?.beneficiariesCount || 0) + (seats > 0 ? seats : 0)
-            }
-        }));
-
         setWorkshops(prev => prev.map(w => 
             w.id === workshopId 
                 ? { ...w, payItForwardBalance: (w.payItForwardBalance || 0) + amount } 
@@ -759,45 +609,38 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } as any, true, true);
         }
     };
-    
-    const grantPayItForwardSeat = (userId: number, workshopId: number, cost: number, donorSubscriptionId: string, notes?: string) => {
-        setWorkshops(prev => prev.map(w => 
-            w.id === workshopId 
-                ? { ...w, payItForwardBalance: Math.max(0, (w.payItForwardBalance || 0) - cost) } 
-                : w
-        ));
+
+    const grantPayItForwardSeat = (userId: number, workshopId: number, amount: number, donorSubscriptionId: string, notes: string) => {
+        let donorUser: User | undefined;
+        let donorSub: Subscription | undefined;
         
-        let donorName = 'صندوق إهداء غير القادرين';
-        
-        setUsers(prevUsers => prevUsers.map(u => {
-            const hasTargetSub = u.subscriptions.some(s => s.id === donorSubscriptionId);
-            if (hasTargetSub) {
-                return {
-                    ...u,
-                    subscriptions: u.subscriptions.map(s => {
-                        if (s.id === donorSubscriptionId) {
-                            donorName = u.fullName;
-                            const newBalance = Math.max(0, (s.donationRemaining || 0) - cost);
-                            return { ...s, donationRemaining: newBalance };
-                        }
-                        return s;
-                    })
-                };
+        for (const u of users) {
+            const s = u.subscriptions.find(sub => sub.id === donorSubscriptionId);
+            if (s) {
+                donorUser = u;
+                donorSub = s;
+                break;
             }
-            return u;
-        }));
-
-        addSubscription(userId, {
-            workshopId,
-            paymentMethod: 'GIFT', 
-            pricePaid: 0,
-            isGift: true,
-            gifterName: donorName,
-            giftMessage: 'نتمنى لك رحلة تعليمية موفقة ومفيدة.',
-            notes: `تم منح المقعد من دعم: ${donorName}. التكلفة المخصومة: ${cost}. ${notes || ''}`
-        }, true, true);
+        }
+        
+        if (donorUser && donorSub) {
+            const newBalance = (donorSub.donationRemaining || 0) - amount;
+            updateSubscription(donorUser.id, donorSub.id, { donationRemaining: newBalance });
+            
+            addSubscription(userId, {
+                workshopId,
+                paymentMethod: 'GIFT',
+                pricePaid: 0,
+                notes: `Granted via Pay It Forward from ${donorUser.fullName}. ${notes}`,
+                isGift: true,
+                gifterName: donorUser.fullName,
+                isApproved: true,
+                status: SubscriptionStatus.ACTIVE
+            } as any, true, true);
+        }
     };
-
+    
+    // Auth
     const login = (email: string, phone: string) => {
         const normalizedPhone = normalizePhoneNumber(phone);
         const lowercasedEmail = email.toLowerCase();
@@ -823,155 +666,172 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
-    const loginAsUser = (userToLogin: User) => {
-        setCurrentUser(userToLogin);
-        trackEvent('admin_login_as_user', { adminAction: true }, userToLogin);
+    // Orders
+    const placeOrder = (userId: number, orderData: any, initialStatus: any) => {
+        const newOrder: Order = { ...orderData, id: `ord-${Date.now()}`, userId, status: initialStatus || OrderStatus.PENDING, orderDate: new Date().toISOString() };
+        setUsers(prev => prev.map(u => u.id === userId ? { ...u, orders: [...u.orders, newOrder] } : u));
+        return newOrder;
+    };
+    const confirmOrder = (userId: number, orderId: string) => {
+        setUsers(prev => prev.map(u => {
+            if (u.id === userId) {
+                return {
+                    ...u,
+                    orders: u.orders.map(o => o.id === orderId ? { ...o, status: OrderStatus.COMPLETED } : o)
+                };
+            }
+            return u;
+        }));
+    };
+
+    // Workshops
+    const addWorkshop = (workshopData: Omit<Workshop, 'id'>) => setWorkshops(prev => [...prev, { ...workshopData, id: Date.now(), isVisible: true, isDeleted: false }]);
+    const updateWorkshop = (updatedWorkshop: Workshop) => setWorkshops(prev => prev.map(w => w.id === updatedWorkshop.id ? updatedWorkshop : w));
+    const deleteWorkshop = (id: number) => setWorkshops(prev => prev.map(w => w.id === id ? { ...w, isDeleted: true } : w));
+    const restoreWorkshop = (id: number) => setWorkshops(prev => prev.map(w => w.id === id ? { ...w, isDeleted: false } : w));
+    const permanentlyDeleteWorkshop = (id: number) => setWorkshops(prev => prev.filter(w => w.id !== id));
+
+    // Products
+    const addProduct = (productData: Omit<Product, 'id'>) => setProducts(prev => [...prev, { ...productData, id: Date.now(), isDeleted: false }]);
+    const updateProduct = (updatedProduct: Product) => setProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+    const deleteProduct = (id: number) => setProducts(prev => prev.map(p => p.id === id ? { ...p, isDeleted: true } : p));
+    const restoreProduct = (id: number) => setProducts(prev => prev.map(p => p.id === id ? { ...p, isDeleted: false } : p));
+    const permanentlyDeleteProduct = (id: number) => setProducts(prev => prev.filter(p => p.id !== id));
+
+    // Partners
+    const addPartner = (partnerData: Omit<Partner, 'id'>) => setPartners(prev => [...prev, { ...partnerData, id: `partner-${Date.now()}` }]);
+    const updatePartner = (updatedPartner: Partner) => setPartners(prev => prev.map(p => p.id === updatedPartner.id ? updatedPartner : p));
+    const deletePartner = (id: string) => setPartners(prev => prev.filter(p => p.id !== id));
+
+    // Expenses
+    const addExpense = (expense: Omit<Expense, 'id' | 'date'>) => setExpenses(prev => [...prev, { ...expense, id: `exp-${Date.now()}`, date: new Date().toISOString(), isDeleted: false }]);
+    const updateExpense = (expense: Expense) => setExpenses(prev => prev.map(e => e.id === expense.id ? expense : e));
+    const deleteExpense = (id: string) => setExpenses(prev => prev.map(e => e.id === id ? { ...e, isDeleted: true } : e));
+    const restoreExpense = (id: string) => setExpenses(prev => prev.map(e => e.id === id ? { ...e, isDeleted: false } : e));
+    const permanentlyDeleteExpense = (id: string) => setExpenses(prev => prev.filter(e => e.id !== id));
+
+    // Consultations
+    const addConsultationRequest = (userId: number, subject: string) => setConsultationRequests(prev => [{ id: `consult-${Date.now()}`, userId, subject, status: 'NEW', requestedAt: new Date().toISOString() }, ...prev]);
+    const updateConsultationRequest = (id: string, updates: Partial<ConsultationRequest>) => setConsultationRequests(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
+
+    // Others
+    const addReview = (workshopId: number, reviewData: any) => setWorkshops(prev => prev.map(w => w.id === workshopId ? { ...w, reviews: [...(w.reviews || []), { ...reviewData, id: `rev-${Date.now()}`, workshopId, date: new Date().toISOString() }] } : w));
+    const deleteReview = (workshopId: number, reviewId: string) => setWorkshops(prev => prev.map(w => w.id === workshopId && w.reviews ? { ...w, reviews: w.reviews.map(r => r.id === reviewId ? { ...r, isDeleted: true } : r) } : w));
+    const restoreReview = (workshopId: number, reviewId: string) => setWorkshops(prev => prev.map(w => w.id === workshopId && w.reviews ? { ...w, reviews: w.reviews.map(r => r.id === reviewId ? { ...r, isDeleted: false } : r) } : w));
+    const permanentlyDeleteReview = (workshopId: number, reviewId: string) => setWorkshops(prev => prev.map(w => w.id === workshopId && w.reviews ? { ...w, reviews: w.reviews.filter(r => r.id !== reviewId) } : w));
+
+    const updateDrhopeData = (updates: Partial<DrhopeData>) => setDrhopeData(prev => ({ ...prev, ...updates }));
+    const addBroadcastToHistory = (campaign: Omit<BroadcastCampaign, 'id' | 'timestamp'>) => {
+        const newCampaign = { ...campaign, id: `camp-${Date.now()}`, timestamp: new Date().toISOString() };
+        setBroadcastHistory(prev => [newCampaign, ...prev]);
+        return newCampaign;
+    };
+    const addNotificationForMultipleUsers = (userIds: number[], message: string) => {
+        setUsers(prev => prev.map(u => userIds.includes(u.id) ? { ...u, notifications: [{ id: `notif-${Date.now()}`, message, timestamp: new Date().toISOString(), read: false }, ...u.notifications] } : u));
+    };
+    const deleteCreditTransaction = (userId: number, txId: string) => {
+        setUsers(prev => prev.map(u => {
+            if (u.id === userId && u.creditTransactions) {
+                const tx = u.creditTransactions.find(t => t.id === txId);
+                if(tx && !tx.isDeleted) {
+                    const newBalance = (u.internalCredit || 0) + (tx.type === 'subtraction' ? tx.amount : -tx.amount);
+                    return { ...u, internalCredit: newBalance, creditTransactions: u.creditTransactions.map(t => t.id === txId ? { ...t, isDeleted: true } : t) };
+                }
+            }
+            return u;
+        }));
+    };
+    const restoreCreditTransaction = (userId: number, txId: string) => {
+        setUsers(prev => prev.map(u => {
+            if (u.id === userId && u.creditTransactions) {
+                const tx = u.creditTransactions.find(t => t.id === txId);
+                if(tx && tx.isDeleted) {
+                    const newBalance = (u.internalCredit || 0) + (tx.type === 'addition' ? tx.amount : -tx.amount);
+                    return { ...u, internalCredit: newBalance, creditTransactions: u.creditTransactions.map(t => t.id === txId ? { ...t, isDeleted: false } : t) };
+                }
+            }
+            return u;
+        }));
+    };
+    const permanentlyDeleteCreditTransaction = (userId: number, txId: string) => {
+        setUsers(prev => prev.map(u => u.id === userId && u.creditTransactions ? { ...u, creditTransactions: u.creditTransactions.filter(t => t.id !== txId) } : u));
     };
 
     const value: UserContextType = useMemo(() => ({
-        currentUser, users, workshops, products, partners, pendingGifts, drhopeData, activeTheme, notifications, expenses, broadcastHistory, globalCertificateTemplate, emailPreview, consultationRequests,
+        currentUser, users, workshops, products, partners, drhopeData, activeTheme, notifications, consultationRequests, expenses, broadcastHistory, pendingGifts,
+        globalCertificateTemplate: null,
         login,
-        loginAsUser,
+        logout: () => { if (currentUser) trackEvent('logout', {}, currentUser); setCurrentUser(null); },
+        register: (fullName, email, phone) => { const newUser = addUser(fullName, email, phone); setCurrentUser(newUser); trackEvent('register', {}, newUser); return newUser; },
+        addUser,
+        updateUser,
+        deleteUser,
+        restoreUser,
+        permanentlyDeleteUser,
+        convertToInternalCredit,
         findUserByCredential: (type, value) => {
             const normalizedValue = type === 'phone' ? normalizePhoneNumber(value) : value.toLowerCase();
             return users.find(u => !u.isDeleted && (type === 'phone' ? normalizePhoneNumber(u.phone) === normalizedValue : u.email.toLowerCase() === normalizedValue)) || null;
         },
-        logRecordingView: (userId, workshopId, recordingUrl) => {
-             setUsers(prev => prev.map(u => {
-                if (u.id === userId) {
-                    const newSubs = u.subscriptions.map(s => {
-                        if (s.workshopId === workshopId) {
-                            const currentStats = s.recordingStats?.[recordingUrl] || { progress: 0, playCount: 0, lastTimestamp: 0 };
-                            return {
-                                ...s,
-                                recordingStats: {
-                                    ...s.recordingStats,
-                                    [recordingUrl]: { ...currentStats, playCount: currentStats.playCount + 1, lastWatched: new Date().toISOString() }
-                                }
-                            };
-                        }
-                        return s;
-                    });
-                    return { ...u, subscriptions: newSubs };
-                }
-                return u;
-            }));
-        },
-        markAttendance: (userId, workshopId) => { /*...*/ },
-        addPendingGift: (giftData) => {
-            const newGift: PendingGift = { ...giftData, id: `gift-${Date.now()}`, createdAt: new Date().toISOString() };
-            setPendingGifts(prev => [newGift, ...prev]);
-            return newGift;
-        },
-        updatePendingGift: (giftId, updates) => setPendingGifts(prev => prev.map(g => g.id === giftId ? { ...g, ...updates } : g)),
-        claimGift: (giftId, claimingUserId) => {
-            const gift = pendingGifts.find(g => g.id === giftId);
-            if (!gift || gift.claimedByUserId) return { success: false, message: 'رابط الهدية غير صالح أو تم استخدامه بالفعل.' };
-            const updatedGift = { ...gift, claimedByUserId: claimingUserId, claimedAt: new Date().toISOString() };
-            setPendingGifts(prev => prev.map(g => g.id === giftId ? updatedGift : g));
-            addSubscription(claimingUserId, { workshopId: gift.workshopId, packageId: gift.packageId, attendanceType: gift.attendanceType, paymentMethod: 'GIFT', pricePaid: gift.pricePaid, isGift: true, gifterName: gift.gifterName, gifterPhone: gift.gifterPhone, gifterUserId: gift.gifterUserId, giftMessage: gift.giftMessage }, true, true);
-            return { success: true };
-        },
-        deletePendingGift: (giftId) => setPendingGifts(prev => prev.map(g => g.id === giftId ? { ...g, isDeleted: true } : g)),
-        restorePendingGift: (giftId) => setPendingGifts(prev => prev.map(g => g.id === giftId ? { ...g, isDeleted: false } : g)),
-        permanentlyDeletePendingGift: (giftId) => setPendingGifts(prev => prev.filter(g => g.id !== giftId)),
+        checkRegistrationAvailability: (email, phone) => { const lowercasedEmail = email.toLowerCase(); const normalizedPhone = normalizePhoneNumber(phone); return { emailUser: users.find(u => u.email.toLowerCase() === lowercasedEmail && !u.isDeleted), phoneUser: users.find(u => normalizePhoneNumber(u.phone) === normalizedPhone && !u.isDeleted) }; },
+        
+        addSubscription,
+        updateSubscription,
+        deleteSubscription,
+        restoreSubscription,
+        permanentlyDeleteSubscription,
+        transferSubscription,
+        reactivateSubscription,
+        placeOrder,
+        confirmOrder,
+        addReview,
+        deleteReview,
+        restoreReview,
+        permanentlyDeleteReview,
+        addConsultationRequest,
+        updateConsultationRequest,
+        
+        addPendingGift,
+        updatePendingGift,
+        deletePendingGift,
+        restorePendingGift,
+        permanentlyDeletePendingGift,
         checkAndClaimPendingGifts,
         adminManualClaimGift,
         donateToPayItForward,
         grantPayItForwardSeat,
-        addPartner: (partnerData) => setPartners(prev => [...prev, { ...partnerData, id: `partner-${Date.now()}` }]),
-        updatePartner: (partnerData) => setPartners(prev => prev.map(p => p.id === partnerData.id ? partnerData : p)),
-        deletePartner: (partnerId) => setPartners(prev => prev.filter(p => p.id !== partnerId)),
-        addProduct: (productData) => setProducts(prev => [...prev, { ...productData, id: Date.now() }]),
-        updateProduct: (productData) => setProducts(prev => prev.map(p => p.id === productData.id ? productData : p)),
-        deleteProduct: (productId) => setProducts(prev => prev.map(p => p.id === productId ? { ...p, isDeleted: true } : p)),
-        restoreProduct: (productId) => setProducts(prev => prev.map(p => p.id === productId ? { ...p, isDeleted: false } : p)),
-        permanentlyDeleteProduct: (productId) => setProducts(prev => prev.filter(p => p.id !== productId)),
-        logout: () => { if (currentUser) { trackEvent('logout', {}, currentUser); setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, sessionId: undefined } : u)); } setCurrentUser(null); },
-        register: (fullName, email, phone) => { const newUser = { id: Date.now(), fullName, email, phone, subscriptions: [], orders: [], notifications: [], creditTransactions: [] }; setUsers(prev => [...prev, newUser]); setCurrentUser(newUser); trackEvent('register', {}, newUser); return newUser; },
-        addUser,
-        updateUser: (userId, updates) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updates } : u)),
-        checkRegistrationAvailability: (email, phone) => { const lowercasedEmail = email.toLowerCase(); const normalizedPhone = normalizePhoneNumber(phone); const emailUser = users.find(u => u.email.toLowerCase() === lowercasedEmail && !u.isDeleted); const phoneUser = users.find(u => normalizePhoneNumber(u.phone) === normalizedPhone && !u.isDeleted); return { emailUser, phoneUser }; },
-        deleteUser: (userId) => setUsers(users.map(u => u.id === userId ? { ...u, isDeleted: true } : u)),
-        restoreUser: (userId) => setUsers(users.map(u => u.id === userId ? { ...u, isDeleted: false } : u)),
-        permanentlyDeleteUser: (userId) => setUsers(users.filter(u => u.id !== userId)),
-        addWorkshop: (workshop) => setWorkshops(prev => [...prev, { ...workshop, id: Date.now() } as Workshop]),
-        updateWorkshop: (workshop) => setWorkshops(prev => prev.map(w => w.id === workshop.id ? workshop : w)),
-        deleteWorkshop: (workshopId) => setWorkshops(workshops.map(w => w.id === workshopId ? { ...w, isDeleted: true } : w)),
-        restoreWorkshop: (workshopId) => setWorkshops(workshops.map(w => w.id === workshopId ? { ...w, isDeleted: false } : w)),
-        permanentlyDeleteWorkshop: (workshopId) => setWorkshops(workshops.filter(w => w.id !== workshopId)),
-        addSubscription,
-        updateSubscription: (userId, subId, updates) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.map(s => s.id === subId ? { ...s, ...updates } : s) } : u)),
-        deleteSubscription: (userId, subId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.map(s => s.id === subId ? { ...s, isDeleted: true } : s) } : u)),
-        restoreSubscription: (userId, subId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.map(s => s.id === subId ? { ...s, isDeleted: false } : s) } : u)),
-        permanentlyDeleteSubscription: (userId, subId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.filter(s => s.id !== subId) } : u)),
-        transferSubscription: (userId, fromSubId, toWorkshopId, notes) => {
-             setUsers(prev => prev.map(u => {
-                if (u.id === userId) {
-                    const newSubs = u.subscriptions.map(s => {
-                        if (s.id === fromSubId) {
-                            return { ...s, status: SubscriptionStatus.TRANSFERRED, transferDate: new Date().toISOString(), notes: (s.notes || '') + `\nTransferred to workshop ID ${toWorkshopId}. Notes: ${notes}` };
-                        }
-                        return s;
-                    });
-                    
-                    const oldSub = u.subscriptions.find(s => s.id === fromSubId);
-                    if(oldSub) {
-                        const newSub: Subscription = {
-                            ...oldSub,
-                            id: `sub-${Date.now()}`,
-                            workshopId: toWorkshopId,
-                            status: SubscriptionStatus.ACTIVE,
-                            isApproved: true,
-                            activationDate: new Date().toISOString().split('T')[0],
-                            notes: `Transferred from previous subscription. Notes: ${notes}`,
-                            transferDate: undefined
-                        };
-                        newSubs.push(newSub);
-                    }
-                    return { ...u, subscriptions: newSubs };
-                }
-                return u;
-            }));
-        },
-        reactivateSubscription: (userId, subId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, subscriptions: u.subscriptions.map(s => s.id === subId ? { ...s, status: SubscriptionStatus.ACTIVE, refundDate: undefined, refundMethod: undefined } : s) } : u)),
-        enrollWithPendingApproval: (workshopId, packageId, paymentMethod, attendanceType) => { /* ... */ },
-        placeOrder: (userId, orderData, initialStatus) => {
-            const newOrder: Order = { ...orderData, id: `ord-${Date.now()}`, userId, status: initialStatus || OrderStatus.PENDING, orderDate: new Date().toISOString() };
-            setUsers(prev => prev.map(u => u.id === userId ? { ...u, orders: [...u.orders, newOrder] } : u));
-            return newOrder;
-        },
-        confirmOrder: (userId, orderId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, orders: u.orders.map(o => o.id === orderId ? { ...o, status: OrderStatus.COMPLETED } : o) } : u)),
-        updateDrhopeData: (updates) => setDrhopeData(prev => ({...prev, ...updates })),
-        addNotificationForMultipleUsers: (userIds, message, workshopId, whatsappMessage) => {
-             setUsers(prev => prev.map(u => {
-                if (userIds.includes(u.id)) {
-                    return { ...u, notifications: [{ id: `notif-${Date.now()}-${u.id}`, message, timestamp: new Date().toISOString(), read: false, workshopId }, ...u.notifications] };
-                }
-                return u;
-            }));
-        },
         markNotificationsAsRead: () => { if(currentUser) setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, notifications: u.notifications.map(n => ({ ...n, read: true })) } : u)); },
-        addExpense: (expense) => setExpenses(prev => [...prev, { ...expense, id: `exp-${Date.now()}`, date: new Date().toISOString() }]),
-        updateExpense: (expense) => setExpenses(prev => prev.map(e => e.id === expense.id ? expense : e)),
-        deleteExpense: (expenseId) => setExpenses(prev => prev.map(e => e.id === expenseId ? { ...e, isDeleted: true } : e)),
-        restoreExpense: (expenseId) => setExpenses(prev => prev.map(e => e.id === expenseId ? { ...e, isDeleted: false } : e)),
-        permanentlyDeleteExpense: (expenseId) => setExpenses(prev => prev.filter(e => e.id !== expenseId)),
-        addReview: (workshopId, reviewData) => setWorkshops(prev => prev.map(w => w.id === workshopId ? { ...w, reviews: [...(w.reviews || []), { ...reviewData, id: `rev-${Date.now()}`, workshopId, date: new Date().toISOString() }] } : w)),
-        deleteReview: (workshopId, reviewId) => setWorkshops(prev => prev.map(w => w.id === workshopId ? { ...w, reviews: w.reviews?.map(r => r.id === reviewId ? { ...r, isDeleted: true } : r) } : w)),
-        restoreReview: (workshopId, reviewId) => setWorkshops(prev => prev.map(w => w.id === workshopId ? { ...w, reviews: w.reviews?.map(r => r.id === reviewId ? { ...r, isDeleted: false } : r) } : w)),
-        permanentlyDeleteReview: (workshopId, reviewId) => setWorkshops(prev => prev.map(w => w.id === workshopId ? { ...w, reviews: w.reviews?.filter(r => r.id !== reviewId) } : w)),
-        addBroadcastToHistory: (campaign) => { const newCampaign = { ...campaign, id: `bc-${Date.now()}`, timestamp: new Date().toISOString() }; setBroadcastHistory(prev => [newCampaign, ...prev]); return newCampaign; },
-        previewEmail: (title, subject, messageHtml) => setEmailPreview({ title, subject, messageHtml }),
-        clearEmailPreview: () => setEmailPreview(null),
-        updateGlobalCertificateTemplate: (template) => setGlobalCertificateTemplate(template),
-        convertToInternalCredit: (userId, subId) => { /* ... implementation ... */ },
-        deleteCreditTransaction: (userId, transactionId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, creditTransactions: u.creditTransactions?.map(t => t.id === transactionId ? { ...t, isDeleted: true } : t) } : u)),
-        restoreCreditTransaction: (userId, transactionId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, creditTransactions: u.creditTransactions?.map(t => t.id === transactionId ? { ...t, isDeleted: false } : t) } : u)),
-        permanentlyDeleteCreditTransaction: (userId, transactionId) => setUsers(prev => prev.map(u => u.id === userId ? { ...u, creditTransactions: u.creditTransactions?.filter(t => t.id !== transactionId) } : u)),
-        addConsultationRequest: (userId, subject) => setConsultationRequests(prev => [{ id: `consult-${Date.now()}`, userId, subject, status: 'NEW', requestedAt: new Date().toISOString() }, ...prev]),
-        updateConsultationRequest: (requestId, updates) => setConsultationRequests(prev => prev.map(req => req.id === requestId ? { ...req, ...updates } : req)),
-    }), [currentUser, users, workshops, products, partners, drhopeData, activeTheme, expenses, broadcastHistory, globalCertificateTemplate, emailPreview, notifications, consultationRequests, pendingGifts]);
+        addNotificationForMultipleUsers,
+
+        addWorkshop,
+        updateWorkshop,
+        deleteWorkshop,
+        restoreWorkshop,
+        permanentlyDeleteWorkshop,
+
+        addProduct,
+        updateProduct,
+        deleteProduct,
+        restoreProduct,
+        permanentlyDeleteProduct,
+
+        addPartner,
+        updatePartner,
+        deletePartner,
+
+        addExpense,
+        updateExpense,
+        deleteExpense,
+        restoreExpense,
+        permanentlyDeleteExpense,
+
+        updateDrhopeData,
+        addBroadcastToHistory,
+        
+        deleteCreditTransaction,
+        restoreCreditTransaction,
+        permanentlyDeleteCreditTransaction,
+    }), [currentUser, users, workshops, products, partners, drhopeData, activeTheme, notifications, consultationRequests, expenses, broadcastHistory, pendingGifts]);
 
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

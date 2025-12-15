@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { InstagramIcon, TwitterIcon, FacebookIcon, SnapchatIcon, TikTokIcon, PhoneIcon, EnvelopeIcon, LockClosedIcon, GlobeAltIcon } from './icons';
+import { InstagramIcon, TwitterIcon, FacebookIcon, SnapchatIcon, TikTokIcon, PhoneIcon, EnvelopeIcon, GlobeAltIcon } from './icons';
 import { useUser } from '../context/UserContext';
 import { SocialMediaLinks } from '../types';
 
@@ -156,18 +156,6 @@ const Footer: React.FC<FooterProps> = ({ onShippingClick, onTermsClick, onAboutC
           <p dir="ltr" className="text-xs text-slate-500 font-medium">
               &copy; {new Date().getFullYear()} <span className="text-white">Nawaya Events</span>. All Rights Reserved.
           </p>
-          
-          <div className="flex items-center gap-4">
-             {/* Admin Entry Link - Direct href for reliability */}
-            <a 
-                href="?mode=admin"
-                className="text-slate-600 hover:text-fuchsia-500 flex items-center gap-1.5 transition-colors group cursor-pointer"
-                title="دخول المسؤول"
-            >
-                <LockClosedIcon className="w-3 h-3 group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">Admin Portal</span>
-            </a>
-          </div>
         </div>
       </div>
     </footer>

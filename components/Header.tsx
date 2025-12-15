@@ -172,10 +172,10 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-1000 ease-in-out ${headerBgClass} ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
-        <nav className="container mx-auto px-4 sm:px-6 h-20 md:h-24 grid grid-cols-3 items-center">
+        <nav className="container mx-auto px-4 sm:px-6 h-20 md:h-24 flex items-center justify-between">
           
-          {/* Left section */}
-          <div className="flex justify-start items-center gap-2">
+          {/* Left section: Hamburger, NavHub (Mobile), Logo (Desktop) */}
+          <div className="flex justify-start items-center gap-3 flex-1">
             <div className="md:hidden">
               <button onClick={handleHamburgerClick} className={iconButtonClasses}>
                 <MenuIcon className="h-6 w-6 transition-transform duration-300 group-hover:rotate-3" />
@@ -192,9 +192,9 @@ const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Center section */}
-          <div className="flex justify-center">
-            <div className="md:hidden">
+          {/* Center section: Logo (Mobile), Menu (Desktop) */}
+          <div className="flex justify-center items-center">
+            <div className="md:hidden absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
               <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} />
             </div>
             <div className="hidden md:flex items-center justify-center gap-x-6">
@@ -250,9 +250,20 @@ const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Right section */}
-          <div className="flex justify-end items-center gap-4">
+          {/* Right section: Profile, Notifications, Login/Logout */}
+          <div className="flex justify-end items-center gap-3 flex-1">
             
+            {/* Mobile Profile Button */}
+            <button
+                onClick={handleProfileClick}
+                className={`md:hidden flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-slate-200 hover:bg-white/10 hover:text-pink-400 transition-all duration-300`}
+                title="الملف الشخصي"
+            >
+                <UserIcon className="w-5 h-5" />
+                <span className="text-xs font-bold hidden sm:inline">الملف الشخصي</span>
+                <span className="text-[10px] font-bold sm:hidden">ملفي</span>
+            </button>
+
             {/* Mobile Notifications Icon - Always Visible (Prompts guest message if guest) */}
             <div className="md:hidden relative" ref={mobileNotificationContainerRef}>
                 <button onClick={handleMobileNotificationsToggle} className={`${iconButtonClasses} relative`}>

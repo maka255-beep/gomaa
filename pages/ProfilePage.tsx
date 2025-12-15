@@ -147,7 +147,8 @@ const AddReviewForm: React.FC<{ workshopId: number; onReviewAdded: () => void }>
 };
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoomRedirect, onPlayRecording, onViewAttachment, onViewRecommendedWorkshop, showToast, onPayForConsultation, onViewInvoice }) => {
-    const { workshops, currentUser: loggedInUser, addReview, updateSubscription, consultationRequests, globalCertificateTemplate } = useUser();
+    // REMOVED updateSubscription from destructuring as it's no longer available in UserContextType
+    const { workshops, currentUser: loggedInUser, addReview, consultationRequests, globalCertificateTemplate } = useUser();
     
     const [activeView, setActiveView] = useState<ProfileView>('my_workshops');
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);

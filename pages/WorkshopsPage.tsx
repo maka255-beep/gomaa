@@ -6,6 +6,7 @@ import LiveStreamCard from '../components/LiveStreamCard';
 import Hero from '../components/Hero';
 import { useUser } from '../context/UserContext';
 import { isWorkshopExpired } from '../utils';
+import HowToAttendModal from '../components/HowToAttendModal';
 
 interface WorkshopsPageProps {
   onLiveStreamLoginRequest: () => void;
@@ -25,6 +26,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
   const { currentUser: user, workshops } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'أونلاين' | 'حضوري' | 'مسجلة' | 'أونلاين وحضوري'>('all');
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   
   const visibleWorkshops = workshops.filter(w => w.isVisible);
 
@@ -79,6 +81,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
                 onLoginRequest={onLiveStreamLoginRequest}
                 onZoomRedirect={onZoomRedirect}
                 onShowToast={showToast}
+                onShowHelp={() => setIsHelpModalOpen(true)}
             />
           </div>
         )}
@@ -157,6 +160,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
           </>
         )}
       </div>
+      <HowToAttendModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
     </>
   );
 };

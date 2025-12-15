@@ -10,12 +10,12 @@ const initialWorkshops: Workshop[] = [
         id: 999,
         title: '🔴 ورشة بث مباشر (تجربة النظام)',
         instructor: 'فريق التطوير',
-        startDate: '2025-10-20',
+        startDate: '2025-10-18', 
         startTime: '21:00',
         location: 'أونلاين',
         country: 'الإمارات العربية المتحدة',
         isRecorded: false,
-        zoomLink: 'https://zoom.us/j/TEST_LINK_123',
+        zoomLink: '', // Removed link
         isVisible: true,
         price: 50,
         paymentLink: 'https://example.com/payment',
@@ -37,7 +37,7 @@ const initialWorkshops: Workshop[] = [
         location: 'أونلاين',
         country: 'المملكة العربية السعودية',
         isRecorded: false,
-        zoomLink: 'https://zoom.us/j/1234567890',
+        zoomLink: '', // Removed link
         isVisible: true,
         price: 350,
         paymentLink: 'https://example.com/payment',
@@ -65,7 +65,7 @@ const initialWorkshops: Workshop[] = [
         hotelName: 'فندق أرماني',
         hallName: 'قاعة الألماس',
         isRecorded: false,
-        zoomLink: 'https://zoom.us/j/9876543210',
+        zoomLink: '', // Removed link
         isVisible: true,
         description: 'تعلم كيفية فهم وإدارة مشاعرك ومشاعر الآخرين لتحقيق النجاح في الحياة الشخصية والمهنية.',
         topics: ['مفهوم الذكاء العاطفي', 'الوعي الذاتي', 'إدارة العلاقات'],
@@ -112,7 +112,7 @@ const initialWorkshops: Workshop[] = [
         location: 'أونلاين',
         country: 'عالمي',
         isRecorded: false,
-        zoomLink: 'https://zoom.us/j/123123123',
+        zoomLink: '', // Removed link
         isVisible: true,
         price: 450,
         description: 'رحلة عميقة لاكتشاف شغفك، تحديد قيمك العليا، ورسم خريطة طريق واضحة لمستقبلك الشخصي والمهني.',

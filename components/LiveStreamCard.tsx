@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { User, SubscriptionStatus } from '../types';
-import { VideoIcon, LoginIcon } from './icons';
+import { VideoIcon, LoginIcon, InformationCircleIcon } from './icons';
 
 interface LiveStreamCardProps {
     workshopId: number;
@@ -11,9 +11,10 @@ interface LiveStreamCardProps {
     onLoginRequest: () => void;
     onZoomRedirect: (zoomLink: string, workshopId: number) => void;
     onShowToast: (message: string, type?: 'success' | 'warning' | 'error') => void;
+    onShowHelp: () => void;
 }
 
-const LiveStreamCard: React.FC<LiveStreamCardProps> = ({ workshopId, workshopTitle, zoomLink, user, onLoginRequest, onZoomRedirect, onShowToast }) => {
+const LiveStreamCard: React.FC<LiveStreamCardProps> = ({ workshopId, workshopTitle, zoomLink, user, onLoginRequest, onZoomRedirect, onShowToast, onShowHelp }) => {
     
     const isSubscribed = user?.subscriptions.some(
         sub => sub.workshopId === workshopId && 
@@ -44,8 +45,16 @@ const LiveStreamCard: React.FC<LiveStreamCardProps> = ({ workshopId, workshopTit
             {/* Main card - Dark Royal Gradient Background */}
             <div className="relative bg-gradient-to-br from-[#2e0235] via-[#4c1d95] to-[#701a75] rounded-2xl shadow-2xl shadow-black/50 p-5 sm:p-6 text-center flex flex-col items-center transform group-hover:-translate-y-1 transition-transform duration-300 border border-purple-500/30">
 
+                <button 
+                    onClick={onShowHelp}
+                    className="absolute top-4 right-4 text-pink-300 hover:text-white transition-colors flex items-center gap-1 text-[10px] sm:text-xs font-bold bg-white/5 px-2 py-1 rounded-full hover:bg-white/10"
+                >
+                    <InformationCircleIcon className="w-4 h-4" />
+                    <span>كيف أدخل؟</span>
+                </button>
+
                 {/* Icon section with pulsing effect */}
-                <div className="relative mb-4">
+                <div className="relative mb-4 mt-2">
                     <span className="absolute -inset-3 animate-ping rounded-full bg-purple-500 opacity-10"></span>
                     <div className="relative bg-white/10 p-4 rounded-full border border-purple-400/30 shadow-[0_0_15px_rgba(147,51,234,0.3)] backdrop-blur-md">
                         <VideoIcon className="w-8 h-8 sm:w-10 sm:h-10 text-pink-200 drop-shadow-md"/>

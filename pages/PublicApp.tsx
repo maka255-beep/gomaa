@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import { Page, Workshop, Package, User, Subscription, ConsultationRequest, NoteResource, Recording, PaymentIntent, OrderStatus } from '../types';
 import Header from '../components/Header';
@@ -47,6 +47,7 @@ const PublicApp: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalInitialView, setAuthModalInitialView] = useState<'login' | 'register'>('login');
+  const [authModalHideRegister, setAuthModalHideRegister] = useState(false);
   
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
@@ -105,6 +106,13 @@ const PublicApp: React.FC = () => {
       }
   }, [currentUser, postLoginPaymentIntent, postLoginGiftIntent]);
 
+  // Determine if there is an active live stream right now
+  const activeLiveWorkshop = useMemo(() => {
+      return workshops
+          .filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w))
+          .sort((a, b) => new Date(`${a.startDate}T${a.startTime}:00Z`).getTime() - new Date(`${b.startDate}T${b.startTime}:00Z`).getTime())[0];
+  }, [workshops]);
+
   // --- Handlers ---
 
   const showToast = (message: string, type: 'success' | 'warning' | 'error' = 'success') => {
@@ -112,13 +120,15 @@ const PublicApp: React.FC = () => {
     setToasts(prev => [...prev, { id, message, type }]);
   };
 
-  const handleLoginClick = () => {
+  const handleLoginClick = (hideRegister = false) => {
     setAuthModalInitialView('login');
+    setAuthModalHideRegister(hideRegister);
     setIsAuthModalOpen(true);
   };
 
   const handleRegisterClick = () => {
     setAuthModalInitialView('register');
+    setAuthModalHideRegister(false);
     setIsAuthModalOpen(true);
   };
 
@@ -156,7 +166,7 @@ const PublicApp: React.FC = () => {
   const handleLiveStreamCardLogin = () => {
       setPendingHubAction('live'); // Set intent to 'live'
       setReturnToHub(false); // Do not return to hub on cancel, just stay on page
-      handleLoginClick();
+      handleLoginClick(true);
   };
 
   // Handles Auth Modal Closing (X button)
@@ -193,7 +203,7 @@ const PublicApp: React.FC = () => {
 
   const handleNavigate = (target: Page | string) => {
     setIsMobileMenuOpen(false);
-    if (target === Page.PROFILE) { if (currentUser) setIsProfileOpen(true); else handleLoginClick(); }
+    if (target === Page.PROFILE) { if (currentUser) setIsProfileOpen(true); else handleLoginClick(true); }
     else if (target === Page.REVIEWS) setIsReviewsModalOpen(true);
     else if (target === Page.PARTNERS) setIsPartnersModalOpen(true);
     else if (target === Page.BOUTIQUE) { setBoutiqueInitialView('products'); setIsBoutiqueModalOpen(true); }
@@ -223,7 +233,7 @@ const PublicApp: React.FC = () => {
 
   const removeFromCart = (productId: number) => { setCart(prev => { const newCart = new Map(prev); newCart.delete(productId); return newCart; }); };
 
-  const handleCheckout = () => { if (currentUser) { setIsBoutiqueModalOpen(false); setIsProductCheckoutOpen(true); } else { setIsBoutiqueModalOpen(false); handleLoginClick(); } };
+  const handleCheckout = () => { if (currentUser) { setIsBoutiqueModalOpen(false); setIsProductCheckoutOpen(true); } else { setIsBoutiqueModalOpen(false); handleLoginClick(false); } };
 
   const handleProductOrderConfirm = (isCard: boolean) => {
     if (!currentUser) return;
@@ -240,7 +250,7 @@ const PublicApp: React.FC = () => {
   const handleEnrollRequest = (workshop: Workshop, selectedPackage: Package | null) => {
     setOpenedWorkshopId(null);
     const intent: PaymentIntent = { type: 'workshop', item: workshop, pkg: selectedPackage || undefined };
-    if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(); }
+    if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(false); }
   };
 
   const handleGiftRequest = (workshop: Workshop, selectedPackage: Package | null) => {
@@ -277,7 +287,7 @@ const PublicApp: React.FC = () => {
       if (!giftModalIntent) return;
       const { workshop, pkg } = giftModalIntent;
       const intent: PaymentIntent = { type: data.type === 'fund' ? 'payItForward' : 'gift', item: workshop, pkg: pkg || undefined, amount: data.totalAmount, recipientDetails: data };
-      if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(); }
+      if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(false); }
   };
 
   const isHomePage = currentPage === Page.WORKSHOPS;
@@ -333,12 +343,13 @@ const PublicApp: React.FC = () => {
         onClose={handleAuthModalClose} 
         onSuccess={handleAuthModalSuccess} 
         initialView={authModalInitialView}
+        showRegisterView={!authModalHideRegister}
       />
       {openedWorkshopId && <WorkshopDetailsModal workshop={workshops.find(w => w.id === openedWorkshopId)!} onClose={() => setOpenedWorkshopId(null)} onEnrollRequest={handleEnrollRequest} onGiftRequest={handleGiftRequest} showToast={showToast} />}
-      {isPaymentModalOpen && paymentModalIntent && <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} onCardPaymentSubmit={() => handlePaymentSubmit('CARD')} onBankPaymentSubmit={() => handlePaymentSubmit('BANK_TRANSFER')} itemTitle={paymentModalIntent.item.title || paymentModalIntent.item.subject} itemPackageName={paymentModalIntent.pkg?.name} amount={paymentModalIntent.amount || 0} currentUser={currentUser} onRequestLogin={() => { setIsPaymentModalOpen(false); handleLoginClick(); setPostLoginPaymentIntent(paymentModalIntent); }} paymentType={paymentModalIntent.type} />}
+      {isPaymentModalOpen && paymentModalIntent && <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} onCardPaymentSubmit={() => handlePaymentSubmit('CARD')} onBankPaymentSubmit={() => handlePaymentSubmit('BANK_TRANSFER')} itemTitle={paymentModalIntent.item.title || paymentModalIntent.item.subject} itemPackageName={paymentModalIntent.pkg?.name} amount={paymentModalIntent.amount || 0} currentUser={currentUser} onRequestLogin={() => { setIsPaymentModalOpen(false); handleLoginClick(false); setPostLoginPaymentIntent(paymentModalIntent); }} paymentType={paymentModalIntent.type} />}
       {isGiftModalOpen && giftModalIntent && <UnifiedGiftModal workshop={giftModalIntent.workshop} selectedPackage={giftModalIntent.pkg} onClose={() => setIsGiftModalOpen(false)} onProceed={handleGiftProceed} />}
       {isBoutiqueModalOpen && <BoutiqueModal isOpen={isBoutiqueModalOpen} onClose={() => setIsBoutiqueModalOpen(false)} cart={cart} onAddToCart={handleAddToCart} updateCartQuantity={updateCartQuantity} removeFromCart={removeFromCart} onCheckout={handleCheckout} initialView={boutiqueInitialView} />}
-      {isProductCheckoutOpen && <ProductCheckoutModal isOpen={isProductCheckoutOpen} onClose={() => setIsProductCheckoutOpen(false)} cart={cart} onConfirm={() => handleProductOrderConfirm(false)} onCardPaymentConfirm={() => handleProductOrderConfirm(true)} onRequestLogin={() => { setIsProductCheckoutOpen(false); handleLoginClick(); }} currentUser={currentUser} />}
+      {isProductCheckoutOpen && <ProductCheckoutModal isOpen={isProductCheckoutOpen} onClose={() => setIsProductCheckoutOpen(false)} cart={cart} onConfirm={() => handleProductOrderConfirm(false)} onCardPaymentConfirm={() => handleProductOrderConfirm(true)} onRequestLogin={() => { setIsProductCheckoutOpen(false); handleLoginClick(false); }} currentUser={currentUser} />}
       {isProfileOpen && <ProfilePage isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={currentUser} onZoomRedirect={(link) => setZoomRedirectLink(link)} onPlayRecording={(w, r) => setWatchData({ workshop: w, recording: r })} onViewAttachment={(note) => setAttachmentToView(note)} onViewRecommendedWorkshop={(id) => { setIsProfileOpen(false); setOpenedWorkshopId(id); }} showToast={showToast} onPayForConsultation={() => {}} onViewInvoice={(details) => setInvoiceToView(details)} />}
       
       {isVideoModalOpen && <VideoModal isOpen={isVideoModalOpen} onClose={() => setIsVideoModalOpen(false)} />}
@@ -362,7 +373,7 @@ const PublicApp: React.FC = () => {
                 } else { 
                     setReturnToHub(true);
                     setPendingHubAction('profile');
-                    handleLoginClick(); 
+                    handleLoginClick(true); 
                 } 
             } else if (target === 'live') { 
                 if (currentUser) {
@@ -370,13 +381,14 @@ const PublicApp: React.FC = () => {
                 } else {
                     setReturnToHub(true);
                     setPendingHubAction('live');
-                    handleLoginClick();
+                    handleLoginClick(true);
                 }
             } else if (target === 'new') { 
                 setCurrentPage(Page.WORKSHOPS); 
                 setTimeout(() => handleScrollToSection('workshops_section'), 100); 
             } 
         }} 
+        hasActiveLiveStream={!!activeLiveWorkshop && !!activeLiveWorkshop.zoomLink}
       />}
       {legalModalContent && <LegalModal isOpen={!!legalModalContent} onClose={() => setLegalModalContent(null)} title={legalModalContent.title} content={legalModalContent.content} />}
       <Chatbot />

@@ -6,7 +6,7 @@ import { useUser } from '../context/UserContext';
 import NotificationsPanel from './NotificationsPanel';
 
 interface HeaderProps {
-  onLoginClick: () => void;
+  onLoginClick: (hideRegister?: boolean) => void;
   onRegisterClick: () => void; // Kept for interface compatibility
   onNavigate: (target: Page | string) => void;
   onScrollToSection: (sectionId: string) => void;
@@ -129,7 +129,8 @@ const Header: React.FC<HeaderProps> = ({
       if (user) {
           onNavigate(Page.PROFILE);
       } else {
-          onLoginClick();
+          // Hide registration when clicking profile
+          onLoginClick(true);
       }
   };
   
@@ -237,7 +238,7 @@ const Header: React.FC<HeaderProps> = ({
                         </button>
                     ) : (
                         <button 
-                            onClick={onLoginClick} 
+                            onClick={() => onLoginClick(false)} 
                             className={mobileIconButtonClasses}
                             title="تسجيل الدخول"
                         >
@@ -342,7 +343,7 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
             ) : (
               <div className="hidden md:flex gap-3">
-                <button onClick={onLoginClick} className={primaryButtonClasses}>
+                <button onClick={() => onLoginClick(false)} className={primaryButtonClasses}>
                   تسجيل دخول / انشاء حساب
                 </button>
               </div>

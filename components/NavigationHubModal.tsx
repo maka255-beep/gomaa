@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { UserCircleIcon, VideoIcon, AcademicCapIcon, UsersIcon } from './icons';
 
@@ -5,6 +6,7 @@ interface NavigationHubModalProps {
   isOpen: boolean;
   userFullName?: string;
   onNavigate: (target: 'new' | 'recorded' | 'profile' | 'live') => void;
+  hasActiveLiveStream?: boolean;
 }
 
 interface NavigationButtonProps {
@@ -12,24 +14,40 @@ interface NavigationButtonProps {
     icon: React.FC<{className?: string}>;
     title: string;
     subtitle?: string;
+    isLive?: boolean;
 }
 
-const NavigationButton: React.FC<NavigationButtonProps> = ({ onClick, icon: Icon, title, subtitle }) => (
+const NavigationButton: React.FC<NavigationButtonProps> = ({ onClick, icon: Icon, title, subtitle, isLive }) => (
     <button 
         onClick={onClick}
-        className="relative group bg-theme-gradient-card backdrop-blur-lg border border-slate-700 rounded-2xl p-6 text-center transition-all duration-300 hover:border-fuchsia-400/80 hover:-translate-y-2 hover:shadow-2xl hover:shadow-fuchsia-500/30 overflow-hidden"
+        className={`relative group backdrop-blur-lg border rounded-2xl p-6 text-center transition-all duration-300 overflow-hidden ${
+            isLive 
+            ? 'bg-gradient-to-b from-purple-900/80 to-fuchsia-900/80 border-fuchsia-500 shadow-[0_0_30px_rgba(219,39,119,0.3)] hover:scale-105' 
+            : 'bg-theme-gradient-card border-slate-700 hover:border-fuchsia-400/80 hover:-translate-y-2 hover:shadow-2xl hover:shadow-fuchsia-500/30'
+        }`}
     >
+        {/* Live Indicator Badge */}
+        {isLive && (
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-red-600 text-white text-[9px] font-black px-2 py-1 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.6)] animate-pulse border border-red-400/50 tracking-wider z-10">
+                <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                <span>LIVE NOW</span>
+            </div>
+        )}
+
         {/* Glowing orb effect */}
-        <div className="absolute -top-8 -right-8 w-32 h-32 bg-fuchsia-500/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+        <div className={`absolute -top-8 -right-8 w-32 h-32 rounded-full blur-3xl transition-opacity duration-500 ${isLive ? 'bg-red-500/20 opacity-50' : 'bg-fuchsia-500/20 opacity-0 group-hover:opacity-100'}`}></div>
         
         <div className="relative">
-            <div className="relative mx-auto w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-slate-800/50 border-2 border-slate-600 group-hover:border-fuchsia-400/50 transition-colors">
-                <div className="absolute inset-0 bg-fuchsia-500/30 rounded-full blur-xl opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
-                <Icon className="w-8 h-8 text-fuchsia-300 transition-transform duration-300 group-hover:scale-110" />
+            <div className={`relative mx-auto w-16 h-16 mb-4 flex items-center justify-center rounded-full border-2 transition-colors ${
+                isLive 
+                ? 'bg-red-500/20 border-red-500 text-red-200' 
+                : 'bg-slate-800/50 border-slate-600 group-hover:border-fuchsia-400/50'
+            }`}>
+                <Icon className={`w-8 h-8 transition-transform duration-300 group-hover:scale-110 ${isLive ? 'text-white' : 'text-fuchsia-300'}`} />
             </div>
-            <h3 className="text-base font-bold text-white mb-1 group-hover:text-fuchsia-300 transition-colors">{title}</h3>
+            <h3 className={`text-base font-bold mb-1 transition-colors ${isLive ? 'text-white' : 'text-white group-hover:text-fuchsia-300'}`}>{title}</h3>
             {subtitle && (
-                <p className="text-slate-400 mt-1" style={{ fontSize: '13px' }}>
+                <p className={`mt-1 text-[13px] ${isLive ? 'text-fuchsia-200' : 'text-slate-400'}`}>
                     {subtitle}
                 </p>
             )}
@@ -38,7 +56,7 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({ onClick, icon: Icon
 );
 
 
-const NavigationHubModal: React.FC<NavigationHubModalProps> = ({ isOpen, userFullName, onNavigate }) => {
+const NavigationHubModal: React.FC<NavigationHubModalProps> = ({ isOpen, userFullName, onNavigate, hasActiveLiveStream }) => {
   if (!isOpen) {
     return null;
   }
@@ -64,8 +82,9 @@ const NavigationHubModal: React.FC<NavigationHubModalProps> = ({ isOpen, userFul
           <NavigationButton 
             onClick={() => handleNavigation('live')}
             icon={VideoIcon}
-            title="البث المباشر - ZOOM"
-            subtitle="( خاص بالمشتركات )"
+            title={hasActiveLiveStream ? "دخول البث الآن" : "ورش البث المباشر"}
+            subtitle={hasActiveLiveStream ? "اضغط للانضمام فوراً" : "( خاص بالمشتركات )"}
+            isLive={hasActiveLiveStream}
           />
           <NavigationButton 
             onClick={() => handleNavigation('profile')}
@@ -77,6 +96,7 @@ const NavigationHubModal: React.FC<NavigationHubModalProps> = ({ isOpen, userFul
             onClick={() => handleNavigation('new')}
             icon={AcademicCapIcon}
             title="استكشف الورش"
+            subtitle="( التسجيل في الورش )"
           />
         </div>
       </div>

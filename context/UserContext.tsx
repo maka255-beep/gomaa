@@ -674,7 +674,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // --- Expense Actions ---
     const addExpense = (expense: Omit<Expense, 'id'>) => {
-        const newExpense: Expense = { ...expense, id: `exp-${Date.now()}`, date: new Date().toISOString() };
+        const newExpense: Expense = { ...expense, id: `exp-${Date.now()}` };
         setExpenses(prev => [newExpense, ...prev]);
     };
     const updateExpense = (expense: Expense) => setExpenses(prev => prev.map(e => e.id === expense.id ? expense : e));

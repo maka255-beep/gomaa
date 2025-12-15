@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useUser } from '../context/UserContext';
 import { CloseIcon, DownloadIcon, TrashIcon, RestoreIcon, PencilIcon, ChevronDownIcon, PrintIcon } from './icons';
@@ -20,6 +21,7 @@ export const ExpensesModal: React.FC<ExpensesModalProps> = ({ isOpen, onClose })
     // Form state
     const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
     const [title, setTitle] = useState('');
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [invoiceNumber, setInvoiceNumber] = useState('');
     const [workshopId, setWorkshopId] = useState(''); // Empty string for 'General'
     const [supplier, setSupplier] = useState('');
@@ -55,6 +57,7 @@ export const ExpensesModal: React.FC<ExpensesModalProps> = ({ isOpen, onClose })
     useEffect(() => {
         if (editingExpense) {
             setTitle(editingExpense.title);
+            setDate(editingExpense.date.split('T')[0]);
             setInvoiceNumber(editingExpense.invoiceNumber || '');
             setWorkshopId(editingExpense.workshopId?.toString() || '');
             setSupplier(editingExpense.supplier);
@@ -193,6 +196,7 @@ export const ExpensesModal: React.FC<ExpensesModalProps> = ({ isOpen, onClose })
 
     const resetForm = () => {
         setTitle('');
+        setDate(new Date().toISOString().split('T')[0]);
         setInvoiceNumber('');
         setWorkshopId('');
         setSupplier('');
@@ -214,6 +218,7 @@ export const ExpensesModal: React.FC<ExpensesModalProps> = ({ isOpen, onClose })
         
         const expenseData = {
             title,
+            date: new Date(date).toISOString(),
             invoiceNumber: invoiceNumber || undefined,
             workshopId: workshopId ? parseInt(workshopId) : undefined,
             supplier,
@@ -300,6 +305,7 @@ export const ExpensesModal: React.FC<ExpensesModalProps> = ({ isOpen, onClose })
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                                 <div className="space-y-4">
                                     <div><label className={labelClass}>عنوان الفاتورة</label><input type="text" value={title} onChange={e => setTitle(e.target.value)} className={inputClass} required /></div>
+                                    <div><label className={labelClass}>التاريخ</label><input type="date" value={date} onChange={e => setDate(e.target.value)} className={inputClass} required /></div>
                                     <div><label className={labelClass}>رقم الفاتورة (اختياري)</label><input type="text" value={invoiceNumber} onChange={e => setInvoiceNumber(toEnglishDigits(e.target.value))} className={inputClass} /></div>
                                     <div><label className={labelClass}>الشركة الموردة</label><input type="text" value={supplier} onChange={e => setSupplier(e.target.value)} className={inputClass} required /></div>
                                     <div>

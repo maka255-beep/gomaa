@@ -258,8 +258,7 @@ const Header: React.FC<HeaderProps> = ({
                 title="الملف الشخصي"
             >
                 <UserIcon className="w-5 h-5" />
-                <span className="text-xs font-bold hidden sm:inline">الملف الشخصي</span>
-                <span className="text-[10px] font-bold sm:hidden">ملفي</span>
+                <span className="text-xs font-bold">الملف الشخصي</span>
             </button>
 
             {/* Mobile Notifications Icon - Always Visible (Prompts guest message if guest) */}

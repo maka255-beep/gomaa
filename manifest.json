@@ -3,6 +3,8 @@
   "short_name": "Nawaya",
   "name": "Nawaya Events",
   "description": "منصة رائدة لإدارة الندوات والفعاليات وورش العمل التطويرية",
+  "id": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/vite.svg",

@@ -86,8 +86,8 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
           </div>
         )}
         
-        {/* Search and Filter UI - Updated for Light Mode */}
-        <div id="workshops_section" className="my-8 p-4 bg-white shadow-xl rounded-2xl border border-slate-200 relative overflow-hidden">
+        {/* Search and Filter UI - Reverted to White/Light Theme */}
+        <div id="workshops_section" className="my-8 p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/10 relative overflow-hidden">
             <div className="flex flex-col md:flex-row gap-4 relative z-10">
                 <div className="relative flex-grow">
                     <input
@@ -95,7 +95,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
                         placeholder="ابحث عن ورشة أو مدرب..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full p-3 pr-10 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500 transition-all shadow-inner"
+                        className="w-full p-3 pr-10 bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500 transition-all shadow-inner"
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <svg className="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -103,12 +103,12 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
                         </svg>
                     </div>
                 </div>
-                <div className="flex flex-wrap items-center justify-center gap-2 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
+                <div className="flex flex-wrap items-center justify-center gap-2 bg-white/80 p-1.5 rounded-lg border border-slate-200">
                     {filters.map(filter => (
                         <button
                             key={filter}
                             onClick={() => setActiveFilter(filter)}
-                            className={`px-4 py-2 text-sm font-bold rounded-md transition-all duration-300 ${activeFilter === filter ? 'bg-gradient-to-r from-purple-800 to-pink-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-200 hover:text-slate-800'}`}
+                            className={`px-4 py-2 text-sm font-bold rounded-md transition-all duration-300 ${activeFilter === filter ? 'bg-gradient-to-r from-purple-800 to-pink-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'}`}
                         >
                             {filterLabels[filter]}
                         </button>
@@ -118,7 +118,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
         </div>
 
         {(filteredAndSearchedWorkshops.length === 0) ? (
-             <div className="text-center text-lg sm:text-2xl text-slate-500 bg-slate-50 py-16 rounded-xl border border-slate-200">
+             <div className="text-center text-lg sm:text-2xl text-slate-300 bg-white/5 py-16 rounded-xl border border-white/10">
               {searchTerm || activeFilter !== 'all'
                 ? 'عفواً، لم نجد ورشات تطابق بحثك. حاول بكلمات أخرى.'
                 : 'انتظرونا قريبا...'
@@ -129,7 +129,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
             {newWorkshops.length > 0 && (
               <section id="live_events" className="mb-12 sm:mb-16 text-right">
                 <div className="relative mb-8">
-                  <h2 className="text-xl font-bold text-slate-900 pb-2 tracking-wider inline-flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-white pb-2 tracking-wider inline-flex items-center gap-2">
                     <span className="w-1.5 h-8 bg-fuchsia-600 rounded-full"></span>
                     الورش المباشرة
                   </h2>
@@ -145,7 +145,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
             {recordedWorkshops.length > 0 && (
               <section id="record_events" className="text-right">
                 <div className="relative mb-8">
-                  <h2 className="text-xl font-bold text-slate-900 pb-2 tracking-wider inline-flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-white pb-2 tracking-wider inline-flex items-center gap-2">
                     <span className="w-1.5 h-8 bg-violet-600 rounded-full"></span>
                     الورش المسجلة
                   </h2>

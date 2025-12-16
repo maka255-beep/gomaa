@@ -172,6 +172,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClo
   const isPhoneDisabled = !selectedCountryCode;
   const isOtherCountrySelected = selectedCountryCode === 'OTHER';
   
+  const inputClass = "w-full p-3 bg-white border border-slate-300 rounded-xl focus:ring-1 focus:ring-fuchsia-500 focus:border-fuchsia-500 text-slate-900 placeholder-slate-400 transition-all";
+
   const phoneInputSection = (
     <div>
       <label className="block mb-2 text-sm font-medium">رقم الهاتف</label>
@@ -185,7 +187,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClo
             const currentFullPhoneNumber = newCode === 'OTHER' ? phone : newCode + phone;
             handleCredentialBlur('phone', currentFullPhoneNumber);
           }}
-          className="w-full p-3 bg-slate-700/50 border border-slate-600 rounded-md"
+          className={inputClass}
         >
           <option value="" disabled>اختر الدولة</option>
           <optgroup label="دول الخليج">
@@ -214,14 +216,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClo
                 setLoginHint(null); // Reset hint while typing
             }}
             onBlur={() => handleCredentialBlur('phone', fullPhoneNumber)}
-            className={`w-full p-3 bg-slate-700/50 border border-slate-600 rounded-md ltr-input disabled:cursor-not-allowed`}
+            className={`${inputClass} ltr-input disabled:cursor-not-allowed`}
             required 
             disabled={isPhoneDisabled}
             placeholder={isPhoneDisabled ? "اختر الدولة أولاً" : (isOtherCountrySelected ? "2XXXXXX" : "5XXXXXXX")}
         />
       </div>
       {isOtherCountrySelected && (
-        <p className="text-sm text-white font-bold mt-2 text-center">
+        <p className="text-sm text-slate-300 font-bold mt-2 text-center">
             اكتب رقم التليفون مع الكود من غير + و 00
         </p>
       )}
@@ -241,7 +243,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClo
             {isRegister && (
             <div>
                 <label className="block mb-2 text-sm font-medium flex items-center gap-x-2"><UserIcon className="w-5 h-5"/> الاسم الكامل</label>
-                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full p-3 bg-slate-700/50 border border-slate-600 rounded-md" required />
+                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} className={inputClass} required />
             </div>
             )}
             <div>
@@ -254,7 +256,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, isClo
                     setLoginHint(null); // Reset hint while typing
                 }} 
                 onBlur={() => handleCredentialBlur('email', email)} 
-                className={`w-full p-3 bg-slate-700/50 border border-slate-600 rounded-md ltr-input ${emailWarning ? 'border-red-500' : ''}`} 
+                className={`${inputClass} ltr-input ${emailWarning ? 'border-red-500' : ''}`} 
                 required 
             />
             {emailWarning && <p className="text-xs text-red-400 mt-1">الرجاء استخدام الأحرف الإنجليزية فقط في هذا الحقل.</p>}

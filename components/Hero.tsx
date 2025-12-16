@@ -10,10 +10,10 @@ interface HeroProps {
 
 const CountdownUnit: React.FC<{ value: number; label: string }> = ({ value, label }) => (
     <div className="flex flex-col items-center mx-1.5 sm:mx-2">
-        <span className="text-lg sm:text-xl font-bold text-black tracking-tight">
+        <span className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
             {value.toString().padStart(2, '0')}
         </span>
-        <span className="text-[8px] text-slate-500 uppercase tracking-wide mt-0.5 font-bold">{label}</span>
+        <span className="text-[8px] text-purple-600 uppercase tracking-wide mt-0.5 font-bold">{label}</span>
     </div>
 );
 
@@ -69,26 +69,26 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
             <div className="container mx-auto px-4 relative z-10">
                 {nextWorkshop && timeLeft ? (
                     <div className="animate-fade-in-up max-w-xl mx-auto">
-                        {/* White Card Container for Black Text visibility */}
-                        <div className="bg-white rounded-xl p-4 shadow-xl relative overflow-hidden text-slate-900 border border-slate-100">
+                        {/* White Card */}
+                        <div className="bg-white rounded-xl p-4 shadow-2xl relative overflow-hidden text-slate-800 border border-slate-100">
                             
                             <div className="relative z-10">
                                 <div className="inline-block mb-2">
-                                    <span className="bg-fuchsia-100 text-fuchsia-700 text-[8px] font-bold px-2 py-0.5 rounded-full tracking-wide">
+                                    <span className="bg-purple-100 text-purple-700 border border-purple-200 text-[8px] font-bold px-2 py-0.5 rounded-full tracking-wide">
                                         ✨ الورشة القادمة
                                     </span>
                                 </div>
                                 
-                                <h1 className="text-lg sm:text-xl font-black text-black mb-1 leading-snug">
+                                <h1 className="text-lg sm:text-xl font-black text-slate-900 mb-1 leading-snug">
                                     {nextWorkshop.title}
                                 </h1>
                                 
-                                <p className="text-[10px] sm:text-xs text-slate-600 mb-4 font-bold flex items-center justify-center gap-1">
-                                    <span className="text-fuchsia-600">تقديم:</span> 
+                                <p className="text-[10px] sm:text-xs text-slate-500 mb-4 font-bold flex items-center justify-center gap-1">
+                                    <span className="text-pink-600">تقديم:</span> 
                                     {nextWorkshop.instructor}
                                 </p>
                                 
-                                {/* Countdown with Black Numbers and Small Font */}
+                                {/* Countdown */}
                                 <div className="flex justify-center items-start gap-2 sm:gap-3 mb-4" dir="ltr">
                                     <CountdownUnit value={timeLeft.days || 0} label="أيام" />
                                     <span className="text-lg sm:text-xl font-light text-slate-300 mt-[-2px]">:</span>
@@ -113,11 +113,11 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                     </div>
                 ) : (
                     <div className="py-4 max-w-xl mx-auto">
-                        <div className="bg-white rounded-xl p-5 shadow-xl border border-slate-100">
-                            <h1 className="text-xl sm:text-2xl font-black mb-2 text-black leading-tight">
+                        <div className="bg-white rounded-xl p-5 shadow-2xl border border-slate-100 text-slate-800">
+                            <h1 className="text-xl sm:text-2xl font-black mb-2 text-slate-900 leading-tight">
                                 نوايا.. حيث يبدأ الأثر
                             </h1>
-                            <p className="text-[10px] sm:text-xs text-slate-600 max-w-md mx-auto mb-4 font-medium leading-relaxed">
+                            <p className="text-[10px] sm:text-xs text-slate-500 max-w-md mx-auto mb-4 font-medium leading-relaxed">
                                 اكتشف ورش عمل مباشرة ومسجلة تمنحك المهارات والمعرفة لتحقيق أهدافك.
                             </p>
                             <button

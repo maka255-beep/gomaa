@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
-import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon, InformationCircleIcon, LightBulbIcon, LoginIcon } from './icons';
+import { CloseIcon, BellIcon, ChevronDownIcon, ShoppingCartIcon, GlobeAltIcon, ArrowLeftOnRectangleIcon, VideoIcon, CollectionIcon, InstagramIcon, ChatBubbleIcon, ChatBubbleLeftRightIcon, UsersIcon, UserIcon, InformationCircleIcon, LightBulbIcon, LoginIcon, PlusCircleIcon } from './icons';
 import { useUser } from '../context/UserContext';
 import NotificationsPanel from './NotificationsPanel';
 
@@ -54,7 +54,44 @@ const Header: React.FC<HeaderProps> = ({
   const mobileNotificationContainerRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   
+  // Install App State
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
+
   const unreadCount = user ? notifications.filter(n => !n.read).length : 0;
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+      // Update UI notify the user they can install the PWA
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = () => {
+    if (!deferredPrompt) return;
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    deferredPrompt.userChoice.then((choiceResult: any) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        setShowInstallButton(false);
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      setDeferredPrompt(null);
+    });
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -180,6 +217,17 @@ const Header: React.FC<HeaderProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
+                    {/* Install Button Mobile */}
+                    {showInstallButton && (
+                        <button 
+                            onClick={handleInstallClick}
+                            className="flex items-center gap-1 bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white text-[10px] font-bold py-1.5 px-2.5 rounded-lg shadow-lg animate-pulse"
+                        >
+                            <PlusCircleIcon className="w-3.5 h-3.5" />
+                            <span>تطبيق</span>
+                        </button>
+                    )}
+
                     <button 
                         onClick={handleDrHopeMenuToggle} 
                         className={`mobile-menu-trigger flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full py-1.5 px-3 transition-all duration-300 ${isMobileMenuOpen ? 'bg-fuchsia-500/20 border-fuchsia-500/50 text-white' : 'text-slate-200'}`}
@@ -241,6 +289,17 @@ const Header: React.FC<HeaderProps> = ({
         <nav className="hidden md:flex container mx-auto px-6 h-24 items-center justify-between">
           <div className="flex justify-start items-center gap-3 flex-1">
             <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} />
+            
+            {/* Install Button Desktop */}
+            {showInstallButton && (
+                <button 
+                    onClick={handleInstallClick}
+                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-full transition-all border border-white/20 hover:border-fuchsia-500/50 animate-bounce-slow"
+                >
+                    <PlusCircleIcon className="w-5 h-5 text-fuchsia-400" />
+                    <span className="text-sm">تحميل التطبيق</span>
+                </button>
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-x-6">
@@ -385,6 +444,13 @@ const Header: React.FC<HeaderProps> = ({
         }
         .animate-slide-down {
             animation: slide-down 0.3s ease-out forwards;
+        }
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 2s infinite;
         }
       `}</style>
     </>

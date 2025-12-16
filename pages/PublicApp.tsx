@@ -36,14 +36,10 @@ import { isWorkshopExpired } from '../utils';
 const PublicApp: React.FC = () => {
   const { currentUser, workshops, products, placeOrder, addSubscription, addPendingGift, donateToPayItForward } = useUser();
   
-  // Navigation State
   const [currentPage, setCurrentPage] = useState<Page>(Page.WORKSHOPS);
-  
-  // UI State
   const [showIntro, setShowIntro] = useState(true);
   const [toasts, setToasts] = useState<{ id: string, message: string, type: 'success' | 'warning' | 'error' }[]>([]);
 
-  // Modals & Menus State
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalInitialView, setAuthModalInitialView] = useState<'login' | 'register'>('login');
@@ -79,17 +75,14 @@ const PublicApp: React.FC = () => {
   const [paymentModalIntent, setPaymentModalIntent] = useState<PaymentIntent | null>(null);
   const [giftModalIntent, setGiftModalIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
   
-  // Authentication & Navigation Flow State
   const [postLoginPaymentIntent, setPostLoginPaymentIntent] = useState<PaymentIntent | null>(null);
   const [postLoginGiftIntent, setPostLoginGiftIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
   
-  // New state to handle Navigation Hub logic
   const [returnToHub, setReturnToHub] = useState(false);
   const [pendingHubAction, setPendingHubAction] = useState<'profile' | 'live' | null>(null);
   
   const initialHubOpenRef = useRef(false);
 
-  // --- Effects ---
   useEffect(() => { localStorage.setItem('nawaya_cart', JSON.stringify(Array.from(cart.entries()))); }, [cart]);
   useEffect(() => { const timer = setTimeout(() => setShowIntro(false), 3500); return () => clearTimeout(timer); }, []);
   useEffect(() => { 
@@ -106,14 +99,11 @@ const PublicApp: React.FC = () => {
       }
   }, [currentUser, postLoginPaymentIntent, postLoginGiftIntent]);
 
-  // Determine if there is an active live stream right now
   const activeLiveWorkshop = useMemo(() => {
       return workshops
           .filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w))
           .sort((a, b) => new Date(`${a.startDate}T${a.startTime}:00Z`).getTime() - new Date(`${b.startDate}T${b.startTime}:00Z`).getTime())[0];
   }, [workshops]);
-
-  // --- Handlers ---
 
   const showToast = (message: string, type: 'success' | 'warning' | 'error' = 'success') => {
     const id = Date.now().toString();
@@ -122,7 +112,7 @@ const PublicApp: React.FC = () => {
 
   const handleLoginClick = (hideRegister = false) => {
     setAuthModalInitialView('login');
-    setAuthModalHideRegister(hideRegister);
+    setAuthModalHideRegister(hideRegister); // Sets the state
     setIsAuthModalOpen(true);
   };
 
@@ -132,7 +122,6 @@ const PublicApp: React.FC = () => {
     setIsAuthModalOpen(true);
   };
 
-  // Helper to process Live Stream Access Logic
   const processLiveStreamAccess = (user: User) => {
       const nextLiveWorkshop = workshops
           .filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w))
@@ -162,41 +151,33 @@ const PublicApp: React.FC = () => {
       }
   };
 
-  // Dedicated handler for clicking "Enter Broadcast" from the Card
   const handleLiveStreamCardLogin = () => {
-      setPendingHubAction('live'); // Set intent to 'live'
-      setReturnToHub(false); // Do not return to hub on cancel, just stay on page
+      setPendingHubAction('live');
+      setReturnToHub(false); 
       handleLoginClick(true);
   };
 
-  // Handles Auth Modal Closing (X button)
   const handleAuthModalClose = () => {
       setIsAuthModalOpen(false);
-      // If the user came from Navigation Hub and closed without logging in
       if (returnToHub) {
           setReturnToHub(false);
           setPendingHubAction(null);
-          // Small delay to ensure smooth transition
           setTimeout(() => setIsNavigationHubOpen(true), 100);
       } else {
-          // If simply closing modal and had a pending action (like from Card), clear it
           setPendingHubAction(null);
       }
   };
 
-  // Handles Auth Modal Success (Login/Register)
   const handleAuthModalSuccess = (user: User) => {
       setIsAuthModalOpen(false);
       showToast(`مرحباً ${user.fullName}`);
       
-      // Check for pending actions (Shared between Hub and Card)
       if (pendingHubAction === 'profile') {
           setIsProfileOpen(true);
       } else if (pendingHubAction === 'live') {
           processLiveStreamAccess(user);
       }
       
-      // Cleanup
       setReturnToHub(false);
       setPendingHubAction(null);
   };
@@ -343,7 +324,7 @@ const PublicApp: React.FC = () => {
         onClose={handleAuthModalClose} 
         onSuccess={handleAuthModalSuccess} 
         initialView={authModalInitialView}
-        showRegisterView={!authModalHideRegister}
+        showRegisterView={!authModalHideRegister} // Pass the state here
       />
       {openedWorkshopId && <WorkshopDetailsModal workshop={workshops.find(w => w.id === openedWorkshopId)!} onClose={() => setOpenedWorkshopId(null)} onEnrollRequest={handleEnrollRequest} onGiftRequest={handleGiftRequest} showToast={showToast} />}
       {isPaymentModalOpen && paymentModalIntent && <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} onCardPaymentSubmit={() => handlePaymentSubmit('CARD')} onBankPaymentSubmit={() => handlePaymentSubmit('BANK_TRANSFER')} itemTitle={paymentModalIntent.item.title || paymentModalIntent.item.subject} itemPackageName={paymentModalIntent.pkg?.name} amount={paymentModalIntent.amount || 0} currentUser={currentUser} onRequestLogin={() => { setIsPaymentModalOpen(false); handleLoginClick(false); setPostLoginPaymentIntent(paymentModalIntent); }} paymentType={paymentModalIntent.type} />}

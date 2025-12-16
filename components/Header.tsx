@@ -7,7 +7,7 @@ import NotificationsPanel from './NotificationsPanel';
 
 interface HeaderProps {
   onLoginClick: (hideRegister?: boolean) => void;
-  onRegisterClick: () => void; // Kept for interface compatibility
+  onRegisterClick: () => void;
   onNavigate: (target: Page | string) => void;
   onScrollToSection: (sectionId: string) => void;
   onShowVideo: () => void;
@@ -56,19 +56,15 @@ const Header: React.FC<HeaderProps> = ({
   
   const unreadCount = user ? notifications.filter(n => !n.read).length : 0;
 
-  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Close desktop panel
       if (window.innerWidth >= 768 && desktopNotificationContainerRef.current && !desktopNotificationContainerRef.current.contains(event.target as Node)) {
         setIsNotificationsPanelOpen(false);
         setShowGuestNotificationMessage(false);
       }
-      // Close mobile guest message
       if (window.innerWidth < 768 && mobileNotificationContainerRef.current && !mobileNotificationContainerRef.current.contains(event.target as Node)) {
          setShowGuestNotificationMessage(false);
       }
-      // Close mobile menu if clicked outside
       if (isMobileMenuOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node) && !(event.target as Element).closest('.mobile-menu-trigger')) {
           setIsMobileMenuOpen(false);
       }
@@ -129,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({
       if (user) {
           onNavigate(Page.PROFILE);
       } else {
-          // Hide registration when clicking profile
+          // KEY CHANGE: Pass true to hide registration link for profile login
           onLoginClick(true);
       }
   };
@@ -147,7 +143,6 @@ const Header: React.FC<HeaderProps> = ({
 
   const headerBgClass = 'bg-theme-header-gradient shadow-xl border-b border-white/10';
 
-  // Component for Guest Notification Message
   const GuestNotificationMessage = () => (
       <div className="absolute top-full left-0 mt-3 w-72 bg-slate-900/95 backdrop-blur-xl border border-fuchsia-500/30 rounded-xl shadow-2xl p-4 z-50 text-right animate-fade-in-up">
           <div className="flex items-start gap-3">
@@ -162,7 +157,7 @@ const Header: React.FC<HeaderProps> = ({
                   <button 
                       onClick={() => {
                           setShowGuestNotificationMessage(false);
-                          onLoginClick();
+                          onLoginClick(false);
                       }}
                       className="w-full bg-fuchsia-600 hover:bg-fuchsia-500 text-white text-xs font-bold py-2 rounded-lg transition-colors"
                   >
@@ -170,34 +165,21 @@ const Header: React.FC<HeaderProps> = ({
                   </button>
               </div>
           </div>
-          {/* Arrow */}
           <div className="absolute -top-2 left-4 w-4 h-4 bg-slate-900 border-t border-l border-fuchsia-500/30 transform rotate-45"></div>
       </div>
   );
 
   return (
     <>
-      {/* 
-        HEADER STRUCTURE:
-        Mobile: Vertical Flex (Row 1: Icons, Row 2: Profile)
-        Desktop: Horizontal Flex
-      */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-1000 ease-in-out ${headerBgClass} ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         
-        {/* MOBILE HEADER LAYOUT (Two Rows) */}
         <div className="md:hidden flex flex-col p-3 gap-3">
-            {/* Row 1: Logo & Actions */}
             <div className="flex items-center justify-between">
-                
-                {/* Right: Logo */}
                 <div className="flex-shrink-0">
                     <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} isMobile={true} />
                 </div>
 
-                {/* Left: Action Icons Row */}
                 <div className="flex items-center gap-2">
-                    
-                    {/* Dr Hope Menu Trigger */}
                     <button 
                         onClick={handleDrHopeMenuToggle} 
                         className={`mobile-menu-trigger flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full py-1.5 px-3 transition-all duration-300 ${isMobileMenuOpen ? 'bg-fuchsia-500/20 border-fuchsia-500/50 text-white' : 'text-slate-200'}`}
@@ -209,12 +191,10 @@ const Header: React.FC<HeaderProps> = ({
                         <ChevronDownIcon className={`w-3 h-3 transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {/* Navigation Hub */}
                     <button onClick={onOpenNavigationHub} className={mobileIconButtonClasses} title="إلى أين تود الذهاب؟">
                         <GlobeAltIcon className="w-5 h-5"/>
                     </button>
 
-                    {/* Notifications */}
                     <div className="relative" ref={mobileNotificationContainerRef}>
                         <button onClick={handleMobileNotificationsToggle} className={`${mobileIconButtonClasses} relative`}>
                             <BellIcon className="w-5 h-5" />
@@ -227,7 +207,6 @@ const Header: React.FC<HeaderProps> = ({
                         {!user && showGuestNotificationMessage && <GuestNotificationMessage />}
                     </div>
 
-                    {/* Login/Logout */}
                     {user ? (
                         <button 
                             onClick={onLogout} 
@@ -248,7 +227,6 @@ const Header: React.FC<HeaderProps> = ({
                 </div>
             </div>
 
-            {/* Row 2: Large Profile Button */}
             <div className="w-full">
                 <button
                     onClick={handleProfileClick}
@@ -260,8 +238,6 @@ const Header: React.FC<HeaderProps> = ({
             </div>
         </div>
 
-
-        {/* DESKTOP HEADER LAYOUT (Original) */}
         <nav className="hidden md:flex container mx-auto px-6 h-24 items-center justify-between">
           <div className="flex justify-start items-center gap-3 flex-1">
             <LogoButton logoUrl={drhopeData.logoUrl} onClick={() => onNavigate(Page.WORKSHOPS)} />
@@ -273,7 +249,6 @@ const Header: React.FC<HeaderProps> = ({
                   <span>دكتور هوب</span>
                   <ChevronDownIcon className="w-4 h-4 transition-transform group-hover:rotate-180" />
                 </button>
-                {/* Desktop Dropdown */}
                 <div className="absolute top-full left-1/2 -translate-x-1/2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transform transition-all duration-300 ease-in-out group-hover:translate-y-2 translate-y-4 bg-theme-header-gradient backdrop-blur-2xl rounded-xl shadow-2xl mt-2 p-2 w-[550px] border border-white/10 z-10 ring-1 ring-black/20">
                   <div className="grid grid-cols-2 gap-2 text-slate-200">
                     <a onClick={onShowVideo} className="group flex items-center gap-x-4 p-3 rounded-lg hover:bg-white/10 cursor-pointer transition-colors duration-200">
@@ -351,7 +326,6 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </nav>
 
-        {/* Mobile Dropdown Menu (Replacing Sidebar) */}
         {isMobileMenuOpen && (
             <div 
                 ref={mobileMenuRef}
@@ -398,14 +372,12 @@ const Header: React.FC<HeaderProps> = ({
         )}
       </header>
 
-      {/* Mobile Notifications Fullscreen Overlay */}
       {isMobileNotificationsOpen && (
         <div className="fixed inset-0 z-[60] bg-theme-header-gradient md:hidden flex flex-col">
             <NotificationsPanel onClose={() => setIsMobileNotificationsOpen(false)} isMobile={true} />
         </div>
       )}
       
-      {/* Animation Style */}
       <style>{`
         @keyframes slide-down {
             from { opacity: 0; transform: translateY(-10px); }

@@ -10,10 +10,10 @@ interface HeroProps {
 
 const CountdownUnit: React.FC<{ value: number; label: string }> = ({ value, label }) => (
     <div className="flex flex-col items-center mx-1.5 sm:mx-2">
-        <span className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+        <span className="text-lg sm:text-xl font-black text-[#2e1065] tracking-tight drop-shadow-sm">
             {value.toString().padStart(2, '0')}
         </span>
-        <span className="text-[8px] text-purple-600 uppercase tracking-wide mt-0.5 font-bold">{label}</span>
+        <span className="text-[8px] text-[#db2777] uppercase tracking-wide mt-0.5 font-bold">{label}</span>
     </div>
 );
 
@@ -61,7 +61,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
         return () => clearInterval(timer);
     }, [nextWorkshop]);
 
-    const btnClasses = "bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-1.5 px-5 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-[10px] sm:text-xs flex items-center justify-center gap-2 group mx-auto";
+    const btnClasses = "bg-gradient-to-r from-[#2e1065] to-[#db2777] hover:from-[#1e0b4b] hover:to-[#be185d] text-white font-bold py-1.5 px-5 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md text-[10px] sm:text-xs flex items-center justify-center gap-2 group mx-auto";
 
     return (
         <section className="hero-section relative text-center pt-24 pb-8 overflow-hidden min-h-[40vh] flex flex-col justify-center">
@@ -70,32 +70,32 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                 {nextWorkshop && timeLeft ? (
                     <div className="animate-fade-in-up max-w-xl mx-auto">
                         {/* White Card */}
-                        <div className="bg-white rounded-xl p-4 shadow-2xl relative overflow-hidden text-slate-800 border border-slate-100">
+                        <div className="bg-white rounded-xl p-4 shadow-2xl relative overflow-hidden text-[#2e1065] border border-white/20">
                             
                             <div className="relative z-10">
                                 <div className="inline-block mb-2">
-                                    <span className="bg-purple-100 text-purple-700 border border-purple-200 text-[8px] font-bold px-2 py-0.5 rounded-full tracking-wide">
+                                    <span className="bg-[#2e1065]/5 text-[#2e1065] border border-[#2e1065]/10 text-[8px] font-bold px-2 py-0.5 rounded-full tracking-wide">
                                         ✨ الورشة القادمة
                                     </span>
                                 </div>
                                 
-                                <h1 className="text-lg sm:text-xl font-black text-slate-900 mb-1 leading-snug">
+                                <h1 className="text-lg sm:text-xl font-black text-[#2e1065] mb-1 leading-snug">
                                     {nextWorkshop.title}
                                 </h1>
                                 
                                 <p className="text-[10px] sm:text-xs text-slate-500 mb-4 font-bold flex items-center justify-center gap-1">
-                                    <span className="text-pink-600">تقديم:</span> 
+                                    <span className="text-[#db2777]">تقديم:</span> 
                                     {nextWorkshop.instructor}
                                 </p>
                                 
                                 {/* Countdown */}
                                 <div className="flex justify-center items-start gap-2 sm:gap-3 mb-4" dir="ltr">
                                     <CountdownUnit value={timeLeft.days || 0} label="أيام" />
-                                    <span className="text-lg sm:text-xl font-light text-slate-300 mt-[-2px]">:</span>
+                                    <span className="text-lg sm:text-xl font-light text-[#2e1065]/20 mt-[-2px]">:</span>
                                     <CountdownUnit value={timeLeft.hours || 0} label="ساعات" />
-                                    <span className="text-lg sm:text-xl font-light text-slate-300 mt-[-2px]">:</span>
+                                    <span className="text-lg sm:text-xl font-light text-[#2e1065]/20 mt-[-2px]">:</span>
                                     <CountdownUnit value={timeLeft.minutes || 0} label="دقائق" />
-                                    <span className="text-lg sm:text-xl font-light text-slate-300 mt-[-2px]">:</span>
+                                    <span className="text-lg sm:text-xl font-light text-[#2e1065]/20 mt-[-2px]">:</span>
                                     <CountdownUnit value={timeLeft.seconds || 0} label="ثواني" />
                                 </div>
 
@@ -114,7 +114,7 @@ const Hero: React.FC<HeroProps> = ({ onExploreClick, onOpenWorkshopDetails }) =>
                 ) : (
                     <div className="py-4 max-w-xl mx-auto">
                         <div className="bg-white rounded-xl p-5 shadow-2xl border border-slate-100 text-slate-800">
-                            <h1 className="text-xl sm:text-2xl font-black mb-2 text-slate-900 leading-tight">
+                            <h1 className="text-xl sm:text-2xl font-black mb-2 text-[#2e1065] leading-tight">
                                 نوايا.. حيث يبدأ الأثر
                             </h1>
                             <p className="text-[10px] sm:text-xs text-slate-500 max-w-md mx-auto mb-4 font-medium leading-relaxed">

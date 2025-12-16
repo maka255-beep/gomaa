@@ -230,7 +230,7 @@ const Header: React.FC<HeaderProps> = ({
             <div className="w-full">
                 <button
                     onClick={handleProfileClick}
-                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-800 to-fuchsia-700 hover:from-purple-700 hover:to-fuchsia-600 text-white font-bold py-2.5 rounded-xl shadow-lg border border-white/10 active:scale-[0.99] transition-all"
+                    className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#2e1065] to-[#db2777] hover:from-[#4c1d95] hover:to-[#be185d] text-white font-bold py-2.5 rounded-xl shadow-lg border border-white/10 active:scale-[0.99] transition-all"
                 >
                     <UserIcon className="w-5 h-5" />
                     <span>{user ? 'الملف الشخصي' : 'تسجيل الدخول للملف الشخصي'}</span>

@@ -230,8 +230,14 @@ const PublicApp: React.FC = () => {
 
   const handleEnrollRequest = (workshop: Workshop, selectedPackage: Package | null) => {
     setOpenedWorkshopId(null);
-    const price = selectedPackage?.discountPrice ?? selectedPackage?.price ?? workshop.price ?? 0;
-    const intent: PaymentIntent = { type: 'workshop', item: workshop, pkg: selectedPackage || undefined, amount: price };
+    // FIX: Calculate price correctly. Fallback to first package if selectedPackage is null but packages exist (e.g. direct click)
+    let effectivePackage = selectedPackage;
+    if (!effectivePackage && workshop.packages && workshop.packages.length > 0) {
+        effectivePackage = workshop.packages[0];
+    }
+    const price = effectivePackage?.discountPrice ?? effectivePackage?.price ?? workshop.price ?? 0;
+    
+    const intent: PaymentIntent = { type: 'workshop', item: workshop, pkg: effectivePackage || undefined, amount: price };
     if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(false); }
   };
 

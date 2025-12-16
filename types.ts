@@ -1,7 +1,5 @@
 
-// FIX: Populating the entire content of types.ts with type definitions
-// inferred from their usage across all application files. This will resolve
-// numerous 'Cannot find name' and 'is not a module' errors.
+// Types for User-Facing Application
 
 export enum Page {
     WORKSHOPS = 'WORKSHOPS',
@@ -104,11 +102,10 @@ export interface Recording {
 export interface MediaResource {
     type: 'audio' | 'video';
     name: string;
-    value: string; // data URL for the file
+    value: string; 
     notes?: string;
 }
 
-// FIX: Add RecordingStats interface
 export interface RecordingStats {
     progress: number;
     playCount: number;
@@ -165,7 +162,7 @@ export interface Workshop {
     certificatesIssued?: boolean;
     trainerPercentage?: number;
     trainerPayments?: Payment[];
-    payItForwardBalance?: number; // Balance specific to this workshop
+    payItForwardBalance?: number; 
 }
 
 export interface Subscription {
@@ -186,13 +183,12 @@ export interface Subscription {
     transferMethod?: string;
     refundDate?: string;
     refundMethod?: string;
-    // FIX: Add recordingStats property to Subscription interface
     recordingStats?: { [key: string]: RecordingStats };
     creditApplied?: number;
     recordingAccessOverrides?: { [recordingUrl: string]: { accessStartDate?: string; accessEndDate?: string } };
     isGift?: boolean;
-    isPayItForwardDonation?: boolean; // True if this subscription is just a donation record
-    donationRemaining?: number; // Track how much of this donation is left to be used
+    isPayItForwardDonation?: boolean;
+    donationRemaining?: number; 
     gifterName?: string;
     gifterUserId?: number;
     giftMessage?: string;
@@ -202,7 +198,7 @@ export interface Subscription {
 }
 
 export interface PendingGift {
-  id: string; // Unique ID for the link
+  id: string;
   workshopId: number;
   packageId?: number;
   attendanceType?: 'أونلاين' | 'حضوري';
@@ -255,7 +251,6 @@ export interface ConsultationRequest {
     paymentMethod?: 'CARD' | 'BANK_TRANSFER';
 }
 
-
 export interface DrhopeData {
     videos: { id: string; title: string; url: string }[];
     photos: string[];
@@ -267,7 +262,6 @@ export interface DrhopeData {
     introText: string;
     logoUrl: string;
     signature?: string;
-    // FIX: Add missing cvUrl property to the DrhopeData interface.
     cvUrl: string;
     headerLinks: {
         drhope: string;
@@ -295,44 +289,10 @@ export interface DrhopeData {
     taxRegistrationNumber?: string;
     liveWorkshopRefundPolicy?: string;
     recordedWorkshopTerms?: string;
-    // Pay It Forward Global Stats (Optional now, as we track per workshop)
     payItForwardStats?: {
         totalFund: number;
         beneficiariesCount: number;
     };
-}
-
-export interface Expense {
-    id: string;
-    date: string;
-    title: string;
-    invoiceNumber?: string;
-    workshopId?: number;
-    supplier: string;
-    amount: number;
-    invoiceImageUrl?: string;
-    notes?: string;
-    isDeleted?: boolean;
-    includesVat?: boolean;
-}
-
-export interface BroadcastCampaign {
-    id: string;
-    timestamp: string;
-    subject: string;
-    messageHtml: string;
-    targetAudience: string;
-    recipients: BroadcastRecipient[];
-    attachments: any[];
-    channel: 'email' | 'notification' | 'whatsapp';
-}
-
-export interface BroadcastRecipient {
-    userId: number;
-    fullName: string;
-    email: string;
-    phone?: string;
-    status: 'Sent' | 'Failed' | 'Bounced (Invalid Email)' | 'Failed (No WhatsApp)';
 }
 
 export interface CertificateFieldConfig {
@@ -368,7 +328,7 @@ export interface Partner {
 
 export interface PaymentIntent {
     type: 'workshop' | 'consultation' | 'gift' | 'payItForward';
-    item: any; // Workshop or ConsultationRequest
+    item: any; 
     pkg?: Package;
     amount?: number;
     recipientDetails?: any;

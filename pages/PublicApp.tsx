@@ -307,7 +307,7 @@ const PublicApp: React.FC = () => {
   const isHomePage = currentPage === Page.WORKSHOPS;
 
   return (
-    <div className={`min-h-screen font-sans selection:bg-fuchsia-500/30 ${isHomePage ? 'bg-white text-slate-900' : 'bg-theme-gradient text-slate-200'}`}>
+    <div className={`min-h-screen font-sans selection:bg-fuchsia-500/30 ${isHomePage ? 'bg-slate-50 text-slate-900' : 'bg-theme-gradient text-slate-200'}`}>
       {showIntro && <IntroAnimation />}
       
       <Header 

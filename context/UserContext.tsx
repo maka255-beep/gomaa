@@ -167,7 +167,9 @@ const initialDrhopeData: DrhopeData = {
     activeThemeId: 'default',
     themes: [], 
     consultationSettings: { defaultDurationMinutes: 50, defaultFee: 450, consultationsEnabled: true },
-    paymentSettings: { cardPaymentsEnabled: true, bankTransfersEnabled: true }
+    paymentSettings: { cardPaymentsEnabled: true, bankTransfersEnabled: true },
+    liveWorkshopRefundPolicy: "يحق للمشترك استرداد المبلغ كاملاً في حال الإلغاء قبل موعد الورشة بـ 7 أيام على الأقل.\nلا يمكن استرداد رسوم الاشتراك إذا كان الإلغاء خلال الـ 7 أيام التي تسبق موعد الورشة.\nيمكن تحويل المقعد لشخص آخر بالتنسيق مع إدارة المنصة قبل موعد الورشة بـ 24 ساعة.",
+    recordedWorkshopTerms: "المحتوى التعليمي متاح للاستخدام الشخصي فقط للمشترك المسجل.\nيمنع منعاً باتاً مشاركة حساب الدخول أو المحتوى مع أي طرف آخر.\nجميع حقوق الملكية الفكرية محفوظة، ويمنع نسخ أو توزيع المواد.\nالرسوم المدفوعة للمحتوى المسجل غير قابلة للاسترداد بعد إتمام عملية الدفع."
 };
 
 interface RegistrationAvailability {

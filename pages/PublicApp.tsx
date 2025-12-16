@@ -79,7 +79,8 @@ const PublicApp: React.FC = () => {
   const [postLoginGiftIntent, setPostLoginGiftIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
   
   const [returnToHub, setReturnToHub] = useState(false);
-  const [pendingHubAction, setPendingHubAction] = useState<'profile' | 'live' | null>(null);
+  // Added 'consultation' to pending actions
+  const [pendingHubAction, setPendingHubAction] = useState<'profile' | 'live' | 'consultation' | null>(null);
   
   const initialHubOpenRef = useRef(false);
 
@@ -157,6 +158,15 @@ const PublicApp: React.FC = () => {
       handleLoginClick(true);
   };
 
+  const handleRequestConsultation = () => {
+      if (currentUser) {
+          setIsConsultationRequestModalOpen(true);
+      } else {
+          setPendingHubAction('consultation');
+          handleLoginClick(false); // Allow registration
+      }
+  };
+
   const handleAuthModalClose = () => {
       setIsAuthModalOpen(false);
       if (returnToHub) {
@@ -176,6 +186,8 @@ const PublicApp: React.FC = () => {
           setIsProfileOpen(true);
       } else if (pendingHubAction === 'live') {
           processLiveStreamAccess(user);
+      } else if (pendingHubAction === 'consultation') {
+          setIsConsultationRequestModalOpen(true);
       }
       
       setReturnToHub(false);
@@ -309,7 +321,7 @@ const PublicApp: React.FC = () => {
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
         onBoutiqueClick={() => { setIsBoutiqueModalOpen(true); setBoutiqueInitialView('products'); }}
-        onRequestConsultationClick={() => setIsConsultationRequestModalOpen(true)}
+        onRequestConsultationClick={handleRequestConsultation}
         onOpenNavigationHub={() => setIsNavigationHubOpen(true)}
         isHomePage={isHomePage}
         isVisible={!showIntro}

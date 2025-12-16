@@ -237,10 +237,15 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onCardPaym
                                         <span dir="ltr" className="font-mono text-white select-all">{drhopeData.accountNumber || 'غير متوفر'}</span>
                                     </div>
                                 </div>
-                                <div className="bg-amber-500/10 p-3 rounded-lg border border-amber-500/30 flex items-start gap-2 text-right">
-                                    <span className="text-amber-400 text-lg">⚠️</span>
-                                    <p className="text-xs font-bold text-amber-200/80 leading-relaxed">
-                                        ملاحظة هامة: بعد التحويل، يرجى إرسال صورة من إثبات التحويل إلى رقم الواتساب لإتمام العملية.
+                                <div className="bg-amber-500/10 p-4 rounded-xl border border-amber-500/30 flex flex-col gap-2 text-right">
+                                    <div className="flex items-start gap-2">
+                                        <span className="text-amber-400 text-lg">⚠️</span>
+                                        <p className="text-sm font-bold text-amber-100 leading-relaxed">
+                                            هام جداً: يرجى إرسال صورة التحويل البنكي على رقم الواتساب للتأكد من التحويل.
+                                        </p>
+                                    </div>
+                                    <p className="text-xs text-amber-200/70 mr-7">
+                                        لن يتم تفعيل الاشتراك إلا بعد استلام صورة التحويل والمطابقة.
                                     </p>
                                 </div>
                             </div>

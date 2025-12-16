@@ -111,6 +111,22 @@ const initialWorkshops: Workshop[] = [
         isVisible: true,
         price: 200,
         packages: [{ id: 601, name: "تذكرة عامة", price: 200, features: ["حضور الورشة"] }]
+    },
+    {
+        id: 7,
+        title: "جلسة تأمل: هدوء النفس (مجانية)",
+        instructor: "د. أمل العتيبي",
+        startDate: new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0],
+        startTime: "20:30",
+        location: "أونلاين",
+        country: "الإمارات",
+        isRecorded: false,
+        zoomLink: "https://zoom.us/j/free-session",
+        description: "جلسة خاصة مجانية لجميع مشتركينا، نركز فيها على تقنيات التنفس وتفريغ الضغوطات اليومية. هذه الورشة تجريبية لتوضيح آلية التسجيل المجاني.",
+        topics: ["تمارين التنفس", "التخيل الموجه", "أسئلة وأجوبة"],
+        isVisible: true,
+        price: 0,
+        packages: [{ id: 701, name: "حضور مجاني", price: 0, features: ["دخول القاعة", "المشاركة في الشات"] }]
     }
 ];
 

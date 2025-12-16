@@ -7,6 +7,22 @@ import { trackEvent } from '../analytics';
 // Initial Mock Data for Workshops
 const initialWorkshops: Workshop[] = [
     {
+        id: 8,
+        title: "كود استقبال ٢٠٢٦",
+        instructor: "د. أمل العتيبي",
+        startDate: "2025-12-27",
+        startTime: "20:00",
+        location: "أونلاين",
+        country: "الإمارات",
+        isRecorded: false,
+        zoomLink: "",
+        description: "استعدي لاستقبال عام ٢٠٢٦ بطاقة متجددة ووعي مختلف. في هذه الورشة سنتعلم كيف نغلق ملفات العام الماضي بسلام ونفتح أبواب الفرص للعام الجديد من خلال تفعيل كود الاستقبال والذبذبات العالية.",
+        topics: ["تنظيف الطاقة السلبية لعام ٢٠٢٥", "تفعيل كود الوفرة والاستقبال", "كتابة النوايا بذكاء طاقي", "تمارين عملية لرفع الاستحقاق"],
+        isVisible: true,
+        price: 350,
+        packages: [{ id: 801, name: "تذكرة حضور أونلاين", price: 350, features: ["حضور البث المباشر", "تسجيل الورشة متاح لمدة شهر"] }]
+    },
+    {
         id: 1,
         title: "رحلة الوعي الذاتي",
         instructor: "د. أمل العتيبي",

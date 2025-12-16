@@ -34,7 +34,7 @@ import { PrivacyPolicyContent, TermsContent, ShippingPolicyContent, AboutContent
 import { isWorkshopExpired } from '../utils';
 
 const PublicApp: React.FC = () => {
-  const { currentUser, workshops, products, placeOrder, addSubscription, addPendingGift, donateToPayItForward } = useUser();
+  const { currentUser, workshops, products, placeOrder, addSubscription, addPendingGift, donateToPayItForward, updateConsultationRequest } = useUser();
   
   const [currentPage, setCurrentPage] = useState<Page>(Page.WORKSHOPS);
   const [showIntro, setShowIntro] = useState(true);
@@ -230,7 +230,8 @@ const PublicApp: React.FC = () => {
 
   const handleEnrollRequest = (workshop: Workshop, selectedPackage: Package | null) => {
     setOpenedWorkshopId(null);
-    const intent: PaymentIntent = { type: 'workshop', item: workshop, pkg: selectedPackage || undefined };
+    const price = selectedPackage?.discountPrice ?? selectedPackage?.price ?? workshop.price ?? 0;
+    const intent: PaymentIntent = { type: 'workshop', item: workshop, pkg: selectedPackage || undefined, amount: price };
     if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(false); }
   };
 
@@ -238,6 +239,16 @@ const PublicApp: React.FC = () => {
     setOpenedWorkshopId(null);
     setGiftModalIntent({ workshop, pkg: selectedPackage });
     setIsGiftModalOpen(true);
+  };
+
+  const handlePayForConsultation = (request: ConsultationRequest) => {
+    const intent: PaymentIntent = { 
+        type: 'consultation', 
+        item: request, 
+        amount: request.fee || 0 
+    };
+    setPaymentModalIntent(intent);
+    setIsPaymentModalOpen(true);
   };
 
   const handlePaymentSubmit = (method: 'CARD' | 'BANK_TRANSFER') => {
@@ -258,6 +269,10 @@ const PublicApp: React.FC = () => {
           const { seats, totalAmount } = recipientDetails;
           donateToPayItForward(item.id, totalAmount, seats, currentUser.id);
           showToast('شكراً لمساهمتك!', 'success');
+      } else if (type === 'consultation') {
+          const newStatus = method === 'CARD' ? 'PAID' : 'PENDING_PAYMENT';
+          updateConsultationRequest(item.id, { status: newStatus, paymentMethod: method });
+          showToast(method === 'CARD' ? 'تم دفع رسوم الاستشارة بنجاح' : 'تم إرسال طلب التحويل للمراجعة', 'success');
       }
       setIsPaymentModalOpen(false);
       setPaymentModalIntent(null);
@@ -331,7 +346,7 @@ const PublicApp: React.FC = () => {
       {isGiftModalOpen && giftModalIntent && <UnifiedGiftModal workshop={giftModalIntent.workshop} selectedPackage={giftModalIntent.pkg} onClose={() => setIsGiftModalOpen(false)} onProceed={handleGiftProceed} />}
       {isBoutiqueModalOpen && <BoutiqueModal isOpen={isBoutiqueModalOpen} onClose={() => setIsBoutiqueModalOpen(false)} cart={cart} onAddToCart={handleAddToCart} updateCartQuantity={updateCartQuantity} removeFromCart={removeFromCart} onCheckout={handleCheckout} initialView={boutiqueInitialView} />}
       {isProductCheckoutOpen && <ProductCheckoutModal isOpen={isProductCheckoutOpen} onClose={() => setIsProductCheckoutOpen(false)} cart={cart} onConfirm={() => handleProductOrderConfirm(false)} onCardPaymentConfirm={() => handleProductOrderConfirm(true)} onRequestLogin={() => { setIsProductCheckoutOpen(false); handleLoginClick(false); }} currentUser={currentUser} />}
-      {isProfileOpen && <ProfilePage isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={currentUser} onZoomRedirect={(link) => setZoomRedirectLink(link)} onPlayRecording={(w, r) => setWatchData({ workshop: w, recording: r })} onViewAttachment={(note) => setAttachmentToView(note)} onViewRecommendedWorkshop={(id) => { setIsProfileOpen(false); setOpenedWorkshopId(id); }} showToast={showToast} onPayForConsultation={() => {}} onViewInvoice={(details) => setInvoiceToView(details)} />}
+      {isProfileOpen && <ProfilePage isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={currentUser} onZoomRedirect={(link) => setZoomRedirectLink(link)} onPlayRecording={(w, r) => setWatchData({ workshop: w, recording: r })} onViewAttachment={(note) => setAttachmentToView(note)} onViewRecommendedWorkshop={(id) => { setIsProfileOpen(false); setOpenedWorkshopId(id); }} showToast={showToast} onPayForConsultation={handlePayForConsultation} onViewInvoice={(details) => setInvoiceToView(details)} />}
       
       {isVideoModalOpen && <VideoModal isOpen={isVideoModalOpen} onClose={() => setIsVideoModalOpen(false)} />}
       {isPhotoAlbumModalOpen && <PhotoAlbumModal isOpen={isPhotoAlbumModalOpen} onClose={() => setIsPhotoAlbumModalOpen(false)} />}

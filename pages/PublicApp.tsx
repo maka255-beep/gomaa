@@ -101,9 +101,14 @@ const PublicApp: React.FC = () => {
   }, [currentUser, postLoginPaymentIntent, postLoginGiftIntent]);
 
   const activeLiveWorkshop = useMemo(() => {
-      return workshops
-          .filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w))
-          .sort((a, b) => new Date(`${a.startDate}T${a.startTime}:00Z`).getTime() - new Date(`${b.startDate}T${b.startTime}:00Z`).getTime())[0];
+      // Logic: Prefer workshop with a link FIRST to ensure badge appears.
+      const validWorkshops = workshops
+          .filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w));
+      
+      const withLink = validWorkshops.find(w => !!w.zoomLink);
+      if (withLink) return withLink;
+
+      return validWorkshops.sort((a, b) => new Date(`${a.startDate}T${a.startTime}:00Z`).getTime() - new Date(`${b.startDate}T${b.startTime}:00Z`).getTime())[0];
   }, [workshops]);
 
   const showToast = (message: string, type: 'success' | 'warning' | 'error' = 'success') => {
@@ -124,9 +129,8 @@ const PublicApp: React.FC = () => {
   };
 
   const processLiveStreamAccess = (user: User) => {
-      const nextLiveWorkshop = workshops
-          .filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w))
-          .sort((a, b) => new Date(`${a.startDate}T${a.startTime}:00Z`).getTime() - new Date(`${b.startDate}T${b.startTime}:00Z`).getTime())[0];
+      // Use the same logic to find the priority workshop for redirection
+      const nextLiveWorkshop = activeLiveWorkshop;
 
       if (!nextLiveWorkshop) {
           showToast('لا توجد ورش مباشرة متاحة حالياً', 'warning');

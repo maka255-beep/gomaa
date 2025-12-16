@@ -15,7 +15,7 @@ const initialWorkshops: Workshop[] = [
         location: "أونلاين",
         country: "الإمارات",
         isRecorded: false,
-        zoomLink: "https://zoom.us/j/123456789",
+        zoomLink: "", // REMOVED MOCK LINK
         description: "ورشة عمل مكثفة تأخذك في رحلة لاستكشاف أعماق ذاتك وفهم دوافعك ومشاعرك. سنتعلم كيف نتحرر من المعتقدات المعيقة ونبني هوية متزنة.",
         topics: ["مفهوم الوعي الذاتي", "تحليل أنماط الشخصية", "التحرر من صدمات الماضي", "بناء العادات الإيجابية"],
         isVisible: true,

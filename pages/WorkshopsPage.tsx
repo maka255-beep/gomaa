@@ -49,8 +49,18 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
   const newWorkshops = filteredAndSearchedWorkshops.filter(w => !w.isRecorded && !isWorkshopExpired(w));
   const recordedWorkshops = filteredAndSearchedWorkshops.filter(w => w.isRecorded);
 
-  // The live stream card should always point to the next upcoming workshop, regardless of filters.
-  const liveStreamWorkshop = visibleWorkshops.filter(w => !w.isRecorded && !isWorkshopExpired(w)).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0] || null;
+  // LOGIC UPDATE: Prioritize any workshop with a Zoom Link (Active Live) regardless of date.
+  // If no link exists, fall back to the nearest upcoming unexpired workshop.
+  const liveStreamWorkshop = useMemo(() => {
+      // 1. Find a workshop with an active link (Manual Override)
+      const activeLinkWorkshop = visibleWorkshops.find(w => !w.isRecorded && w.zoomLink);
+      if (activeLinkWorkshop) return activeLinkWorkshop;
+
+      // 2. Fallback: Find the nearest upcoming workshop that hasn't expired
+      return visibleWorkshops
+        .filter(w => !w.isRecorded && !isWorkshopExpired(w))
+        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0] || null;
+  }, [visibleWorkshops]);
 
   const filters: Array<'all' | 'أونلاين' | 'حضوري' | 'مسجلة' | 'أونلاين وحضوري'> = ['all', 'أونلاين', 'حضوري', 'مسجلة'];
   const filterLabels = {

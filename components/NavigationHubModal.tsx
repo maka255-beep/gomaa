@@ -22,8 +22,8 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({ onClick, icon: Icon
         onClick={onClick}
         className={`relative group backdrop-blur-lg border rounded-2xl p-6 text-center transition-all duration-300 overflow-hidden ${
             isLive 
-            ? 'bg-gradient-to-b from-purple-900/80 to-fuchsia-900/80 border-fuchsia-500 shadow-[0_0_30px_rgba(219,39,119,0.3)] hover:scale-105' 
-            : 'bg-theme-gradient-card border-slate-700 hover:border-fuchsia-400/80 hover:-translate-y-2 hover:shadow-2xl hover:shadow-fuchsia-500/30'
+            ? 'bg-gradient-to-br from-[#4c1d95] to-[#db2777] border-white/20 shadow-[0_0_30px_rgba(219,39,119,0.5)] hover:scale-105' 
+            : 'bg-gradient-to-br from-[#1e1b4b] to-[#4c1d95] border-white/10 hover:border-white/30 hover:-translate-y-2 hover:shadow-2xl'
         }`}
     >
         {/* Live Indicator Badge */}
@@ -35,19 +35,19 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({ onClick, icon: Icon
         )}
 
         {/* Glowing orb effect */}
-        <div className={`absolute -top-8 -right-8 w-32 h-32 rounded-full blur-3xl transition-opacity duration-500 ${isLive ? 'bg-red-500/20 opacity-50' : 'bg-fuchsia-500/20 opacity-0 group-hover:opacity-100'}`}></div>
+        <div className={`absolute -top-8 -right-8 w-32 h-32 rounded-full blur-3xl transition-opacity duration-500 ${isLive ? 'bg-white/20 opacity-50' : 'bg-purple-500/20 opacity-0 group-hover:opacity-100'}`}></div>
         
         <div className="relative">
             <div className={`relative mx-auto w-16 h-16 mb-4 flex items-center justify-center rounded-full border-2 transition-colors ${
                 isLive 
-                ? 'bg-red-500/20 border-red-500 text-red-200' 
-                : 'bg-slate-800/50 border-slate-600 group-hover:border-fuchsia-400/50'
+                ? 'bg-white/20 border-white text-white' 
+                : 'bg-white/5 border-white/20 group-hover:border-white/50 text-fuchsia-300 group-hover:text-white'
             }`}>
-                <Icon className={`w-8 h-8 transition-transform duration-300 group-hover:scale-110 ${isLive ? 'text-white' : 'text-fuchsia-300'}`} />
+                <Icon className={`w-8 h-8 transition-transform duration-300 group-hover:scale-110 ${isLive ? 'text-white' : 'text-current'}`} />
             </div>
-            <h3 className={`text-base font-bold mb-1 transition-colors ${isLive ? 'text-white' : 'text-white group-hover:text-fuchsia-300'}`}>{title}</h3>
+            <h3 className={`text-base font-bold mb-1 transition-colors text-white`}>{title}</h3>
             {subtitle && (
-                <p className={`mt-1 text-[13px] ${isLive ? 'text-fuchsia-200' : 'text-slate-400'}`}>
+                <p className={`mt-1 text-[13px] ${isLive ? 'text-pink-100' : 'text-slate-400 group-hover:text-slate-200'}`}>
                     {subtitle}
                 </p>
             )}

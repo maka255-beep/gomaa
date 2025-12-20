@@ -4,56 +4,24 @@ import { User, Workshop, DrhopeData, Notification, SubscriptionStatus, Subscript
 import { normalizePhoneNumber } from '../utils';
 import { trackEvent } from '../analytics';
 
-// Initial Mock Data for Workshops
+// Initial Mock Data for Workshops - Single upcoming workshop on Dec 30 + Archive
 const initialWorkshops: Workshop[] = [
     {
-        id: 8,
-        title: "كود استقبال ٢٠٢٦",
+        id: 12,
+        title: "تخطيط النوايا لعام ٢٠٢٦",
         instructor: "د. أمل العتيبي",
-        startDate: "2025-12-27",
+        startDate: "2025-12-30",
         startTime: "20:00",
         location: "أونلاين",
+        application: "Zoom",
         country: "الإمارات",
         isRecorded: false,
         zoomLink: "",
-        description: "استعدي لاستقبال عام ٢٠٢٦ بطاقة متجددة ووعي مختلف. في هذه الورشة سنتعلم كيف نغلق ملفات العام الماضي بسلام ونفتح أبواب الفرص للعام الجديد من خلال تفعيل كود الاستقبال والذبذبات العالية.",
-        topics: ["تنظيف الطاقة السلبية لعام ٢٠٢٥", "تفعيل كود الوفرة والاستقبال", "كتابة النوايا بذكاء طاقي", "تمارين عملية لرفع الاستحقاق"],
+        description: "ورشة عمل تفاعلية لوضع حجر الأساس لعامك القادم. سنتعلم كيفية صياغة النوايا بذكاء، وتجاوز عقبات الماضي، ورسم خارطة طريق واضحة لتحقيق التوازن والنجاح في مختلف جوانب الحياة.",
+        topics: ["مراجعة إنجازات العام الماضي", "تقنيات صياغة الأهداف الذكية", "التوازن بين الجوانب الروحية والمادية", "جلسة تأمل واستقبال النوايا"],
         isVisible: true,
         price: 350,
-        packages: [{ id: 801, name: "تذكرة حضور أونلاين", price: 350, features: ["حضور البث المباشر", "تسجيل الورشة متاح لمدة شهر"] }]
-    },
-    {
-        id: 1,
-        title: "رحلة الوعي الذاتي",
-        instructor: "د. أمل العتيبي",
-        startDate: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0], // 5 days from now
-        startTime: "18:00",
-        location: "أونلاين",
-        country: "الإمارات",
-        isRecorded: false,
-        zoomLink: "",
-        description: "ورشة عمل مكثفة تأخذك في رحلة لاستكشاف أعماق ذاتك وفهم دوافعك ومشاعرك. سنتعلم كيف نتحرر من المعتقدات المعيقة ونبني هوية متزنة.",
-        topics: ["مفهوم الوعي الذاتي", "تحليل أنماط الشخصية", "التحرر من صدمات الماضي", "بناء العادات الإيجابية"],
-        isVisible: true,
-        price: 350,
-        packages: [{ id: 101, name: "تذكرة حضور أونلاين", price: 350, features: ["حضور البث المباشر", "مذكرة الدورة PDF"] }]
-    },
-    {
-        id: 4,
-        title: "فن العلاقات والذكاء الاجتماعي",
-        instructor: "د. أمل العتيبي",
-        startDate: new Date().toISOString().split('T')[0], // TODAY for testing LIVE
-        startTime: "19:00",
-        location: "أونلاين",
-        country: "الإمارات",
-        isRecorded: false,
-        zoomLink: "", // Removed as requested
-        description: "ورشة تفاعلية تركز على مهارات التواصل الفعال وبناء علاقات صحية ومثمرة.",
-        isVisible: true,
-        price: 400,
-        packages: [
-            { id: 401, name: "حضور أونلاين", price: 400, features: ["بث مباشر عالي الجودة", "تفاعل عبر الشات"], attendanceType: 'أونلاين' }
-        ]
+        packages: [{ id: 1201, name: "حضور البث المباشر", price: 350, features: ["رابط حضور مباشر", "نسخة PDF من العرض التقديمي", "تسجيل متاح لمدة أسبوع"] }]
     },
     {
         id: 3,
@@ -65,13 +33,30 @@ const initialWorkshops: Workshop[] = [
         country: "السعودية",
         isRecorded: true,
         zoomLink: "",
-        description: "دورة شاملة لكل مربي ومربية.",
+        description: "دورة شاملة لكل مربي ومربية تتناول أساليب التعامل الحديثة مع الأطفال وبناء شخصية متزنة.",
         isVisible: true,
         price: 299,
         recordings: [
             { name: "الجزء الأول: فهم نفسية الطفل", url: "https://vimeo.com/123456789" }
         ],
         notes: [{ type: 'file', name: 'ملخص الدورة.pdf', value: '#' }]
+    },
+    {
+        id: 10,
+        title: "دورة التحرر من الصدمات (أرشيف)",
+        instructor: "د. أمل العتيبي",
+        startDate: "2023-05-20",
+        startTime: "18:00",
+        location: "مسجلة",
+        country: "الإمارات",
+        isRecorded: true,
+        zoomLink: "",
+        description: "مجموعة جلسات مسجلة تساعدك على فهم الصدمات النفسية وكيفية التحرر من آثارها العالقة في الجسد والمشاعر.",
+        isVisible: true,
+        price: 450,
+        recordings: [
+            { name: "الجلسة الأولى: الوعي بالجسد", url: "https://vimeo.com/123456789" }
+        ]
     }
 ];
 
@@ -120,16 +105,6 @@ const testUser: User = {
     phone: "+971501234567",
     isDeleted: false,
     subscriptions: [
-        {
-            id: "sub-test-1",
-            workshopId: 4, // "فن العلاقات" which is TODAY
-            status: SubscriptionStatus.ACTIVE,
-            isApproved: true,
-            activationDate: new Date().toISOString(),
-            expiryDate: "2030-01-01",
-            pricePaid: 400,
-            attendanceType: "أونلاين"
-        },
         {
             id: "sub-test-2",
             workshopId: 3, // "التربية الإيجابية"
@@ -189,7 +164,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [workshops, setWorkshops] = useState<Workshop[]>(() => {
         try {
             const saved = localStorage.getItem('nawaya_workshops');
-            return saved ? JSON.parse(saved) : initialWorkshops;
+            // When user requests "one workshop on Dec 30", we enforce it in the initial state
+            // but keep the state dynamic if they add/edit via hypothetical admin tools
+            if (!saved) return initialWorkshops;
+            const parsed: Workshop[] = JSON.parse(saved);
+            // If the Dec 30 workshop isn't there, we re-inject the initial state to match the user request
+            if (!parsed.some(w => w.startDate === "2025-12-30")) return initialWorkshops;
+            return parsed;
         } catch(e) { return initialWorkshops; }
     });
 
@@ -197,7 +178,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const saved = localStorage.getItem('nawaya_users');
             const parsed = saved ? JSON.parse(saved) : [];
-            // If empty, add our test user
             if (parsed.length === 0) return [testUser];
             return parsed;
         } catch(e) { return [testUser]; }

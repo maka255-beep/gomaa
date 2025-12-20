@@ -4,19 +4,19 @@ import { User, Workshop, DrhopeData, Notification, SubscriptionStatus, Subscript
 import { normalizePhoneNumber } from '../utils';
 import { trackEvent } from '../analytics';
 
-// Initial Mock Data for Workshops - Single upcoming workshop on Dec 30 + Archive
+// Initial Mock Data for Workshops - Single workshop set to TODAY for testing
 const initialWorkshops: Workshop[] = [
     {
         id: 12,
         title: "تخطيط النوايا لعام ٢٠٢٦",
         instructor: "د. أمل العتيبي",
-        startDate: "2025-12-30",
+        startDate: new Date().toISOString().split('T')[0], // SET TO TODAY
         startTime: "20:00",
         location: "أونلاين",
         application: "Zoom",
         country: "الإمارات",
         isRecorded: false,
-        zoomLink: "",
+        zoomLink: "", // Leave empty to test "Today but no link" messages
         description: "ورشة عمل تفاعلية لوضع حجر الأساس لعامك القادم. سنتعلم كيفية صياغة النوايا بذكاء، وتجاوز عقبات الماضي، ورسم خارطة طريق واضحة لتحقيق التوازن والنجاح في مختلف جوانب الحياة.",
         topics: ["مراجعة إنجازات العام الماضي", "تقنيات صياغة الأهداف الذكية", "التوازن بين الجوانب الروحية والمادية", "جلسة تأمل واستقبال النوايا"],
         isVisible: true,
@@ -97,7 +97,7 @@ const initialDrhopeData: DrhopeData = {
     recordedWorkshopTerms: "شروط المحتوى المسجل..."
 };
 
-// PRE-DEFINED TEST USER
+// PRE-DEFINED TEST USER - Subscribed to active workshop ID 12 for testing purposes
 const testUser: User = {
     id: 999,
     fullName: "مستخدم تجريبي",
@@ -105,6 +105,15 @@ const testUser: User = {
     phone: "+971501234567",
     isDeleted: false,
     subscriptions: [
+        {
+            id: "sub-test-1",
+            workshopId: 12, // Subscribed to the "Today" workshop (No link)
+            status: SubscriptionStatus.ACTIVE,
+            isApproved: true,
+            activationDate: new Date().toISOString(),
+            expiryDate: "2030-01-01",
+            pricePaid: 350
+        },
         {
             id: "sub-test-2",
             workshopId: 3, // "التربية الإيجابية"
@@ -164,12 +173,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [workshops, setWorkshops] = useState<Workshop[]>(() => {
         try {
             const saved = localStorage.getItem('nawaya_workshops');
-            // When user requests "one workshop on Dec 30", we enforce it in the initial state
-            // but keep the state dynamic if they add/edit via hypothetical admin tools
             if (!saved) return initialWorkshops;
             const parsed: Workshop[] = JSON.parse(saved);
-            // If the Dec 30 workshop isn't there, we re-inject the initial state to match the user request
-            if (!parsed.some(w => w.startDate === "2025-12-30")) return initialWorkshops;
+            // Check if our test workshop is present and set to today
+            const today = new Date().toISOString().split('T')[0];
+            if (!parsed.some(w => w.id === 12 && w.startDate === today)) return initialWorkshops;
             return parsed;
         } catch(e) { return initialWorkshops; }
     });
@@ -178,7 +186,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const saved = localStorage.getItem('nawaya_users');
             const parsed = saved ? JSON.parse(saved) : [];
-            if (parsed.length === 0) return [testUser];
+            // Ensure test user is always there with correct subscription for current testing
+            if (parsed.length === 0 || !parsed.find((u: any) => u.id === 999)) return [testUser];
             return parsed;
         } catch(e) { return [testUser]; }
     }); 

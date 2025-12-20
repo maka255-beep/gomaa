@@ -23,6 +23,7 @@ import NavigationHubModal from '../components/NavigationHubModal';
 import WorkshopsPage from '../pages/WorkshopsPage';
 import ProfilePage from '../pages/ProfilePage';
 import WatchPage from '../pages/WatchPage';
+import RecordingPledgeModal from '../components/RecordingPledgeModal';
 import { InvoiceModal } from '../components/InvoiceModal';
 import ConsultationRequestModal from '../components/ConsultationRequestModal';
 import ReviewsModal from '../components/ReviewsModal';
@@ -71,7 +72,10 @@ const PublicApp: React.FC = () => {
   const [attachmentToView, setAttachmentToView] = useState<NoteResource | null>(null);
   const [invoiceToView, setInvoiceToView] = useState<{ user: User; subscription: Subscription } | null>(null);
   
+  // Watch State
   const [watchData, setWatchData] = useState<{ workshop: Workshop, recording: Recording } | null>(null);
+  const [pendingWatchData, setPendingWatchData] = useState<{ workshop: Workshop, recording: Recording } | null>(null);
+  
   const [paymentModalIntent, setPaymentModalIntent] = useState<PaymentIntent | null>(null);
   const [giftModalIntent, setGiftModalIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
   
@@ -99,20 +103,14 @@ const PublicApp: React.FC = () => {
       }
   }, [currentUser, postLoginPaymentIntent, postLoginGiftIntent]);
 
-  // STRICTOR LOGIC: Find the active workshop for the Live Indicator
   const activeLiveWorkshop = useMemo(() => {
       const now = new Date();
       const today = now.toISOString().split('T')[0];
-      
       const validWorkshops = workshops.filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w));
-      
       return validWorkshops.find(w => {
-          // Rule 1: Is today the day of the workshop?
           const isToday = today >= w.startDate && today <= (w.endDate || w.startDate);
-          // Rule 2: Has the admin explicitly provided a Zoom link?
           const hasLink = !!w.zoomLink && w.zoomLink.trim() !== "";
-          
-          return isToday || hasLink; // Only return true if one of the two conditions is met
+          return isToday || hasLink;
       }) || null;
   }, [workshops]);
 
@@ -135,18 +133,15 @@ const PublicApp: React.FC = () => {
 
   const processLiveStreamAccess = (user: User) => {
       const nextLiveWorkshop = activeLiveWorkshop;
-
       if (!nextLiveWorkshop) {
           showToast('لا توجد ورش مباشرة جارية حالياً', 'warning');
           return;
       }
-
       const isSubscribed = user.subscriptions.some(
           sub => sub.workshopId === nextLiveWorkshop.id && 
           sub.status !== 'REFUNDED' && 
           !sub.isPayItForwardDonation
       );
-
       if (isSubscribed) {
           if (nextLiveWorkshop.zoomLink) {
               setZoomRedirectLink(nextLiveWorkshop.zoomLink);
@@ -189,7 +184,6 @@ const PublicApp: React.FC = () => {
   const handleAuthModalSuccess = (user: User) => {
       setIsAuthModalOpen(false);
       showToast(`مرحباً ${user.fullName}`);
-      
       if (pendingHubAction === 'profile') {
           setIsProfileOpen(true);
       } else if (pendingHubAction === 'live') {
@@ -197,7 +191,6 @@ const PublicApp: React.FC = () => {
       } else if (pendingHubAction === 'consultation') {
           setIsConsultationRequestModalOpen(true);
       }
-      
       setReturnToHub(false);
       setPendingHubAction(null);
   };
@@ -255,7 +248,6 @@ const PublicApp: React.FC = () => {
         effectivePackage = workshop.packages[0];
     }
     const price = effectivePackage?.discountPrice ?? effectivePackage?.price ?? workshop.price ?? 0;
-    
     const intent: PaymentIntent = { type: 'workshop', item: workshop, pkg: effectivePackage || undefined, amount: price };
     if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(false); }
   };
@@ -267,11 +259,7 @@ const PublicApp: React.FC = () => {
   };
 
   const handlePayForConsultation = (request: ConsultationRequest) => {
-    const intent: PaymentIntent = { 
-        type: 'consultation', 
-        item: request, 
-        amount: request.fee || 0 
-    };
+    const intent: PaymentIntent = { type: 'consultation', item: request, amount: request.fee || 0 };
     setPaymentModalIntent(intent);
     setIsPaymentModalOpen(true);
   };
@@ -311,34 +299,39 @@ const PublicApp: React.FC = () => {
       if (currentUser) { setPaymentModalIntent(intent); setIsPaymentModalOpen(true); } else { setPostLoginPaymentIntent(intent); handleLoginClick(false); }
   };
 
+  const handlePledgeConfirm = () => {
+    if (pendingWatchData) {
+      setWatchData(pendingWatchData);
+      setPendingWatchData(null);
+    }
+  };
+
   const isHomePage = currentPage === Page.WORKSHOPS;
 
   return (
     <div className={`min-h-screen font-sans selection:bg-fuchsia-500/30 ${isHomePage ? 'bg-slate-50 text-slate-900' : 'bg-theme-gradient text-slate-200'}`}>
       {showIntro && <IntroAnimation />}
       
-      <Header 
-        onLoginClick={handleLoginClick}
-        onRegisterClick={handleRegisterClick}
-        onNavigate={handleNavigate}
-        onScrollToSection={handleScrollToSection}
-        onShowVideo={() => setIsVideoModalOpen(true)}
-        onShowPhotoAlbum={() => setIsPhotoAlbumModalOpen(true)}
-        onShowInstagram={() => setIsInstagramModalOpen(true)}
-        isMobileMenuOpen={isMobileMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
-        onBoutiqueClick={() => { setIsBoutiqueModalOpen(true); setBoutiqueInitialView('products'); }}
-        onRequestConsultationClick={handleRequestConsultation}
-        onOpenNavigationHub={() => setIsNavigationHubOpen(true)}
-        isHomePage={isHomePage}
-        isVisible={!showIntro}
-      />
+      {!watchData && (
+        <>
+            <Header 
+                onLoginClick={handleLoginClick}
+                onRegisterClick={handleRegisterClick}
+                onNavigate={handleNavigate}
+                onScrollToSection={handleScrollToSection}
+                onShowVideo={() => setIsVideoModalOpen(true)}
+                onShowPhotoAlbum={() => setIsPhotoAlbumModalOpen(true)}
+                onShowInstagram={() => setIsInstagramModalOpen(true)}
+                isMobileMenuOpen={isMobileMenuOpen}
+                setIsMobileMenuOpen={setIsMobileMenuOpen}
+                onBoutiqueClick={() => { setIsBoutiqueModalOpen(true); setBoutiqueInitialView('products'); }}
+                onRequestConsultationClick={handleRequestConsultation}
+                onOpenNavigationHub={() => setIsNavigationHubOpen(true)}
+                isHomePage={isHomePage}
+                isVisible={!showIntro}
+            />
 
-      <main className="min-h-screen pt-24 pb-12">
-        {watchData ? (
-            <WatchPage workshop={watchData.workshop} recording={watchData.recording} onBack={() => setWatchData(null)} />
-        ) : (
-            <>
+            <main className="min-h-screen pt-24 pb-12">
                 {currentPage === Page.WORKSHOPS && (
                     <WorkshopsPage 
                         onLiveStreamLoginRequest={handleLiveStreamCardLogin}
@@ -348,15 +341,30 @@ const PublicApp: React.FC = () => {
                         showToast={showToast}
                     />
                 )}
-            </>
-        )}
-      </main>
+            </main>
 
-      <Footer 
-        onShippingClick={() => setLegalModalContent({ title: 'سياسة الشحن والتوصيل', content: <ShippingPolicyContent /> })}
-        onTermsClick={() => setLegalModalContent({ title: 'الشروط والأحكام', content: <TermsContent /> })}
-        onAboutClick={() => setLegalModalContent({ title: 'من نحن', content: <AboutContent /> })}
-        onPrivacyClick={() => setLegalModalContent({ title: 'سياسة الخصوصية', content: <PrivacyPolicyContent /> })}
+            <Footer 
+                onShippingClick={() => setLegalModalContent({ title: 'سياسة الشحن والتوصيل', content: <ShippingPolicyContent /> })}
+                onTermsClick={() => setLegalModalContent({ title: 'الشروط والأحكام', content: <TermsContent /> })}
+                onAboutClick={() => setLegalModalContent({ title: 'من نحن', content: <AboutContent /> })}
+                onPrivacyClick={() => setLegalModalContent({ title: 'سياسة الخصوصية', content: <PrivacyPolicyContent /> })}
+            />
+        </>
+      )}
+
+      {watchData && (
+          <WatchPage 
+            workshop={watchData.workshop} 
+            recording={watchData.recording} 
+            onBack={() => setWatchData(null)} 
+          />
+      )}
+
+      <RecordingPledgeModal 
+        isOpen={!!pendingWatchData} 
+        onClose={() => setPendingWatchData(null)} 
+        onConfirm={handlePledgeConfirm} 
+        workshop={pendingWatchData?.workshop || null} 
       />
 
       <AuthModal 
@@ -371,7 +379,7 @@ const PublicApp: React.FC = () => {
       {isGiftModalOpen && giftModalIntent && <UnifiedGiftModal workshop={giftModalIntent.workshop} selectedPackage={giftModalIntent.pkg} onClose={() => setIsGiftModalOpen(false)} onProceed={handleGiftProceed} />}
       {isBoutiqueModalOpen && <BoutiqueModal isOpen={isBoutiqueModalOpen} onClose={() => setIsBoutiqueModalOpen(false)} cart={cart} onAddToCart={handleAddToCart} updateCartQuantity={updateCartQuantity} removeFromCart={removeFromCart} onCheckout={handleCheckout} initialView={boutiqueInitialView} />}
       {isProductCheckoutOpen && <ProductCheckoutModal isOpen={isProductCheckoutOpen} onClose={() => setIsProductCheckoutOpen(false)} cart={cart} onConfirm={() => handleProductOrderConfirm(false)} onCardPaymentConfirm={() => handleProductOrderConfirm(true)} onRequestLogin={() => { setIsProductCheckoutOpen(false); handleLoginClick(false); }} currentUser={currentUser} />}
-      {isProfileOpen && <ProfilePage isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={currentUser} onZoomRedirect={(link) => setZoomRedirectLink(link)} onPlayRecording={(w, r) => setWatchData({ workshop: w, recording: r })} onViewAttachment={(note) => setAttachmentToView(note)} onViewRecommendedWorkshop={(id) => { setIsProfileOpen(false); setOpenedWorkshopId(id); }} showToast={showToast} onPayForConsultation={handlePayForConsultation} onViewInvoice={(details) => setInvoiceToView(details)} />}
+      {isProfileOpen && <ProfilePage isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={currentUser} onZoomRedirect={(link) => setZoomRedirectLink(link)} onPlayRecording={(w, r) => { setIsProfileOpen(false); setPendingWatchData({ workshop: w, recording: r }); }} onViewAttachment={(note) => setAttachmentToView(note)} onViewRecommendedWorkshop={(id) => { setIsProfileOpen(false); setOpenedWorkshopId(id); }} showToast={showToast} onPayForConsultation={handlePayForConsultation} onViewInvoice={(details) => setInvoiceToView(details)} />}
       
       {isVideoModalOpen && <VideoModal isOpen={isVideoModalOpen} onClose={() => setIsVideoModalOpen(false)} />}
       {isPhotoAlbumModalOpen && <PhotoAlbumModal isOpen={isPhotoAlbumModalOpen} onClose={() => setIsPhotoAlbumModalOpen(false)} />}
@@ -409,7 +417,6 @@ const PublicApp: React.FC = () => {
                 setTimeout(() => handleScrollToSection('workshops_section'), 100); 
             } 
         }} 
-        // PASS THE UPDATED LOGIC HERE
         hasActiveLiveStream={!!activeLiveWorkshop}
       />}
       {legalModalContent && <LegalModal isOpen={!!legalModalContent} onClose={() => setLegalModalContent(null)} title={legalModalContent.title} content={legalModalContent.content} />}

@@ -79,7 +79,6 @@ const PublicApp: React.FC = () => {
   const [postLoginGiftIntent, setPostLoginGiftIntent] = useState<{ workshop: Workshop, pkg: Package | null } | null>(null);
   
   const [returnToHub, setReturnToHub] = useState(false);
-  // Added 'consultation' to pending actions
   const [pendingHubAction, setPendingHubAction] = useState<'profile' | 'live' | 'consultation' | null>(null);
   
   const initialHubOpenRef = useRef(false);
@@ -100,15 +99,21 @@ const PublicApp: React.FC = () => {
       }
   }, [currentUser, postLoginPaymentIntent, postLoginGiftIntent]);
 
+  // STRICTOR LOGIC: Find the active workshop for the Live Indicator
   const activeLiveWorkshop = useMemo(() => {
-      // Logic: Prefer workshop with a link FIRST to ensure badge appears.
-      const validWorkshops = workshops
-          .filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w));
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
       
-      const withLink = validWorkshops.find(w => !!w.zoomLink);
-      if (withLink) return withLink;
-
-      return validWorkshops.sort((a, b) => new Date(`${a.startDate}T${a.startTime}:00Z`).getTime() - new Date(`${b.startDate}T${b.startTime}:00Z`).getTime())[0];
+      const validWorkshops = workshops.filter(w => w.isVisible && !w.isRecorded && !isWorkshopExpired(w));
+      
+      return validWorkshops.find(w => {
+          // Rule 1: Is today the day of the workshop?
+          const isToday = today >= w.startDate && today <= (w.endDate || w.startDate);
+          // Rule 2: Has the admin explicitly provided a Zoom link?
+          const hasLink = !!w.zoomLink && w.zoomLink.trim() !== "";
+          
+          return isToday || hasLink; // Only return true if one of the two conditions is met
+      }) || null;
   }, [workshops]);
 
   const showToast = (message: string, type: 'success' | 'warning' | 'error' = 'success') => {
@@ -118,7 +123,7 @@ const PublicApp: React.FC = () => {
 
   const handleLoginClick = (hideRegister = false) => {
     setAuthModalInitialView('login');
-    setAuthModalHideRegister(hideRegister); // Sets the state
+    setAuthModalHideRegister(hideRegister);
     setIsAuthModalOpen(true);
   };
 
@@ -129,11 +134,10 @@ const PublicApp: React.FC = () => {
   };
 
   const processLiveStreamAccess = (user: User) => {
-      // Use the same logic to find the priority workshop for redirection
       const nextLiveWorkshop = activeLiveWorkshop;
 
       if (!nextLiveWorkshop) {
-          showToast('لا توجد ورش مباشرة متاحة حالياً', 'warning');
+          showToast('لا توجد ورش مباشرة جارية حالياً', 'warning');
           return;
       }
 
@@ -147,7 +151,7 @@ const PublicApp: React.FC = () => {
           if (nextLiveWorkshop.zoomLink) {
               setZoomRedirectLink(nextLiveWorkshop.zoomLink);
           } else {
-              showToast('رابط البث غير متوفر حالياً، يرجى الانتظار', 'warning');
+              showToast('رابط البث سيظهر هنا قريباً قبل موعد الورشة', 'success');
           }
       } else {
           showToast('يجب الاشتراك في الورشة للوصول إلى البث المباشر', 'warning');
@@ -167,7 +171,7 @@ const PublicApp: React.FC = () => {
           setIsConsultationRequestModalOpen(true);
       } else {
           setPendingHubAction('consultation');
-          handleLoginClick(false); // Allow registration
+          handleLoginClick(false);
       }
   };
 
@@ -246,7 +250,6 @@ const PublicApp: React.FC = () => {
 
   const handleEnrollRequest = (workshop: Workshop, selectedPackage: Package | null) => {
     setOpenedWorkshopId(null);
-    // FIX: Calculate price correctly. Fallback to first package if selectedPackage is null but packages exist (e.g. direct click)
     let effectivePackage = selectedPackage;
     if (!effectivePackage && workshop.packages && workshop.packages.length > 0) {
         effectivePackage = workshop.packages[0];
@@ -361,7 +364,7 @@ const PublicApp: React.FC = () => {
         onClose={handleAuthModalClose} 
         onSuccess={handleAuthModalSuccess} 
         initialView={authModalInitialView}
-        showRegisterView={!authModalHideRegister} // Pass the state here
+        showRegisterView={!authModalHideRegister}
       />
       {openedWorkshopId && <WorkshopDetailsModal workshop={workshops.find(w => w.id === openedWorkshopId)!} onClose={() => setOpenedWorkshopId(null)} onEnrollRequest={handleEnrollRequest} onGiftRequest={handleGiftRequest} showToast={showToast} />}
       {isPaymentModalOpen && paymentModalIntent && <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} onCardPaymentSubmit={() => handlePaymentSubmit('CARD')} onBankPaymentSubmit={() => handlePaymentSubmit('BANK_TRANSFER')} itemTitle={paymentModalIntent.item.title || paymentModalIntent.item.subject} itemPackageName={paymentModalIntent.pkg?.name} amount={paymentModalIntent.amount || 0} currentUser={currentUser} onRequestLogin={() => { setIsPaymentModalOpen(false); handleLoginClick(false); setPostLoginPaymentIntent(paymentModalIntent); }} paymentType={paymentModalIntent.type} />}
@@ -406,7 +409,8 @@ const PublicApp: React.FC = () => {
                 setTimeout(() => handleScrollToSection('workshops_section'), 100); 
             } 
         }} 
-        hasActiveLiveStream={!!activeLiveWorkshop && !!activeLiveWorkshop.zoomLink}
+        // PASS THE UPDATED LOGIC HERE
+        hasActiveLiveStream={!!activeLiveWorkshop}
       />}
       {legalModalContent && <LegalModal isOpen={!!legalModalContent} onClose={() => setLegalModalContent(null)} title={legalModalContent.title} content={legalModalContent.content} />}
       <Chatbot />

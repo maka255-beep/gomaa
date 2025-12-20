@@ -26,7 +26,7 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({ onClick, icon: Icon
             : 'bg-gradient-to-br from-[#1e1b4b] to-[#4c1d95] border-white/10 hover:border-white/30 hover:-translate-y-2 hover:shadow-2xl'
         }`}
     >
-        {/* Live Indicator Badge */}
+        {/* Live Indicator Badge - ONLY shows if isLive is true */}
         {isLive && (
             <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-red-600 text-white text-[9px] font-black px-2 py-1 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.6)] animate-pulse border border-red-400/50 tracking-wider z-10">
                 <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
@@ -34,7 +34,7 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({ onClick, icon: Icon
             </div>
         )}
 
-        {/* Glowing orb effect */}
+        {/* Glowing orb effect - Highlight only for live or hover */}
         <div className={`absolute -top-8 -right-8 w-32 h-32 rounded-full blur-3xl transition-opacity duration-500 ${isLive ? 'bg-white/20 opacity-50' : 'bg-purple-500/20 opacity-0 group-hover:opacity-100'}`}></div>
         
         <div className="relative">

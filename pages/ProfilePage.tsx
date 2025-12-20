@@ -44,10 +44,7 @@ const checkRecordingAccess = (recording: Recording, subscription: Subscription):
   const startDate = startDateString ? new Date(startDateString) : null;
   const endDate = endDateString ? new Date(endDateString) : null;
 
-  // Make sure to compare dates only, ignoring time, by setting hours to 0.
   if (startDate) startDate.setHours(0, 0, 0, 0);
-  
-  // Set end date to the very end of the day.
   if (endDate) endDate.setHours(23, 59, 59, 999);
 
   if (startDate && now < startDate) {
@@ -90,7 +87,6 @@ const AddReviewForm: React.FC<{ workshopId: number; onReviewAdded: () => void }>
       });
       trackEvent('add_review', { workshopId, rating }, currentUser);
       onReviewAdded();
-      // Reset form visually
       setRating(0);
       setComment('');
     }
@@ -147,7 +143,6 @@ const AddReviewForm: React.FC<{ workshopId: number; onReviewAdded: () => void }>
 };
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoomRedirect, onPlayRecording, onViewAttachment, onViewRecommendedWorkshop, showToast, onPayForConsultation, onViewInvoice }) => {
-    // REMOVED updateSubscription from destructuring as it's no longer available in UserContextType
     const { workshops, currentUser: loggedInUser, addReview, consultationRequests, globalCertificateTemplate } = useUser();
     
     const [activeView, setActiveView] = useState<ProfileView>('my_workshops');
@@ -173,15 +168,20 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
             .sort((a,b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
     }, [consultationRequests, user]);
 
+    // CENTRAL LOGIC REPLICATED: Only show high-priority live card if it's the date OR has a link.
     const nextLiveWorkshop = useMemo(() => {
+        const today = new Date().toISOString().split('T')[0];
         const liveSub = subscriptions.find(sub => {
             const w = workshops.find(wk => wk.id === sub.workshopId);
-            return w && !w.isRecorded && !isWorkshopExpired(w);
+            if (!w || w.isRecorded || isWorkshopExpired(w)) return false;
+            
+            const isToday = today >= w.startDate && today <= (w.endDate || w.startDate);
+            const hasLink = !!w.zoomLink;
+            return isToday || hasLink; // Follow "Two cases only" rule
         });
         return liveSub ? workshops.find(w => w.id === liveSub.workshopId) : null;
     }, [subscriptions, workshops]);
 
-    // Auto-expand the first upcoming live workshop
     useEffect(() => {
         if (isOpen && nextLiveWorkshop) {
             setExpandedWorkshopId(nextLiveWorkshop.id);
@@ -189,7 +189,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
     }, [isOpen, nextLiveWorkshop]);
 
     useEffect(() => {
-        // Reset view when modal is opened for a new user
         if (isOpen) {
             setActiveView('my_workshops');
             setRecommendations([]);
@@ -264,7 +263,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
     };
 
     const handleLiveStreamClick = (workshop: Workshop, e?: React.MouseEvent) => {
-        e?.stopPropagation(); // Prevent toggling accordion
+        e?.stopPropagation(); 
         if (workshop.zoomLink) {
             onZoomRedirect(workshop.zoomLink, workshop.id);
         } else {
@@ -313,7 +312,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                 <div className="flex-grow overflow-y-auto p-6 space-y-8">
                     {activeView === 'my_workshops' ? (
                         <>
-                           {/* Hero Section: Next Live Workshop */}
                            {nextLiveWorkshop && (
                                 <div className="mb-6 p-6 bg-gradient-to-r from-purple-900 to-fuchsia-900 rounded-2xl border border-fuchsia-500 shadow-[0_0_30px_rgba(219,39,119,0.3)] relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-500/20 rounded-full blur-3xl -z-10 group-hover:bg-fuchsia-500/30 transition-all duration-700"></div>
@@ -322,7 +320,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                                         <div className="text-center md:text-right">
                                             <div className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-3 animate-pulse shadow-lg">
                                                 <span className="w-2 h-2 bg-white rounded-full"></span>
-                                                بث مباشر قادم
+                                                بث مباشر جاري الآن
                                             </div>
                                             <h3 className="text-2xl font-black text-white mb-2">{nextLiveWorkshop.title}</h3>
                                             <p className="text-fuchsia-200 text-sm mb-4 flex items-center justify-center md:justify-start gap-2">
@@ -342,7 +340,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                                 </div>
                            )}
 
-                           {/* Subscribed Workshops List */}
                            <section>
                                <h3 className="text-base font-bold text-fuchsia-300 mb-4">كل الورش ({subscriptions.length})</h3>
                                <div className="flex flex-col space-y-4">
@@ -372,14 +369,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                                             locationValue = workshop.location;
                                         }
                                         
-                                        const showLiveStreamButton = !isWorkshopExpired(workshop) && (
+                                        // LOGIC UPDATED FOR EACH ROW: Only show if today or if link exists
+                                        const todayStr = new Date().toISOString().split('T')[0];
+                                        const isLiveTime = todayStr >= workshop.startDate && todayStr <= (workshop.endDate || workshop.startDate);
+                                        const hasZoomLink = !!workshop.zoomLink;
+
+                                        const showLiveStreamButton = !isWorkshopExpired(workshop) && (isLiveTime || hasZoomLink) && (
                                             workshop.location === 'أونلاين' || 
                                             (workshop.location === 'أونلاين وحضوري' && sub.attendanceType === 'أونلاين')
                                         );
 
                                        return (
                                            <div key={sub.id} className={`bg-black/20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${isExpanded ? 'border-fuchsia-500/50 shadow-lg shadow-fuchsia-500/10' : 'border-slate-700/50 hover:border-fuchsia-500/30'}`}>
-                                               {/* Header Row */}
                                                <div className="w-full p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:bg-fuchsia-500/10 transition-colors cursor-pointer" onClick={() => setExpandedWorkshopId(isExpanded ? null : workshop.id)}>
                                                    <div className="flex-grow">
                                                        <span className="font-bold text-white text-lg">{workshop.title}</span>
@@ -389,7 +390,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                                                    </div>
                                                    
                                                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                                                        {/* Direct Live Button - Visible when collapsed too! */}
                                                         {showLiveStreamButton && (
                                                             <button 
                                                                 onClick={(e) => handleLiveStreamClick(workshop, e)} 
@@ -532,35 +532,65 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                            
                            {userConsultations.length > 0 && (
                                <section>
-                                   <h3 className="text-base font-bold text-fuchsia-300 mb-4">طلبات الاستشارة ({userConsultations.length})</h3>
+                                   <div className="flex items-center justify-between mb-4">
+                                       <h3 className="text-base font-bold text-fuchsia-300">طلبات الاستشارة ({userConsultations.length})</h3>
+                                       {userConsultations.some(r => r.status === 'APPROVED') && (
+                                           <div className="flex items-center gap-2 bg-fuchsia-500/20 text-fuchsia-300 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                                               <InformationCircleIcon className="w-4 h-4" />
+                                               <span>لديك طلبات بانتظار الدفع</span>
+                                           </div>
+                                       )}
+                                   </div>
                                     <div className="space-y-3">
                                         {userConsultations.map(req => {
                                             const statusClasses: Record<ConsultationRequest['status'], string> = {
-                                                NEW: 'bg-yellow-500/20 text-yellow-300', APPROVED: 'bg-sky-500/20 text-sky-300', PENDING_PAYMENT: 'bg-amber-500/20 text-amber-300', PAID: 'bg-teal-500/20 text-teal-300', COMPLETED: 'bg-green-500/20 text-green-300',
+                                                NEW: 'bg-yellow-500/20 text-yellow-300', APPROVED: 'bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30', PENDING_PAYMENT: 'bg-amber-500/20 text-amber-300', PAID: 'bg-teal-500/20 text-teal-300', COMPLETED: 'bg-green-500/20 text-green-300',
                                             };
                                             const statusNames: Record<ConsultationRequest['status'], string> = {
-                                                NEW: 'جديد', APPROVED: 'بانتظار الدفع', PENDING_PAYMENT: 'بانتظار التأكيد', PAID: 'مدفوع', COMPLETED: 'مكتمل',
+                                                NEW: 'قيد المراجعة', APPROVED: 'بانتظار الدفع', PENDING_PAYMENT: 'بانتظار التأكيد', PAID: 'مدفوع ومؤكد', COMPLETED: 'مكتملة',
                                             };
                                             return (
-                                                <div key={req.id} className="bg-black/20 p-4 rounded-lg border border-slate-700/50">
-                                                    <div className="flex justify-between items-start">
-                                                        <div>
-                                                            <p className="font-bold text-white truncate max-w-sm">موضوع: {req.subject}</p>
-                                                            <p className="text-xs text-slate-400">تاريخ الطلب: {formatArabicDate(req.requestedAt)}</p>
+                                                <div key={req.id} className={`bg-black/20 p-5 rounded-xl border transition-all duration-300 ${req.status === 'APPROVED' ? 'border-fuchsia-500/50 shadow-lg shadow-fuchsia-500/10' : 'border-slate-700/50'}`}>
+                                                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                                                        <div className="flex-grow">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <span className={`px-2 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${statusClasses[req.status]}`}>{statusNames[req.status]}</span>
+                                                                <p className="text-xs text-slate-500">#{req.id.split('-')[1]}</p>
+                                                            </div>
+                                                            <p className="font-bold text-white text-base">موضوع: {req.subject}</p>
+                                                            <p className="text-xs text-slate-400 mt-1">تاريخ الطلب: {formatArabicDate(req.requestedAt)}</p>
                                                         </div>
-                                                        <span className={`px-2 py-1 text-xs font-bold rounded-full ${statusClasses[req.status]}`}>{statusNames[req.status]}</span>
+                                                        
+                                                        {(req.status === 'APPROVED' || req.status === 'PAID') && req.consultationDate && req.consultationTime && (
+                                                            <div className="bg-white/5 p-3 rounded-lg border border-white/5 text-right min-w-[180px]">
+                                                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">الموعد المحدد</p>
+                                                                <div className="flex items-center gap-2 text-white font-bold text-xs">
+                                                                    <CalendarIcon className="w-3.5 h-3.5 text-fuchsia-400" />
+                                                                    <span>{formatArabicDate(req.consultationDate)}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 text-white font-bold text-xs mt-1">
+                                                                    <ClockIcon className="w-3.5 h-3.5 text-fuchsia-400" />
+                                                                    <span>الساعة {formatArabicTime(req.consultationTime)}</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    {(req.status === 'APPROVED' || req.status === 'PAID') && req.consultationDate && req.consultationTime && (
-                                                        <div className="mt-3 pt-3 border-t border-slate-700 text-sm">
-                                                            <p className="font-bold">موعدك المحدد:</p>
-                                                            <p className="text-slate-300">{formatArabicDate(req.consultationDate)} - الساعة {formatArabicTime(req.consultationTime)}</p>
-                                                        </div>
-                                                    )}
+
                                                      {req.status === 'APPROVED' && (
-                                                        <div className="mt-4 text-center">
-                                                            <button onClick={() => onPayForConsultation(req)} className="bg-theme-gradient-btn text-white font-bold py-2 px-6 rounded-lg text-sm">
-                                                                إتمام الدفع (رسوم {req.fee} درهم)
-                                                            </button>
+                                                        <div className="mt-5 pt-4 border-t border-white/5">
+                                                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                                <div className="text-right">
+                                                                    <p className="text-xs text-slate-400">قيمة الاستشارة:</p>
+                                                                    <p className="text-xl font-black text-fuchsia-400">{req.fee} <span className="text-xs font-normal">درهم إماراتي</span></p>
+                                                                </div>
+                                                                <button 
+                                                                    onClick={() => onPayForConsultation(req)} 
+                                                                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-purple-800 to-pink-600 hover:from-purple-700 hover:to-pink-500 text-white font-bold py-3 px-10 rounded-xl shadow-xl transition-all transform hover:scale-105 border border-white/10"
+                                                                >
+                                                                    <CreditCardIcon className="w-5 h-5" />
+                                                                    <span>تأكيد الحجز والدفع الآن</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                      )}
                                                 </div>

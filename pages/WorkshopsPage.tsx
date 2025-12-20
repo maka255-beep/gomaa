@@ -49,17 +49,17 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
   const newWorkshops = filteredAndSearchedWorkshops.filter(w => !w.isRecorded && !isWorkshopExpired(w));
   const recordedWorkshops = filteredAndSearchedWorkshops.filter(w => w.isRecorded);
 
-  // LOGIC UPDATE: Prioritize any workshop with a Zoom Link (Active Live) regardless of date.
-  // If no link exists, fall back to the nearest upcoming unexpired workshop.
+  // LOGIC UPDATE: Only show the LiveStreamCard if today is the day OR there's a link.
   const liveStreamWorkshop = useMemo(() => {
-      // 1. Find a workshop with an active link (Manual Override)
-      const activeLinkWorkshop = visibleWorkshops.find(w => !w.isRecorded && w.zoomLink);
-      if (activeLinkWorkshop) return activeLinkWorkshop;
-
-      // 2. Fallback: Find the nearest upcoming workshop that hasn't expired
+      const today = new Date().toISOString().split('T')[0];
+      
       return visibleWorkshops
         .filter(w => !w.isRecorded && !isWorkshopExpired(w))
-        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0] || null;
+        .find(w => {
+            const isToday = today >= w.startDate && today <= (w.endDate || w.startDate);
+            const hasLink = !!w.zoomLink;
+            return isToday || hasLink;
+        }) || null;
   }, [visibleWorkshops]);
 
   const filters: Array<'all' | 'أونلاين' | 'حضوري' | 'مسجلة' | 'أونلاين وحضوري'> = ['all', 'أونلاين', 'حضوري', 'مسجلة'];
@@ -82,7 +82,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
       <div className="container mx-auto px-4 py-8">
         
         {liveStreamWorkshop && (
-          <div id="live_stream_card">
+          <div id="live_stream_card" className="animate-fade-in">
             <LiveStreamCard 
                 workshopTitle={liveStreamWorkshop.title} 
                 workshopId={liveStreamWorkshop.id}
@@ -96,7 +96,7 @@ const WorkshopsPage: React.FC<WorkshopsPageProps> = ({
           </div>
         )}
         
-        {/* Search and Filter UI - Reverted to White/Light Theme */}
+        {/* Search and Filter UI */}
         <div id="workshops_section" className="my-8 p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/10 relative overflow-hidden">
             <div className="flex flex-col md:flex-row gap-4 relative z-10">
                 <div className="relative flex-grow">

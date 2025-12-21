@@ -4,19 +4,39 @@ import { User, Workshop, DrhopeData, Notification, SubscriptionStatus, Subscript
 import { normalizePhoneNumber } from '../utils';
 import { trackEvent } from '../analytics';
 
-// Initial Mock Data for Workshops - Single workshop set to TODAY for testing
+// Get today's date in YYYY-MM-DD format
+const todayStr = new Date().toISOString().split('T')[0];
+
+// Initial Mock Data for Workshops
 const initialWorkshops: Workshop[] = [
     {
-        id: 12,
-        title: "تخطيط النوايا لعام ٢٠٢٦",
+        id: 15,
+        title: "جلسة مباشرة: فن التعامل مع النوايا",
         instructor: "د. أمل العتيبي",
-        startDate: new Date().toISOString().split('T')[0], // SET TO TODAY
+        startDate: todayStr, // TODAY
         startTime: "20:00",
         location: "أونلاين",
         application: "Zoom",
         country: "الإمارات",
         isRecorded: false,
-        zoomLink: "", // Leave empty to test "Today but no link" messages
+        zoomLink: "https://zoom.us/j/123456789", // ACTIVATES THE LIVE CARD
+        description: "جلسة تفاعلية مباشرة للإجابة على استفساراتكم حول تطبيق النوايا في الحياة اليومية.",
+        topics: ["تجاوز العوائق الذهنية", "الاستمرارية في السعي", "تجليات النوايا"],
+        isVisible: true,
+        price: 150,
+        packages: [{ id: 1501, name: "حضور البث المباشر", price: 150, features: ["رابط حضور مباشر", "تسجيل متاح لمدة 48 ساعة"] }]
+    },
+    {
+        id: 12,
+        title: "تخطيط النوايا لعام ٢٠٢٦",
+        instructor: "د. أمل العتيبي",
+        startDate: "2026-01-01",
+        startTime: "20:00",
+        location: "أونلاين",
+        application: "Zoom",
+        country: "الإمارات",
+        isRecorded: false,
+        zoomLink: "", 
         description: "ورشة عمل تفاعلية لوضع حجر الأساس لعامك القادم. سنتعلم كيفية صياغة النوايا بذكاء، وتجاوز عقبات الماضي، ورسم خارطة طريق واضحة لتحقيق التوازن والنجاح في مختلف جوانب الحياة.",
         topics: ["مراجعة إنجازات العام الماضي", "تقنيات صياغة الأهداف الذكية", "التوازن بين الجوانب الروحية والمادية", "جلسة تأمل واستقبال النوايا"],
         isVisible: true,
@@ -70,11 +90,11 @@ const initialPartners: Partner[] = [
 ];
 
 const defaultThemeData: ThemeColors = {
-    background: { from: '#2e1065', to: '#4a044e', balance: 60 },
+    background: { from: '#1a0b2e', to: '#0f051a', balance: 50 },
     button: { from: '#7c3aed', to: '#db2777', balance: 50 },
-    card: { from: 'rgba(46, 16, 101, 0.6)', to: 'rgba(88, 28, 135, 0.4)', balance: 50 },
-    text: { primary: '#e2e8f0', accent: '#e879f9' },
-    glow: { color: '#d946ef', intensity: 50 },
+    card: { from: 'rgba(26, 11, 46, 0.8)', to: 'rgba(15, 5, 26, 0.6)', balance: 50 },
+    text: { primary: '#f8fafc', accent: '#d4af37' },
+    glow: { color: '#d4af37', intensity: 40 },
 };
 
 const initialDrhopeData: DrhopeData = {
@@ -97,7 +117,6 @@ const initialDrhopeData: DrhopeData = {
     recordedWorkshopTerms: "شروط المحتوى المسجل..."
 };
 
-// PRE-DEFINED TEST USER - Subscribed to active workshop ID 12 for testing purposes
 const testUser: User = {
     id: 999,
     fullName: "مستخدم تجريبي",
@@ -106,22 +125,22 @@ const testUser: User = {
     isDeleted: false,
     subscriptions: [
         {
+            id: "sub-test-0",
+            workshopId: 15, // SUBSCRIBED TO THE NEW LIVE WORKSHOP
+            status: SubscriptionStatus.ACTIVE,
+            isApproved: true,
+            activationDate: new Date().toISOString(),
+            expiryDate: "2030-01-01",
+            pricePaid: 150
+        },
+        {
             id: "sub-test-1",
-            workshopId: 12, // Subscribed to the "Today" workshop (No link)
+            workshopId: 12, 
             status: SubscriptionStatus.ACTIVE,
             isApproved: true,
             activationDate: new Date().toISOString(),
             expiryDate: "2030-01-01",
             pricePaid: 350
-        },
-        {
-            id: "sub-test-2",
-            workshopId: 3, // "التربية الإيجابية"
-            status: SubscriptionStatus.ACTIVE,
-            isApproved: true,
-            activationDate: new Date().toISOString(),
-            expiryDate: "2030-01-01",
-            pricePaid: 299
         }
     ],
     orders: [],
@@ -175,10 +194,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const saved = localStorage.getItem('nawaya_workshops');
             if (!saved) return initialWorkshops;
             const parsed: Workshop[] = JSON.parse(saved);
-            // Check if our test workshop is present and set to today
-            const today = new Date().toISOString().split('T')[0];
-            if (!parsed.some(w => w.id === 12 && w.startDate === today)) return initialWorkshops;
-            return parsed;
+            return parsed.length > 0 ? parsed : initialWorkshops;
         } catch(e) { return initialWorkshops; }
     });
 
@@ -186,7 +202,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const saved = localStorage.getItem('nawaya_users');
             const parsed = saved ? JSON.parse(saved) : [];
-            // Ensure test user is always there with correct subscription for current testing
             if (parsed.length === 0 || !parsed.find((u: any) => u.id === 999)) return [testUser];
             return parsed;
         } catch(e) { return [testUser]; }

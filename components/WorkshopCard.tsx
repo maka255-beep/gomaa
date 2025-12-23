@@ -85,7 +85,10 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({ workshop, user, onEnroll, o
               </div>
               <div className="flex items-start gap-x-3">
                 <ClockIcon className={`w-4 h-4 sm:w-5 sm:h-5 ${iconColorClass} flex-shrink-0 mt-0.5`} />
-                <span className="font-medium leading-tight">{formatArabicTime(workshop.startTime)}{workshop.endTime ? ` - ${formatArabicTime(workshop.endTime)}` : ''}</span>
+                <span className="font-medium leading-tight">
+                    {formatArabicTime(workshop.startTime)}{workshop.endTime ? ` - ${formatArabicTime(workshop.endTime)}` : ''}
+                    <span className="text-[10px] text-[#db2777] block mt-1 font-bold">(بتوقيت دولة الإمارات العربية المتحدة)</span>
+                </span>
               </div>
             </>
           )}

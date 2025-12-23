@@ -10,16 +10,88 @@ const todayStr = new Date().toISOString().split('T')[0];
 // Initial Mock Data for Workshops
 const initialWorkshops: Workshop[] = [
     {
+        id: 25,
+        title: "ورشة القوة الداخلية والاتزان النفسي",
+        instructor: "د. أمل العتيبي",
+        startDate: "2025-09-15",
+        endDate: "2025-09-16",
+        startTime: "16:00",
+        endTime: "21:00",
+        location: "حضوري",
+        city: "الشارقة",
+        country: "الإمارات",
+        hotelName: "فندق راديسون بلو الشارقة",
+        hallName: "قاعة المباركية",
+        isRecorded: false,
+        zoomLink: "",
+        description: "رحلة حضورية لاستكشاف مكامن القوة بداخلنا وكيفية تحقيق التوازن بين متطلبات الحياة وهدوء النفس، من خلال تمارين عملية وجلسات تأمل جماعية.",
+        topics: ["مفهوم الاتزان الداخلي", "تقنيات التحرر من التوتر", "بناء المرونة النفسية", "جلسة تشافٍ جماعية"],
+        isVisible: true,
+        price: 1100,
+        packages: [
+            { id: 2501, name: "حضور المقعد العادي", price: 1100, features: ["حضور يومي الورشة", "مذكرة التمارين مطبوعة", "شهادة حضور", "ضيافة خفيفة"] },
+            { id: 2502, name: "باقة الـ VIP", price: 1650, features: ["جلوس في الصف الأول", "جلسة استشارية قصيرة", "مجموعة أحجار كريمة طاقية", "كل مميزات الباقة العادية"] }
+        ]
+    },
+    {
+        id: 21,
+        title: "ورشة فن الإلقاء والتأثير",
+        instructor: "د. أمل العتيبي",
+        startDate: "2025-12-10",
+        endDate: "2025-12-11",
+        startTime: "10:00",
+        endTime: "15:00",
+        location: "حضوري",
+        city: "دبي",
+        country: "الإمارات",
+        hotelName: "فندق ريتز كارلتون",
+        hallName: "قاعة اللؤلؤة",
+        isRecorded: false,
+        zoomLink: "",
+        description: "ورشة تدريبية عملية تركز على تطوير مهارات الخطابة، لغة الجسد، وكيفية التأثير في الجمهور وبناء الكاريزما الشخصية.",
+        topics: ["كسر حاجز الخوف", "هيكلة الخطاب المؤثر", "أسرار لغة الجسد", "التعامل مع الأسئلة الصعبة"],
+        isVisible: true,
+        price: 1500,
+        packages: [
+            { id: 2101, name: "المقعد الأساسي", price: 1500, features: ["حضور يومي الورشة", "المادة العلمية الرقمية", "شهادة حضور معتمدة", "استراحة قهوة"] },
+            { id: 2102, name: "المقعد الماسي", price: 2200, features: ["جلوس في الصفوف الأولى", "تحليل شخصي لأسلوب الإلقاء", "شهادة فاخرة مطبوعة", "غداء VIP مع المدربة"] }
+        ]
+    },
+    {
+        id: 20,
+        title: "ورشة الذكاء العاطفي في القيادة",
+        instructor: "د. أمل العتيبي",
+        startDate: "2025-11-15",
+        endDate: "2025-11-16",
+        startTime: "09:00",
+        endTime: "14:00",
+        location: "حضوري",
+        city: "أبوظبي",
+        country: "الإمارات",
+        hotelName: "فندق قصر الإمارات",
+        hallName: "قاعة الراية",
+        isRecorded: false,
+        zoomLink: "",
+        description: "دورة تدريبية مكثفة حضورياً تهدف إلى تمكين القادة والمديرين من استخدام مهارات الذكاء العاطفي لتحسين الأداء المؤسسي وبناء فرق عمل متناغمة.",
+        topics: ["مكونات الذكاء العاطفي الخمسة", "إدارة الضغوط في بيئة العمل", "فن التحفيز الذاتي والآخرين", "بناء العلاقات المهنية العميقة"],
+        isVisible: true,
+        price: 1200,
+        packages: [
+            { id: 2001, name: "المقعد العام", price: 1200, features: ["حضور يومي الورشة", "الحقيبة التدريبية مطبوعة", "شهادة حضور معتمدة", "استراحة قهوة وغداء"] },
+            { id: 2002, name: "مقعد VIP", price: 1850, features: ["جلوس في الصفوف الأمامية", "جلسة استشارية خاصة 15 دقيقة", "نسخة موقعة من كتاب دكتور هوب", "كل مميزات المقعد العام"] }
+        ]
+    },
+    {
         id: 15,
         title: "جلسة مباشرة: فن التعامل مع النوايا",
         instructor: "د. أمل العتيبي",
-        startDate: todayStr, // TODAY
+        startDate: todayStr,
         startTime: "20:00",
         location: "أونلاين",
         application: "Zoom",
         country: "الإمارات",
         isRecorded: false,
-        zoomLink: "https://zoom.us/j/123456789", // ACTIVATES THE LIVE CARD
+        zoomLink: "https://zoom.us/j/123456789",
         description: "جلسة تفاعلية مباشرة للإجابة على استفساراتكم حول تطبيق النوايا في الحياة اليومية.",
         topics: ["تجاوز العوائق الذهنية", "الاستمرارية في السعي", "تجليات النوايا"],
         isVisible: true,
@@ -126,12 +198,21 @@ const testUser: User = {
     subscriptions: [
         {
             id: "sub-test-0",
-            workshopId: 15, // SUBSCRIBED TO THE NEW LIVE WORKSHOP
+            workshopId: 15, // LIVE
             status: SubscriptionStatus.ACTIVE,
             isApproved: true,
             activationDate: new Date().toISOString(),
             expiryDate: "2030-01-01",
             pricePaid: 150
+        },
+        {
+            id: "sub-test-recorded",
+            workshopId: 3, // RECORDED WORKSHOP (Positive Parenting)
+            status: SubscriptionStatus.ACTIVE,
+            isApproved: true,
+            activationDate: new Date().toISOString(),
+            expiryDate: "2030-01-01",
+            pricePaid: 299
         },
         {
             id: "sub-test-1",

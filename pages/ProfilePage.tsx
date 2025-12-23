@@ -323,10 +323,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                                                 بث مباشر جاري الآن
                                             </div>
                                             <h3 className="text-2xl font-black text-white mb-2">{nextLiveWorkshop.title}</h3>
-                                            <p className="text-fuchsia-200 text-sm mb-4 flex items-center justify-center md:justify-start gap-2">
-                                                <CalendarIcon className="w-4 h-4"/>
-                                                {formatArabicDate(nextLiveWorkshop.startDate)} - {formatArabicTime(nextLiveWorkshop.startTime)}
-                                            </p>
+                                            <div className="space-y-1">
+                                                <p className="text-fuchsia-200 text-sm flex items-center justify-center md:justify-start gap-2">
+                                                    <CalendarIcon className="w-4 h-4"/>
+                                                    {formatArabicDate(nextLiveWorkshop.startDate)} - {formatArabicTime(nextLiveWorkshop.startTime)}
+                                                </p>
+                                                <p className="text-fuchsia-300 text-xs font-bold mr-6">(بتوقيت دولة الإمارات العربية المتحدة)</p>
+                                            </div>
                                         </div>
                                         
                                         <button 
@@ -417,7 +420,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                                                                 {!workshop.isRecorded && dateValue && (
                                                                     <div className="flex items-center justify-start gap-x-3">
                                                                         <CalendarIcon className="w-5 h-5 text-fuchsia-400 flex-shrink-0"/>
-                                                                        <p className="font-semibold text-white">{dateValue}</p>
+                                                                        <div>
+                                                                            <p className="font-semibold text-white">{dateValue}</p>
+                                                                            <p className="text-[10px] text-fuchsia-300 font-bold mt-0.5">(بتوقيت دولة الإمارات العربية المتحدة)</p>
+                                                                        </div>
                                                                     </div>
                                                                 )}
                                                                 <div className="flex items-center justify-start gap-x-3">
@@ -656,8 +662,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ isOpen, onClose, user, onZoom
                         <div className="p-8 space-y-4">
                             <InformationCircleIcon className="w-16 h-16 mx-auto text-theme-secondary-accent"/>
                             <h3 className="text-xl font-bold text-white">رابط البث المباشر سيظهر هنا قريباً</h3>
-                            <p className="text-sm text-slate-300">
-                                سيتم تفعيل رابط البث قبل موعد الورشة المحدد في {formatArabicDate(comingSoonModalWorkshop.startDate)} الساعة {formatArabicTime(comingSoonModalWorkshop.startTime)}.
+                            <p className="text-sm text-slate-300 leading-relaxed">
+                                سيتم تفعيل رابط البث قبل موعد الورشة المحدد في {formatArabicDate(comingSoonModalWorkshop.startDate)} الساعة {formatArabicTime(comingSoonModalWorkshop.startTime)} <span className="font-bold text-sky-400">(بتوقيت دولة الإمارات العربية المتحدة)</span>.
                             </p>
                             <button onClick={() => setComingSoonModalWorkshop(null)} className="mt-4 bg-sky-600 hover:bg-sky-500 text-white font-bold py-2 px-6 rounded-lg text-sm">
                                 حسناً
